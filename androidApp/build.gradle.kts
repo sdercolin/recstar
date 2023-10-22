@@ -10,6 +10,8 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation(project(":shared"))
+                implementation("androidx.activity:activity-ktx:1.8.0")
+                implementation("androidx.fragment:fragment-ktx:1.6.1")
             }
         }
     }

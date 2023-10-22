@@ -7,11 +7,17 @@ import androidx.appcompat.app.AppCompatActivity
 import io.Paths
 
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Paths.initializeAppRootPath(filesDir.absolutePath)
         setContent {
             MainView()
         }
+        initializeApp()
+    }
+
+
+    private fun initializeApp() {
+        Paths.initializeContext(this)
     }
 }

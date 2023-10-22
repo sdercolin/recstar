@@ -32,3 +32,5 @@ actual class File actual constructor(path: String) {
 
     actual fun resolve(path: String): File = File(internalFile.resolve(path))
 }
+
+fun String.toFile(): File = File(this)

@@ -1,5 +1,6 @@
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -12,33 +13,45 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import io.Paths
 
-private const val TEST_FILE_PATH = "test.txt"
 private const val TEST_FILE_CONTENT = "aAあア亜啊🍣"
-private val testFile get() = Paths.appRoot.resolve(TEST_FILE_PATH)
+private val testExternalFile get() = Paths.contentRoot.resolve("test-external.txt")
+private val testInternalFile get() = Paths.appRoot.resolve("test-internal.txt")
 
 @Composable
 fun App() {
     remember { ensurePaths() }
     MaterialTheme {
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            var fileExists by remember { mutableStateOf(false) }
-            var fileContent by remember { mutableStateOf("") }
-            var fileAbsolutePath by remember { mutableStateOf("") }
-            Button(onClick = {
-                testFile.writeText(TEST_FILE_CONTENT)
-                fileExists = testFile.exists()
-                fileAbsolutePath = testFile.absolutePath
-            }) {
-                Text("Write to file")
+        Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+            listOf(
+                "internal" to testInternalFile,
+                "external" to testExternalFile
+            ).forEach { (type, file) ->
+                Column(
+                    Modifier.weight(1f).fillMaxHeight(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    var fileExists by remember { mutableStateOf(file.exists()) }
+                    var fileContent by remember { mutableStateOf("") }
+                    var fileAbsolutePath by remember {
+                        mutableStateOf(if (file.exists()) file.absolutePath else "")
+                    }
+                    Button(onClick = {
+                        file.writeText(TEST_FILE_CONTENT)
+                        fileExists = file.exists()
+                        fileAbsolutePath = file.absolutePath
+                    }) {
+                        Text("Write to $type file")
+                    }
+                    Button(onClick = {
+                        fileContent = file.readText()
+                    }) {
+                        Text("Read from $type file")
+                    }
+                    Text("$type file exists: $fileExists")
+                    Text("$type file content: $fileContent")
+                    Text("$type file absolute path: $fileAbsolutePath")
+                }
             }
-            Button(onClick = {
-                fileContent = testFile.readText()
-            }) {
-                Text("Read from file")
-            }
-            Text("File exists: $fileExists")
-            Text("File content: $fileContent")
-            Text("File absolute path: $fileAbsolutePath")
         }
     }
 }
@@ -46,7 +59,7 @@ fun App() {
 expect fun getPlatformName(): String
 
 fun ensurePaths() {
-    listOf(Paths.appRoot).forEach {
+    listOf(Paths.appRoot, Paths.contentRoot).forEach {
         if (!it.exists()) {
             it.mkdirs()
         }
