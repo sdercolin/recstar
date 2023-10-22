@@ -1,5 +1,3 @@
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
@@ -12,30 +10,45 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.painterResource
+import io.Paths
 
-@OptIn(ExperimentalResourceApi::class)
+private const val TEST_FILE_PATH = "test.txt"
+private const val TEST_FILE_CONTENT = "aAあア亜啊🍣"
+private val testFile get() = Paths.appRoot.resolve(TEST_FILE_PATH)
+
 @Composable
 fun App() {
+    remember { ensurePaths() }
     MaterialTheme {
-        var greetingText by remember { mutableStateOf("Hello, World!") }
-        var showImage by remember { mutableStateOf(false) }
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            var fileExists by remember { mutableStateOf(false) }
+            var fileContent by remember { mutableStateOf("") }
+            var fileAbsolutePath by remember { mutableStateOf("") }
             Button(onClick = {
-                greetingText = "Hello, ${getPlatformName()}"
-                showImage = !showImage
+                testFile.writeText(TEST_FILE_CONTENT)
+                fileExists = testFile.exists()
+                fileAbsolutePath = testFile.absolutePath
             }) {
-                Text(greetingText)
+                Text("Write to file")
             }
-            AnimatedVisibility(showImage) {
-                Image(
-                    painterResource("compose-multiplatform.xml"),
-                    contentDescription = "Compose Multiplatform icon"
-                )
+            Button(onClick = {
+                fileContent = testFile.readText()
+            }) {
+                Text("Read from file")
             }
+            Text("File exists: $fileExists")
+            Text("File content: $fileContent")
+            Text("File absolute path: $fileAbsolutePath")
         }
     }
 }
 
 expect fun getPlatformName(): String
+
+fun ensurePaths() {
+    listOf(Paths.appRoot).forEach {
+        if (!it.exists()) {
+            it.mkdirs()
+        }
+    }
+}

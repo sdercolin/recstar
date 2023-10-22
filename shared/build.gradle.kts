@@ -28,9 +28,14 @@ kotlin {
                 implementation(compose.material)
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
+                implementation("org.jetbrains.kotlinx:kotlinx-io-core:0.3.0")
             }
         }
+        val sharedJvmMain by creating {
+            dependsOn(commonMain)
+        }
         val androidMain by getting {
+            dependsOn(sharedJvmMain)
             dependencies {
                 api("androidx.activity:activity-compose:1.7.2")
                 api("androidx.appcompat:appcompat:1.6.1")
@@ -47,6 +52,7 @@ kotlin {
             iosSimulatorArm64Main.dependsOn(this)
         }
         val desktopMain by getting {
+            dependsOn(sharedJvmMain)
             dependencies {
                 implementation(compose.desktop.common)
             }
