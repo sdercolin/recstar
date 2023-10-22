@@ -1,4 +1,4 @@
-package com.myapplication
+package com.sdercolin.recstar
 
 import MainView
 import android.os.Bundle
