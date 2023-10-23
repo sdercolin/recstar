@@ -2,6 +2,7 @@ package io
 
 import android.content.Context
 import util.JavaFile
+import util.toJavaFile
 import java.lang.ref.WeakReference
 
 actual object Paths {
@@ -11,6 +12,7 @@ actual object Paths {
 
     private lateinit var contentRootFile: JavaFile
     private lateinit var contextRef: WeakReference<Context>
+
     private val context: Context
         get() = contextRef.get() ?: error("Context not initialized")
 

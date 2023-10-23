@@ -50,5 +50,9 @@
     <true/>
     <key>LSSupportsOpeningDocumentsInPlace</key>
     <true/>
+    <key>NSDocumentsDirectory</key>
+    <string>Read/Write access to app’s shared documents directory</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>We need access to the microphone for recording purposes.</string>
 </dict>
 </plist>

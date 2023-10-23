@@ -28,6 +28,7 @@ kotlin {
         ).forEach { iosTarget ->
             iosTarget.binaries.framework {
                 baseName = "shared"
+                linkerOpts("-framework", "AVFoundation")
                 isStatic = true
             }
         }
@@ -41,7 +42,9 @@ kotlin {
                 implementation(compose.material)
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-io-core:0.3.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
             }
         }
         val sharedJvmMain by creating {

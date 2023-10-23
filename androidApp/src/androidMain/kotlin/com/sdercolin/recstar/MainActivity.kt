@@ -10,14 +10,16 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        initializeApp()
         setContent {
             MainView()
         }
-        initializeApp()
     }
 
 
     private fun initializeApp() {
         Paths.initializeContext(this)
     }
+
+
 }

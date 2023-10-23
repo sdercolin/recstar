@@ -9,6 +9,7 @@ import kotlinx.cinterop.ptr
 import kotlinx.cinterop.value
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSString
+import platform.Foundation.NSURL
 import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.create
 import platform.Foundation.stringByAppendingPathComponent
@@ -86,4 +87,6 @@ actual class File actual constructor(private val path: String) {
             File(resolvedPath)
         }
     }
+
+    fun toNSURL() = NSURL.fileURLWithPath(this.absolutePath)
 }
