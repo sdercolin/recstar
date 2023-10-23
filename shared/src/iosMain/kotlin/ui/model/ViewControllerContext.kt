@@ -18,7 +18,7 @@ class ViewControllerContext(private val uiViewController: UIViewController) : Ap
         val folderURL = folder.toNSURL()
         val documentPicker = UIDocumentPickerViewController(
             documentTypes = listOf("public.folder"),
-            inMode = UIDocumentPickerMode.UIDocumentPickerModeOpen
+            inMode = UIDocumentPickerMode.UIDocumentPickerModeOpen,
         ).apply {
             directoryURL = folderURL
         }

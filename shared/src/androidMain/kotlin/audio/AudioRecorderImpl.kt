@@ -73,7 +73,7 @@ class AudioRecorderImpl(
 
 actual class AudioRecorderProvider(
     private val listener: AudioRecorder.Listener,
-    private val context: AndroidContext
+    private val context: AndroidContext,
 ) {
     actual constructor(
         listener: AudioRecorder.Listener,

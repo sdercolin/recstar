@@ -44,7 +44,7 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
                     AVNumberOfChannelsKey to 1,
                     AVLinearPCMBitDepthKey to 16,
                     AVLinearPCMIsBigEndianKey to false,
-                    AVLinearPCMIsFloatKey to false
+                    AVLinearPCMIsFloatKey to false,
                 )
                 val url = output.toNSURL()
                 Log.i("AudioRecorderImpl.start: url: $url")

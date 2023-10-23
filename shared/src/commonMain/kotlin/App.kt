@@ -8,13 +8,12 @@ import ui.model.AppContext
 import ui.model.LocalAppContext
 import util.Log
 
-
 @Composable
 fun App(context: AppContext) {
     CompositionLocalProvider(LocalAppContext provides context) {
         remember { ensurePaths() }
         MaterialTheme {
-            //FileSystemDemo()
+            // FileSystemDemo()
             RecorderDemo()
         }
     }

@@ -43,7 +43,7 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
                 AudioSystem.write(
                     AudioInputStream(line),
                     AudioFileFormat.Type.WAVE,
-                    output.toJavaFile()
+                    output.toJavaFile(),
                 )
             }
         }

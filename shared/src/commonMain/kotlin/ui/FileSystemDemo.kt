@@ -23,11 +23,11 @@ fun FileSystemDemo() {
     Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         listOf(
             "internal" to testInternalFile,
-            "external" to testExternalFile
+            "external" to testExternalFile,
         ).forEach { (type, file) ->
             Column(
                 Modifier.weight(1f).fillMaxHeight(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 var fileExists by remember { mutableStateOf(file.exists()) }
                 var fileContent by remember { mutableStateOf("") }
@@ -38,12 +38,12 @@ fun FileSystemDemo() {
                     file.writeText(TEST_FILE_CONTENT)
                     fileExists = file.exists()
                     fileAbsolutePath = file.absolutePath
-                }) {
+                },) {
                     Text("Write to $type file")
                 }
                 Button(onClick = {
                     fileContent = file.readText()
-                }) {
+                },) {
                     Text("Read from $type file")
                 }
                 Text("$type file exists: $fileExists")

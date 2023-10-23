@@ -71,7 +71,7 @@ fun RecorderDemo() {
                         isRequestedRecording = nextRequestedRecording
                         recorder.stop()
                     }
-                }
+                },
             ) {
                 Text(text = if (isRecording) "Stop recording" else "Start recording")
             }

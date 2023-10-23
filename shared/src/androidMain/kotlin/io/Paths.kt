@@ -2,7 +2,6 @@ package io
 
 import android.content.Context
 import util.JavaFile
-import util.toJavaFile
 import java.lang.ref.WeakReference
 
 actual object Paths {
@@ -21,4 +20,3 @@ actual object Paths {
         contentRootFile = context.getExternalFilesDir(null) ?: context.filesDir
     }
 }
-

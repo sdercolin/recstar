@@ -7,6 +7,7 @@ fun main() = application {
     remember {
         Log.initialize(enableSystemOut = true)
     }
+
     Window(onCloseRequest = ::exitApplication) {
         MainView()
     }

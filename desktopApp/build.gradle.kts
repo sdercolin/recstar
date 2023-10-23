@@ -32,7 +32,7 @@ compose.desktop {
                 "jdk.charsets",
                 "jdk.unsupported",
                 "jdk.accessibility",
-                "java.naming"
+                "java.naming",
             )
             macOS {
                 bundleID = "com.sdercolin.recstar"

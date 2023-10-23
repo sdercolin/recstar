@@ -25,7 +25,7 @@ class AndroidContext(private val contextRef: WeakReference<android.content.Conte
         }
         val permission = ContextCompat.checkSelfPermission(
             context,
-            Manifest.permission.RECORD_AUDIO
+            Manifest.permission.RECORD_AUDIO,
         )
         return if (permission == PackageManager.PERMISSION_GRANTED) {
             true
@@ -33,7 +33,7 @@ class AndroidContext(private val contextRef: WeakReference<android.content.Conte
             ActivityCompat.requestPermissions(
                 context,
                 arrayOf(Manifest.permission.RECORD_AUDIO),
-                REQUEST_RECORD_AUDIO_PERMISSION
+                REQUEST_RECORD_AUDIO_PERMISSION,
             )
             false
         }
