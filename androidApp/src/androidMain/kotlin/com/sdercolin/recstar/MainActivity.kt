@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import io.Paths
+import util.Log
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,10 +17,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     private fun initializeApp() {
+        Log.initialize()
         Paths.initializeContext(this)
     }
-
-
 }

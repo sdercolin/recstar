@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ui.model.AndroidContext
 import ui.model.AppContext
+import util.Log
 
 class AudioRecorderImpl(
     private val listener: AudioRecorder.Listener,
@@ -25,7 +26,7 @@ class AudioRecorderImpl(
     override fun start(output: File) {
         val nativeContext = context.getAndroidNativeContext() ?: return
         if (job?.isActive == true) {
-            println("AudioRecorderImpl.start: already started")
+            Log.w("AudioRecorderImpl.start: already started")
             return
         }
         job = coroutineScope.launch(Dispatchers.IO) {
@@ -37,7 +38,7 @@ class AudioRecorderImpl(
                 @Suppress("DEPRECATION")
                 MediaRecorder()
             }
-            println("AudioRecorderImpl.start: path: ${output.absolutePath}")
+            Log.i("AudioRecorderImpl.start: path: ${output.absolutePath}")
             this@AudioRecorderImpl.recorder = recorder.apply {
                 setAudioSource(MediaRecorder.AudioSource.MIC)
                 setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
@@ -60,7 +61,7 @@ class AudioRecorderImpl(
             recorder?.stop()
             recorder?.release()
             recorder = null
-            println("AudioRecorderImpl.stop: stopped")
+            Log.i("AudioRecorderImpl.stop: stopped")
             withContext(Dispatchers.Main) {
                 listener.onStopped()
             }

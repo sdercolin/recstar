@@ -6,6 +6,7 @@ import io.Paths
 import ui.RecorderDemo
 import ui.model.AppContext
 import ui.model.LocalAppContext
+import util.Log
 
 
 @Composable
@@ -23,11 +24,11 @@ expect fun getPlatformName(): String
 
 fun ensurePaths() {
     listOf(Paths.appRoot, Paths.contentRoot).forEach {
-        println("ensurePaths: ${it.absolutePath}")
+        Log.i("ensurePaths: ${it.absolutePath}")
         if (!it.exists()) {
-            println("not exists, creating...")
+            Log.i("not exists, creating...")
             val created = it.mkdirs()
-            println("created: $created")
+            Log.i("created: $created")
         }
     }
 }

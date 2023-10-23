@@ -19,6 +19,7 @@ import platform.AVFAudio.AVSampleRateKey
 import platform.AVFAudio.setActive
 import platform.CoreAudioTypes.kAudioFormatLinearPCM
 import ui.model.AppContext
+import util.Log
 import util.withNSError
 import util.withNSErrorCatching
 
@@ -32,7 +33,7 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
 
     override fun start(output: io.File) {
         if (job?.isActive == true) {
-            println("AudioRecorderImpl.start: already started")
+            Log.w("AudioRecorderImpl.start: already started")
             return
         }
         job = scope.launch {
@@ -46,7 +47,7 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
                     AVLinearPCMIsFloatKey to false
                 )
                 val url = output.toNSURL()
-                println("AudioRecorderImpl.start: url: $url")
+                Log.i("AudioRecorderImpl.start: url: $url")
                 recorder = AVAudioRecorder(url, settings, e)
                 recorder?.record()
                 withContext(Dispatchers.Default) {
@@ -64,9 +65,9 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
             withNSErrorCatching { e ->
                 AVAudioSession.sharedInstance().setActive(false, e)
             }.onFailure {
-                println("Failed to free AVAudioSession: $it")
+                Log.e("Failed to free AVAudioSession", it)
             }
-            println("AudioRecorderImpl.stop: stopped")
+            Log.i("AudioRecorderImpl.stop: stopped")
             withContext(Dispatchers.Main) {
                 listener.onStopped()
             }

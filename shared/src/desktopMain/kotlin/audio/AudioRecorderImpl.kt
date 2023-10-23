@@ -9,6 +9,7 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ui.model.AppContext
+import util.Log
 import util.toJavaFile
 import javax.sound.sampled.AudioFileFormat
 import javax.sound.sampled.AudioFormat
@@ -25,7 +26,7 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
 
     override fun start(output: File) {
         if (job?.isActive == true) {
-            println("AudioRecorderImpl.start: already started")
+            Log.w("AudioRecorderImpl.start: already started")
             return
         }
         job = scope.launch {
@@ -36,7 +37,7 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
                 open(format)
                 start()
             }
-            println("AudioRecorderImpl.start: path: ${output.absolutePath}")
+            Log.i("AudioRecorderImpl.start: path: ${output.absolutePath}")
             listener.onStarted()
             withContext(Dispatchers.IO) {
                 AudioSystem.write(
@@ -55,7 +56,7 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
             line?.close()
             job?.cancelAndJoin()
             line = null
-            println("AudioRecorderImpl.stop: stopped")
+            Log.i("AudioRecorderImpl.stop: stopped")
             withContext(Dispatchers.Default) {
                 listener.onStopped()
             }
