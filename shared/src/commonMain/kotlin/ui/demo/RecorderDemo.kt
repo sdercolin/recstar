@@ -1,4 +1,4 @@
-package ui
+package ui.demo
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

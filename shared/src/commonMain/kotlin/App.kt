@@ -3,7 +3,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import io.Paths
-import ui.RecorderDemo
+import ui.demo.OrientationDemo
 import ui.model.AppContext
 import ui.model.LocalAppContext
 import util.Log
@@ -13,8 +13,7 @@ fun App(context: AppContext) {
     CompositionLocalProvider(LocalAppContext provides context) {
         remember { ensurePaths() }
         MaterialTheme {
-            // FileSystemDemo()
-            RecorderDemo()
+            OrientationDemo()
         }
     }
 }
