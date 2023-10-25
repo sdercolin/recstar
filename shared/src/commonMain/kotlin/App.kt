@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
@@ -37,6 +38,12 @@ fun App(context: AppContext) {
         MaterialTheme {
             Surface {
                 Navigator(DemoShowcaseScreen) { navigator ->
+                    LaunchedEffect(navigator, context) {
+                        context.navigationPopEvent.collect {
+                            Log.d("Received navigationPopEvent")
+                            navigator.pop()
+                        }
+                    }
                     Scaffold(
                         topBar = {
                             TopAppBar(

@@ -2,6 +2,7 @@ package ui.model
 
 import io.File
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import platform.AVFoundation.AVAuthorizationStatusAuthorized
 import platform.AVFoundation.AVAuthorizationStatusDenied
 import platform.AVFoundation.AVAuthorizationStatusNotDetermined
@@ -49,6 +50,13 @@ class ViewControllerContext(
         }
 
         return authStatus == AVAuthorizationStatusAuthorized
+    }
+
+    private val _navigationPopEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    override val navigationPopEvent = _navigationPopEvent
+
+    suspend fun postNavigationPopEvent() {
+        _navigationPopEvent.emit(Unit)
     }
 }
 
