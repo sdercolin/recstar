@@ -13,7 +13,7 @@ import platform.UIKit.UIDocumentPickerMode
 import platform.UIKit.UIDocumentPickerViewController
 import platform.UIKit.UIViewController
 
-class ViewControllerContext(private val uiViewController: UIViewController) : AppContext {
+class ViewControllerContext(val uiViewController: UIViewController) : AppContext {
     override fun requestOpenFolder(folder: File) {
         val folderURL = folder.toNSURL()
         val documentPicker = UIDocumentPickerViewController(
@@ -47,3 +47,6 @@ class ViewControllerContext(private val uiViewController: UIViewController) : Ap
         return authStatus == AVAuthorizationStatusAuthorized
     }
 }
+
+val AppContext.uiViewControllerContext: ViewControllerContext
+    get() = this as ViewControllerContext

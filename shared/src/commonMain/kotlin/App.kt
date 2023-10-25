@@ -1,19 +1,28 @@
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import io.Paths
-import ui.demo.OrientationDemo
+import ui.common.AlertDialogController
+import ui.common.LocalAlertDialogController
+import ui.demo.AlertDemo
 import ui.model.AppContext
 import ui.model.LocalAppContext
 import util.Log
 
 @Composable
 fun App(context: AppContext) {
-    CompositionLocalProvider(LocalAppContext provides context) {
-        remember { ensurePaths() }
+    remember { ensurePaths() }
+    CompositionLocalProvider(
+        LocalAppContext provides context,
+        LocalAlertDialogController provides remember { AlertDialogController(context) },
+    ) {
         MaterialTheme {
-            OrientationDemo()
+            Surface {
+                AlertDemo()
+                LocalAlertDialogController.current.Compose()
+            }
         }
     }
 }
