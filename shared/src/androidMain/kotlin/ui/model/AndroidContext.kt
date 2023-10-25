@@ -7,6 +7,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import io.File
 import kotlinx.coroutines.CoroutineScope
+import ui.common.ToastController
+import ui.common.show
 import java.lang.ref.WeakReference
 
 class AndroidContext(
@@ -15,10 +17,10 @@ class AndroidContext(
 ) : AppContext {
     fun getAndroidNativeContext(): android.content.Context? = contextRef.get()
 
-    override fun requestOpenFolder(folder: File) {
-        val context = contextRef.get() ?: return
+    var toastController: ToastController? = null
 
-        // TODO: show alert dialog
+    override fun requestOpenFolder(folder: File) {
+        toastController?.show("Not supported on Android")
     }
 
     override fun checkAndRequestRecordingPermission(): Boolean {
@@ -45,5 +47,8 @@ class AndroidContext(
 
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 1001
 
+val AppContext.androidContext: AndroidContext
+    get() = this as AndroidContext
+
 val AppContext.androidNativeContext: android.content.Context
-    get() = requireNotNull((this as AndroidContext).getAndroidNativeContext())
+    get() = requireNotNull(androidContext.getAndroidNativeContext())

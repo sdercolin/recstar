@@ -16,6 +16,10 @@ val localProperties =
 val isMac = System.getProperty("os.name").lowercase().contains("mac")
 val includeIos = isMac && localProperties.getProperty("ios.disabled", "false").toBoolean().not()
 
+val voyagerVersion = "1.0.0-rc08"
+
+fun voyager(module: String) = "cafe.adriel.voyager:voyager-$module:$voyagerVersion"
+
 kotlin {
     androidTarget()
 
@@ -46,6 +50,8 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
                 implementation("io.github.aakira:napier:2.6.1")
+                implementation(voyager("navigator"))
+                implementation(voyager("transitions"))
             }
         }
         val sharedJvmMain by creating {

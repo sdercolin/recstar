@@ -1,4 +1,4 @@
-package ui.demo
+package ui.screen.demo
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,9 +21,18 @@ import io.File
 import io.Paths
 import kotlinx.datetime.Clock
 import ui.model.LocalAppContext
+import ui.model.Screen
+
+object RecorderDemoScreen : Screen {
+    override val title: String
+        get() = "Recorder Demo"
+
+    @Composable
+    override fun Content() = RecorderDemo()
+}
 
 @Composable
-fun RecorderDemo() {
+private fun RecorderDemo() {
     var isRecording by remember { mutableStateOf(false) }
     var isRequestedRecording by remember { mutableStateOf(false) }
     val listener = remember {

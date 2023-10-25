@@ -1,4 +1,4 @@
-package ui.demo
+package ui.screen.demo
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,9 +7,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import ui.model.LocalScreenOrientation
+import ui.model.Screen
+
+object OrientationDemoScreen : Screen {
+    override val title: String
+        get() = "Orientation Demo"
+
+    @Composable
+    override fun Content() = OrientationDemo()
+}
 
 @Composable
-fun OrientationDemo() {
+private fun OrientationDemo() {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(text = "CurrentOrientation: ${LocalScreenOrientation.current}")
     }

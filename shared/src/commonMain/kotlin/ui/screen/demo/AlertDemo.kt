@@ -1,4 +1,4 @@
-package ui.demo
+package ui.screen.demo
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,9 +22,18 @@ import ui.common.requestConfirm
 import ui.common.requestConfirmCancellable
 import ui.common.requestYesNo
 import ui.common.show
+import ui.model.Screen
+
+object AlertDemoScreen : Screen {
+    override val title: String
+        get() = "Alert Demo"
+
+    @Composable
+    override fun Content() = AlertDemo()
+}
 
 @Composable
-fun AlertDemo() {
+private fun AlertDemo() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
             modifier = Modifier.fillMaxWidth(),
