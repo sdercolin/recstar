@@ -42,6 +42,6 @@ actual class AlertDialogController actual constructor(private val context: AppCo
 
     @Composable
     actual fun Compose() {
-        // keep empty, because we are using native alert dialogs
+        // keep empty, because we are using iOS's native Alert
     }
 }

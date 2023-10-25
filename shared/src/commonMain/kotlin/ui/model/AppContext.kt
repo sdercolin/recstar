@@ -2,6 +2,7 @@ package ui.model
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import io.File
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * This interface is used to provide platform specific functionality to the shared code.
@@ -23,6 +24,9 @@ interface AppContext {
      * function is required.
      */
     fun checkAndRequestRecordingPermission(): Boolean
+
+    /** The app-level [CoroutineScope]. */
+    val coroutineScope: CoroutineScope
 }
 
 val LocalAppContext = staticCompositionLocalOf<AppContext> {

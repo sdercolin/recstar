@@ -1,10 +1,11 @@
 package ui.model
 
 import io.File
+import kotlinx.coroutines.CoroutineScope
 import util.toJavaFile
 import java.awt.Desktop
 
-class DesktopContext : AppContext {
+class DesktopContext(override val coroutineScope: CoroutineScope) : AppContext {
     override fun requestOpenFolder(folder: File) {
         Desktop.getDesktop().open(folder.toJavaFile())
     }

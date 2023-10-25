@@ -1,6 +1,7 @@
 package ui.model
 
 import io.File
+import kotlinx.coroutines.CoroutineScope
 import platform.AVFoundation.AVAuthorizationStatusAuthorized
 import platform.AVFoundation.AVAuthorizationStatusDenied
 import platform.AVFoundation.AVAuthorizationStatusNotDetermined
@@ -13,7 +14,10 @@ import platform.UIKit.UIDocumentPickerMode
 import platform.UIKit.UIDocumentPickerViewController
 import platform.UIKit.UIViewController
 
-class ViewControllerContext(val uiViewController: UIViewController) : AppContext {
+class ViewControllerContext(
+    val uiViewController: UIViewController,
+    override val coroutineScope: CoroutineScope,
+) : AppContext {
     override fun requestOpenFolder(folder: File) {
         val folderURL = folder.toNSURL()
         val documentPicker = UIDocumentPickerViewController(

@@ -6,9 +6,13 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import io.File
+import kotlinx.coroutines.CoroutineScope
 import java.lang.ref.WeakReference
 
-class AndroidContext(private val contextRef: WeakReference<android.content.Context>) : AppContext {
+class AndroidContext(
+    private val contextRef: WeakReference<android.content.Context>,
+    override val coroutineScope: CoroutineScope,
+) : AppContext {
 
     fun getAndroidNativeContext(): android.content.Context? = contextRef.get()
 
@@ -41,3 +45,6 @@ class AndroidContext(private val contextRef: WeakReference<android.content.Conte
 }
 
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 1001
+
+val AppContext.androidNativeContext: android.content.Context
+    get() = requireNotNull((this as AndroidContext).getAndroidNativeContext())

@@ -16,9 +16,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ui.common.LocalAlertDialogController
+import ui.common.LocalToastController
+import ui.common.ToastDuration
 import ui.common.requestConfirm
 import ui.common.requestConfirmCancellable
 import ui.common.requestYesNo
+import ui.common.show
 
 @Composable
 fun AlertDemo() {
@@ -29,6 +32,7 @@ fun AlertDemo() {
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             val alertController = LocalAlertDialogController.current
+            val toastController = LocalToastController.current
             var status by remember { mutableStateOf("Idle.") }
             Button(
                 onClick = {
@@ -77,8 +81,19 @@ fun AlertDemo() {
             ) {
                 Text("Show alert with yes/no buttons")
             }
-            Button(onClick = { }) {
-                Text("Show toast")
+            Button(
+                onClick = {
+                    toastController.show("This is a toast.")
+                },
+            ) {
+                Text("Show toast (short)")
+            }
+            Button(
+                onClick = {
+                    toastController.show("This is a toast.", duration = ToastDuration.Long)
+                },
+            ) {
+                Text("Show toast (long)")
             }
             Text(status)
         }
