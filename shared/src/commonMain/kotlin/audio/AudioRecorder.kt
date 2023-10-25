@@ -5,10 +5,10 @@ import ui.model.AppContext
 
 /** An interface for recording audio. */
 interface AudioRecorder {
-
     /** A listener for [AudioRecorder] events. */
     interface Listener {
         fun onStarted()
+
         fun onStopped()
     }
 

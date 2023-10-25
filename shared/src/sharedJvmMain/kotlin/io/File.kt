@@ -3,7 +3,6 @@ package io
 import util.JavaFile
 
 actual class File actual constructor(path: String) {
-
     constructor(file: JavaFile) : this(file.absolutePath)
 
     private val internalFile = JavaFile(path)
@@ -19,8 +18,7 @@ actual class File actual constructor(path: String) {
     actual val isDirectory: Boolean
         get() = internalFile.isDirectory
 
-    actual fun listFiles(): List<File> =
-        internalFile.listFiles()?.map { File(it.absolutePath) }.orEmpty()
+    actual fun listFiles(): List<File> = internalFile.listFiles()?.map { File(it.absolutePath) }.orEmpty()
 
     actual fun mkdirs(): Boolean = internalFile.mkdirs()
 

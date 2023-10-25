@@ -6,12 +6,13 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-val localProperties = Properties().apply {
-    val localPropertiesFile = rootProject.file("local.properties")
-    if (localPropertiesFile.exists()) {
-        localPropertiesFile.inputStream().use { load(it) }
+val localProperties =
+    Properties().apply {
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.inputStream().use { load(it) }
+        }
     }
-}
 val isMac = System.getProperty("os.name").lowercase().contains("mac")
 val includeIos = isMac && localProperties.getProperty("ios.disabled", "false").toBoolean().not()
 
@@ -56,7 +57,6 @@ kotlin {
                 api("androidx.activity:activity-compose:1.8.0")
                 api("androidx.appcompat:appcompat:1.6.1")
                 api("androidx.core:core-ktx:1.12.0")
-                implementation("androidx.documentfile:documentfile:1.0.1")
             }
         }
         if (includeIos) {

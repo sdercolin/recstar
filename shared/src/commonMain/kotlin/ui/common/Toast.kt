@@ -31,5 +31,7 @@ enum class ToastDuration {
     Long,
 }
 
-fun ToastController.show(message: String, duration: ToastDuration = ToastDuration.Short) =
-    show(ToastRequest(message, duration))
+fun ToastController.show(
+    message: String,
+    duration: ToastDuration = ToastDuration.Short,
+) = show(ToastRequest(message, duration))

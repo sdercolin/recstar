@@ -6,7 +6,6 @@ import ui.model.AppContext
 
 /** An app-wide controller for showing alert dialogs. */
 expect class AlertDialogController(context: AppContext) {
-
     fun show(request: AlertDialogRequest)
 
     @Composable

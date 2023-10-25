@@ -12,8 +12,6 @@ subprojects {
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
 
     configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
-        version.set("0.45.2")
-        enableExperimentalRules.set(true)
-        disabledRules.set(setOf("no-wildcard-imports", "filename"))
+        version.set("1.0.1")
     }
 }

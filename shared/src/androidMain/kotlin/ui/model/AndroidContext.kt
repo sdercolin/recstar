@@ -13,7 +13,6 @@ class AndroidContext(
     private val contextRef: WeakReference<android.content.Context>,
     override val coroutineScope: CoroutineScope,
 ) : AppContext {
-
     fun getAndroidNativeContext(): android.content.Context? = contextRef.get()
 
     override fun requestOpenFolder(folder: File) {

@@ -33,12 +33,16 @@ actual class AlertDialogController actual constructor(context: AppContext) {
                     @Composable {
                         Text(request.title)
                     }
-                } else null,
+                } else {
+                    null
+                },
                 text = if (request.message != null) {
                     @Composable {
                         Text(request.message)
                     }
-                } else null,
+                } else {
+                    null
+                },
                 confirmButton = {
                     Button(
                         onClick = {
@@ -57,7 +61,9 @@ actual class AlertDialogController actual constructor(context: AppContext) {
                             Text(request.dismissButton)
                         }
                     }
-                } else null,
+                } else {
+                    null
+                },
                 properties = DialogProperties(
                     dismissOnClickOutside = request.cancelOnClickOutside,
                 ),

@@ -28,7 +28,6 @@ fun RecorderDemo() {
     var isRequestedRecording by remember { mutableStateOf(false) }
     val listener = remember {
         object : AudioRecorder.Listener {
-
             override fun onStarted() {
                 isRecording = true
             }

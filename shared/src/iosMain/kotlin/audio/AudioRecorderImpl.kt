@@ -25,7 +25,6 @@ import util.withNSErrorCatching
 
 @OptIn(ExperimentalForeignApi::class)
 class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRecorder {
-
     private var recorder: AVAudioRecorder? = null
     private var job: Job? = null
     private var cleanupJob: Job? = null

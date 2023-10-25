@@ -11,7 +11,6 @@ import kotlinx.coroutines.CoroutineScope
  * - On Desktop, this is implemented by Java's Desktop API.
  */
 interface AppContext {
-
     /**
      * Opens the given folder in the platform's default file manager.
      * - On Android, this is currently not supported.

@@ -5,7 +5,6 @@ import kotlinx.coroutines.launch
 import ui.model.AppContext
 
 actual class ToastController actual constructor(private val context: AppContext) {
-
     private val snackbarBasedToastController = SnackbarBasedToastController()
 
     actual fun show(request: ToastRequest) {

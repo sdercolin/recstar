@@ -67,7 +67,6 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
 }
 
 actual class AudioRecorderProvider(private val listener: AudioRecorder.Listener) {
-
     actual constructor(listener: AudioRecorder.Listener, context: AppContext) : this(listener)
 
     actual fun get(): AudioRecorder = AudioRecorderImpl(listener)

@@ -8,7 +8,6 @@ package io
  * @param path The path to the file. This can be a relative or absolute path.
  */
 expect class File(path: String) {
-
     /** Returns true if the file exists. */
     fun exists(): Boolean
 

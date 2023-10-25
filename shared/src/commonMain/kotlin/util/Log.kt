@@ -4,7 +4,6 @@ import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 
 object Log {
-
     private var systemOutEnabled = false
 
     fun initialize(enableSystemOut: Boolean = false) {
@@ -37,7 +36,10 @@ object Log {
         }
     }
 
-    fun w(message: String, throwable: Throwable) {
+    fun w(
+        message: String,
+        throwable: Throwable,
+    ) {
         if (systemOutEnabled) {
             println("WARN: $message, throwable: $throwable")
         } else {
@@ -61,7 +63,10 @@ object Log {
         }
     }
 
-    fun e(message: String, throwable: Throwable) {
+    fun e(
+        message: String,
+        throwable: Throwable,
+    ) {
         if (systemOutEnabled) {
             println("ERROR: $message, throwable: $throwable")
         } else {

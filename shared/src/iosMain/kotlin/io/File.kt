@@ -19,20 +19,20 @@ import util.withNSError
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 actual class File actual constructor(private val path: String) {
-
     private val fileManager: NSFileManager = NSFileManager.defaultManager
 
     actual fun exists(): Boolean = fileManager.fileExistsAtPath(path)
 
-    private fun isDir(): BooleanVar? = memScoped {
-        val isDirectory = alloc<BooleanVar>()
-        val exists = fileManager.fileExistsAtPath(path, isDirectory.ptr)
-        if (exists) {
-            isDirectory
-        } else {
-            null
+    private fun isDir(): BooleanVar? =
+        memScoped {
+            val isDirectory = alloc<BooleanVar>()
+            val exists = fileManager.fileExistsAtPath(path, isDirectory.ptr)
+            if (exists) {
+                isDirectory
+            } else {
+                null
+            }
         }
-    }
 
     actual val absolutePath: String = path
 
@@ -41,26 +41,30 @@ actual class File actual constructor(private val path: String) {
     actual val isDirectory: Boolean
         get() = isDir()?.value == true
 
-    actual fun listFiles(): List<File> = withNSError { e ->
-        val nsStringPath = path.toNSString()
-        val contents = fileManager.contentsOfDirectoryAtPath(path, e)
-        contents?.map {
-            File(nsStringPath.stringByAppendingPathComponent(it as String))
-        }.orEmpty()
-    }
+    actual fun listFiles(): List<File> =
+        withNSError { e ->
+            val nsStringPath = path.toNSString()
+            val contents = fileManager.contentsOfDirectoryAtPath(path, e)
+            contents?.map {
+                File(nsStringPath.stringByAppendingPathComponent(it as String))
+            }.orEmpty()
+        }
 
-    actual fun mkdirs(): Boolean = withNSError { e ->
-        return fileManager.createDirectoryAtPath(path, true, null, e)
-    }
+    actual fun mkdirs(): Boolean =
+        withNSError { e ->
+            return fileManager.createDirectoryAtPath(path, true, null, e)
+        }
 
-    actual fun delete(): Boolean = withNSError { e ->
-        return fileManager.removeItemAtPath(path, e)
-    }
+    actual fun delete(): Boolean =
+        withNSError { e ->
+            return fileManager.removeItemAtPath(path, e)
+        }
 
-    actual fun writeText(text: String) = withNSError { e ->
-        text.toNSString().writeToFile(path, true, NSUTF8StringEncoding, e)
-        Unit
-    }
+    actual fun writeText(text: String) =
+        withNSError { e ->
+            text.toNSString().writeToFile(path, true, NSUTF8StringEncoding, e)
+            Unit
+        }
 
     actual fun readText(): String {
         if (!fileManager.fileExistsAtPath(path)) {

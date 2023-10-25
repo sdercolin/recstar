@@ -38,12 +38,12 @@ fun FileSystemDemo() {
                     file.writeText(TEST_FILE_CONTENT)
                     fileExists = file.exists()
                     fileAbsolutePath = file.absolutePath
-                },) {
+                }) {
                     Text("Write to $type file")
                 }
                 Button(onClick = {
                     fileContent = file.readText()
-                },) {
+                }) {
                     Text("Read from $type file")
                 }
                 Text("$type file exists: $fileExists")

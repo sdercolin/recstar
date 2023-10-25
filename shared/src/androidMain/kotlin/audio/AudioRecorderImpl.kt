@@ -17,7 +17,6 @@ class AudioRecorderImpl(
     private val listener: AudioRecorder.Listener,
     private val context: AndroidContext,
 ) : AudioRecorder {
-
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private var job: Job? = null
     private var cleanupJob: Job? = null

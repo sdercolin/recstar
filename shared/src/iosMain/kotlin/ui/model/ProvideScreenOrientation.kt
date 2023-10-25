@@ -49,14 +49,15 @@ private fun getInitialOrientation(): ScreenOrientation {
     }
 }
 
-private fun getCurrentOrientation(): ScreenOrientation = when (UIDevice.currentDevice.orientation) {
-    UIDeviceOrientationPortrait -> ScreenOrientation.Portrait
-    UIDeviceOrientationPortraitUpsideDown,
-    UIDeviceOrientationLandscapeLeft,
-    UIDeviceOrientationLandscapeRight,
-    -> ScreenOrientation.Landscape
-    else -> getInitialOrientation()
-}
+private fun getCurrentOrientation(): ScreenOrientation =
+    when (UIDevice.currentDevice.orientation) {
+        UIDeviceOrientationPortrait -> ScreenOrientation.Portrait
+        UIDeviceOrientationPortraitUpsideDown,
+        UIDeviceOrientationLandscapeLeft,
+        UIDeviceOrientationLandscapeRight,
+        -> ScreenOrientation.Landscape
+        else -> getInitialOrientation()
+    }
 
 private fun observeOrientationChanges(onChange: (ScreenOrientation) -> Unit): () -> Unit {
     val notificationCenter = NSNotificationCenter.defaultCenter

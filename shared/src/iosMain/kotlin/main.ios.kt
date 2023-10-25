@@ -5,13 +5,14 @@ import androidx.compose.ui.window.ComposeUIViewController
 import ui.model.ProvideScreenOrientation
 import ui.model.ViewControllerContext
 
-fun MainViewController() = ComposeUIViewController {
-    val localUIViewController = LocalUIViewController.current
-    val coroutineScope = rememberCoroutineScope()
-    val viewControllerContext = remember(localUIViewController) {
-        ViewControllerContext(localUIViewController, coroutineScope)
+fun MainViewController() =
+    ComposeUIViewController {
+        val localUIViewController = LocalUIViewController.current
+        val coroutineScope = rememberCoroutineScope()
+        val viewControllerContext = remember(localUIViewController) {
+            ViewControllerContext(localUIViewController, coroutineScope)
+        }
+        ProvideScreenOrientation {
+            App(viewControllerContext)
+        }
     }
-    ProvideScreenOrientation {
-        App(viewControllerContext)
-    }
-}

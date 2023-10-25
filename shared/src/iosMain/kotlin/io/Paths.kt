@@ -3,7 +3,6 @@ package io
 import kotlin.concurrent.AtomicReference
 
 actual object Paths {
-
     private val appRootPathRef = AtomicReference<String?>(null)
     private val contentRootPathRef = AtomicReference<String?>(null)
 
