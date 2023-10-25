@@ -28,7 +28,7 @@ inline fun <T> withNSError(block: (CPointer<ObjCObjectVar<NSError?>>) -> T): T {
     }
 }
 
-@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+@OptIn(ExperimentalForeignApi::class)
 inline fun <T> withNSErrorCatching(block: (CPointer<ObjCObjectVar<NSError?>>) -> T) = runCatching {
     withNSError(block)
 }
