@@ -35,6 +35,8 @@ private fun DemoShowcase() {
             DemoButton("Orientation Demo") { OrientationDemoScreen }
             DemoButton("Recorder Demo") { RecorderDemoScreen }
             DemoButton("Alert Demo") { AlertDemoScreen }
+            DemoButton("Theme Color Demo") { ThemeColorDemoScreen }
+            DemoButton("Theme Typography Demo") { ThemeTypographyDemoScreen }
         }
     }
 }

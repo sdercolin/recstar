@@ -1,6 +1,6 @@
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -22,6 +22,8 @@ import ui.model.AppContext
 import ui.model.LocalAppContext
 import ui.model.Screen
 import ui.screen.demo.DemoShowcaseScreen
+import ui.string.*
+import ui.style.AppTheme
 import util.Log
 
 @Composable
@@ -35,7 +37,7 @@ fun App(context: AppContext) {
         LocalAlertDialogController provides alertDialogController,
         LocalToastController provides toastController,
     ) {
-        MaterialTheme {
+        AppTheme(isSystemInDarkTheme()) {
             Surface {
                 Navigator(DemoShowcaseScreen) { navigator ->
                     LaunchedEffect(navigator, context) {
@@ -56,7 +58,7 @@ fun App(context: AppContext) {
                                         IconButton(onClick = { navigator.pop() }) {
                                             Icon(
                                                 imageVector = Icons.Default.ArrowBack,
-                                                contentDescription = "Back",
+                                                contentDescription = string(Strings.CommonBack),
                                             )
                                         }
                                     }

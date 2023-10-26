@@ -3,6 +3,8 @@ package ui.common
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import ui.model.AppContext
+import ui.string.Strings
+import ui.string.stringStatic
 
 /** An app-wide controller for showing alert dialogs. */
 expect class AlertDialogController(context: AppContext) {
@@ -42,7 +44,7 @@ class AlertDialogRequest(
 fun AlertDialogController.requestConfirm(
     title: String? = null,
     message: String? = null,
-    confirmButton: String = "OK",
+    confirmButton: String = stringStatic(Strings.CommonOkay),
     onFinish: (() -> Unit)? = null,
 ) = AlertDialogRequest(
     title = title,
@@ -55,8 +57,8 @@ fun AlertDialogController.requestConfirm(
 fun AlertDialogController.requestConfirmCancellable(
     title: String? = null,
     message: String? = null,
-    confirmButton: String = "OK",
-    dismissButton: String = "Cancel",
+    confirmButton: String = stringStatic(Strings.CommonOkay),
+    dismissButton: String = stringStatic(Strings.CommonCancel),
     onConfirm: (() -> Unit)? = null,
     onDismiss: (() -> Unit)? = null,
 ) = AlertDialogRequest(
@@ -71,8 +73,8 @@ fun AlertDialogController.requestConfirmCancellable(
 fun AlertDialogController.requestYesNo(
     title: String? = null,
     message: String? = null,
-    confirmButton: String = "Yes",
-    dismissButton: String = "No",
+    confirmButton: String = stringStatic(Strings.CommonYes),
+    dismissButton: String = stringStatic(Strings.CommonNo),
     onConfirm: (() -> Unit)? = null,
     onDismiss: (() -> Unit)? = null,
     cancelOnClickOutside: Boolean = false,
