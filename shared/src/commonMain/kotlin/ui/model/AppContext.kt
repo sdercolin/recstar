@@ -3,8 +3,6 @@ package ui.model
 import androidx.compose.runtime.staticCompositionLocalOf
 import io.File
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 
 /**
  * This interface is used to provide platform specific functionality to the shared code.
@@ -28,9 +26,6 @@ interface AppContext {
 
     /** The app-level [CoroutineScope]. */
     val coroutineScope: CoroutineScope
-
-    /** A [Flow] that emits a value when popping the current screen is requested from the platform. */
-    val navigationPopEvent: Flow<Unit> get() = emptyFlow()
 }
 
 val LocalAppContext = staticCompositionLocalOf<AppContext> {
