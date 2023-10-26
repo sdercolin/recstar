@@ -7,8 +7,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import platform.Foundation.NSSelectorFromString
-import platform.QuartzCore.CATransform3DMakeTranslation
 import platform.UIKit.UIGestureRecognizerStateBegan
 import platform.UIKit.UIGestureRecognizerStateCancelled
 import platform.UIKit.UIGestureRecognizerStateEnded
@@ -27,16 +25,15 @@ class AppViewController : UIViewController(null, null) {
     override fun viewDidLoad() {
         super.viewDidLoad()
 
-        val panGesture = UIPanGestureRecognizer(target = this, action = NSSelectorFromString("handlePan:"))
-        view.addGestureRecognizer(panGesture)
-        view.userInteractionEnabled = true
+        // The gesture recognizer is conflicting with compose scroll view, so we disable it for now.
+        // val panGesture = UIPanGestureRecognizer(target = this, action = NSSelectorFromString("handlePan:"))
+        // view.addGestureRecognizer(panGesture)
 
         val composeController = composeUIViewController()
         addChildViewController(composeController)
         composeController.view.setFrame(view.bounds)
         view.addSubview(composeController.view)
         composeController.didMoveToParentViewController(this)
-        view.layer.transform = CATransform3DMakeTranslation(50.0, 0.0, 0.0)
     }
 
     override fun viewDidDisappear(animated: Boolean) {
@@ -60,7 +57,7 @@ class AppViewController : UIViewController(null, null) {
         val width = view.frame.useContents { size.width }
         when (sender.state) {
             UIGestureRecognizerStateBegan -> {
-                if (pointerX < width / 10) {
+                if (pointerX < width / 6) {
                     startedDetecting = true
                 }
             }
