@@ -43,6 +43,9 @@ expect class File(path: String) {
     /** Reads the entire file as a String using UTF-8. */
     fun readText(): String
 
+    /** Appends the given text to the file using UTF-8. */
+    fun appendText(text: String)
+
     /**
      * Returns a new file with the given [path] relative to this file, or if [path] is absolute, returns a new file with
      * the absolute path.

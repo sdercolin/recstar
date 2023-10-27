@@ -8,10 +8,14 @@ import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
 import kotlinx.cinterop.value
 import platform.Foundation.NSFileManager
+import platform.Foundation.NSMutableData
 import platform.Foundation.NSString
 import platform.Foundation.NSURL
 import platform.Foundation.NSUTF8StringEncoding
+import platform.Foundation.appendData
 import platform.Foundation.create
+import platform.Foundation.dataUsingEncoding
+import platform.Foundation.dataWithContentsOfURL
 import platform.Foundation.stringByAppendingPathComponent
 import platform.Foundation.writeToFile
 import util.toNSString
@@ -80,6 +84,20 @@ actual class File actual constructor(private val path: String) {
             ?: throw RuntimeException("Failed to decode file content from UTF-8 at path: $path")
 
         return nsString.toString()
+    }
+
+    actual fun appendText(text: String) {
+        val fileManager = NSFileManager.defaultManager()
+        if (fileManager.fileExistsAtPath(path)) {
+            val url = NSURL.fileURLWithPath(path)
+            val data = NSMutableData.dataWithContentsOfURL(url) as NSMutableData?
+            requireNotNull(data)
+            data.appendData(text.toNSString().dataUsingEncoding(NSUTF8StringEncoding)!!)
+            data.writeToFile(path, true)
+        } else {
+            writeText(text)
+        }
+        Unit
     }
 
     actual fun resolve(path: String): File {

@@ -28,6 +28,8 @@ actual class File actual constructor(path: String) {
 
     actual fun readText(): String = internalFile.readText()
 
+    actual fun appendText(text: String) = internalFile.appendText(text)
+
     actual fun resolve(path: String): File = File(internalFile.resolve(path))
 }
 

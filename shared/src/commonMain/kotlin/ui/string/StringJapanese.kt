@@ -2,6 +2,7 @@ package ui.string
 
 import ui.string.Strings.*
 
+@Suppress("REDUNDANT_ELSE_IN_WHEN")
 fun Strings.ja(): String? =
     when (this) {
         CommonOkay -> "OK"

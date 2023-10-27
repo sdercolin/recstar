@@ -21,16 +21,12 @@ actual object Paths {
         }
 
     fun initializeAppRootPath(path: String) {
-        val isSet = appRootPathRef.compareAndSet(null, path)
-        if (!isSet) {
-            // handle or log the case where it was already set, if needed
-        }
+        appRootPathRef.compareAndSet(null, path)
+        println("appRootPath is set to $path")
     }
 
     fun initializeContentRootPath(path: String) {
-        val isSet = contentRootPathRef.compareAndSet(null, path)
-        if (!isSet) {
-            // handle or log the case where it was already set, if needed
-        }
+        contentRootPathRef.compareAndSet(null, path)
+        println("contentRootPath is set to $path")
     }
 }

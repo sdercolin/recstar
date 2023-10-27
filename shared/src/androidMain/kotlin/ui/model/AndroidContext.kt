@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat
 import io.File
 import kotlinx.coroutines.CoroutineScope
 import ui.common.ToastController
+import ui.common.ToastDuration
 import ui.common.show
 import java.lang.ref.WeakReference
 
@@ -20,7 +21,7 @@ class AndroidContext(
     var toastController: ToastController? = null
 
     override fun requestOpenFolder(folder: File) {
-        toastController?.show("Not supported on Android")
+        toastController?.show("Not supported on Android: path=${folder.absolutePath}", ToastDuration.Long)
     }
 
     override fun checkAndRequestRecordingPermission(): Boolean {

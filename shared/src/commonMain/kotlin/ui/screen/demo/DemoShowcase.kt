@@ -37,6 +37,7 @@ private fun DemoShowcase() {
             DemoButton("Alert Demo") { AlertDemoScreen }
             DemoButton("Theme Color Demo") { ThemeColorDemoScreen }
             DemoButton("Theme Typography Demo") { ThemeTypographyDemoScreen }
+            DemoButton("Exception Demo") { ExceptionDemoScreen }
         }
     }
 }

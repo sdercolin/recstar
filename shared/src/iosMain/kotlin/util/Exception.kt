@@ -11,6 +11,9 @@ import kotlinx.cinterop.nativeHeap
 import kotlinx.cinterop.ptr
 import kotlinx.cinterop.value
 import platform.Foundation.NSError
+import kotlin.concurrent.AtomicReference
+import kotlin.experimental.ExperimentalNativeApi
+import kotlin.native.concurrent.freeze
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 inline fun <T> withNSError(block: (CPointer<ObjCObjectVar<NSError?>>) -> T): T {
@@ -33,3 +36,14 @@ inline fun <T> withNSErrorCatching(block: (CPointer<ObjCObjectVar<NSError?>>) ->
     runCatching {
         withNSError(block)
     }
+
+@OptIn(FreezingIsDeprecated::class, ExperimentalNativeApi::class)
+actual fun setupUncaughtExceptionHandler(onException: (Throwable) -> Unit) {
+    val prevHook = AtomicReference<ReportUnhandledExceptionHook?>(null)
+    val wrappedHook: ReportUnhandledExceptionHook = {
+        onException(it)
+        prevHook.value?.invoke(it)
+        terminateWithUnhandledException(it)
+    }
+    prevHook.value = setUnhandledExceptionHook(wrappedHook.freeze())
+}
