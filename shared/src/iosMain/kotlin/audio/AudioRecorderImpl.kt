@@ -74,6 +74,13 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
     }
 
     override fun isRecording(): Boolean = recorder?.recording == true
+
+    override fun dispose() {
+        cleanupJob?.cancel()
+        job?.cancel()
+        recorder?.stop()
+        recorder = null
+    }
 }
 
 actual class AudioRecorderProvider actual constructor(

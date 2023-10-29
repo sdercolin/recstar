@@ -24,6 +24,13 @@ interface AppContext {
      */
     fun checkAndRequestRecordingPermission(): Boolean
 
+    /**
+     * Checks if the OS has ignored the app's request to record audio. If this returns true, it means the user has
+     * denied the permission more some times, or has checked the "Don't ask again" option. In this case, the app should
+     * show a dialog explaining why it needs the permission and how to enable it manually.
+     */
+    fun checkRecordingPermissionIgnored(): Boolean
+
     /** The app-level [CoroutineScope]. */
     val coroutineScope: CoroutineScope
 }

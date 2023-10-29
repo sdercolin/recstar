@@ -9,4 +9,7 @@ fun Strings.en(): String =
         CommonYes -> "Yes"
         CommonNo -> "No"
         CommonBack -> "Back"
+        AlertNeedManualPermissionGrantTitle -> "Permission Required"
+        AlertNeedManualPermissionGrantMessage ->
+            "The app needs your permission to record audio. Please grant the permission in system settings."
     }

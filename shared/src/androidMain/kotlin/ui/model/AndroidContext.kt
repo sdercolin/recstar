@@ -44,6 +44,17 @@ class AndroidContext(
             false
         }
     }
+
+    override fun checkRecordingPermissionIgnored(): Boolean {
+        val context = contextRef.get()
+        if (context !is Activity) {
+            return false
+        }
+        return ActivityCompat.shouldShowRequestPermissionRationale(
+            context,
+            Manifest.permission.RECORD_AUDIO,
+        )
+    }
 }
 
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 1001

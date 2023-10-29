@@ -50,6 +50,11 @@ class ViewControllerContext(
 
         return authStatus == AVAuthorizationStatusAuthorized
     }
+
+    override fun checkRecordingPermissionIgnored(): Boolean {
+        val authStatus = AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeAudio)
+        return authStatus == AVAuthorizationStatusDenied || authStatus == AVAuthorizationStatusRestricted
+    }
 }
 
 val AppContext.uiViewControllerContext: ViewControllerContext

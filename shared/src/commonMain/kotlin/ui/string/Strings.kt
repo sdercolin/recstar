@@ -8,6 +8,8 @@ enum class Strings {
     CommonYes,
     CommonNo,
     CommonBack,
+    AlertNeedManualPermissionGrantTitle,
+    AlertNeedManualPermissionGrantMessage,
     ;
 
     fun get(language: Language): String =

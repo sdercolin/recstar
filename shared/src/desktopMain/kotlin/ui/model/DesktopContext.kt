@@ -11,4 +11,6 @@ class DesktopContext(override val coroutineScope: CoroutineScope) : AppContext {
     }
 
     override fun checkAndRequestRecordingPermission(): Boolean = true
+
+    override fun checkRecordingPermissionIgnored(): Boolean = false
 }

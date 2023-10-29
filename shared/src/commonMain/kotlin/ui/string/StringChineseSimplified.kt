@@ -10,5 +10,7 @@ fun Strings.zhHans(): String? =
         CommonYes -> "是"
         CommonNo -> "否"
         CommonBack -> "返回"
+        AlertNeedManualPermissionGrantTitle -> "无权限"
+        AlertNeedManualPermissionGrantMessage -> "应用需要您的录音权限，请在系统设置中授予。"
         else -> null
     }

@@ -20,6 +20,11 @@ interface AudioRecorder {
 
     /** Returns `true` if the recorder is currently recording. */
     fun isRecording(): Boolean
+
+    /**
+     * Disposes of the resources used by the recorder.
+     */
+    fun dispose()
 }
 
 expect class AudioRecorderProvider(listener: AudioRecorder.Listener, context: AppContext) {

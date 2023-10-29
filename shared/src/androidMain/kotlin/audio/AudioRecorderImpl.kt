@@ -68,6 +68,15 @@ class AudioRecorderImpl(
     }
 
     override fun isRecording(): Boolean = recorder != null
+
+    override fun dispose() {
+        job?.cancel()
+        cleanupJob?.cancel()
+        recorder?.release()
+        job = null
+        cleanupJob = null
+        recorder = null
+    }
 }
 
 actual class AudioRecorderProvider(
