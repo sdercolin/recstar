@@ -81,6 +81,7 @@ kotlin {
             dependsOn(sharedJvmMain)
             dependencies {
                 implementation(compose.desktop.common)
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3")
             }
         }
     }

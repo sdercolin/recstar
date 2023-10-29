@@ -22,7 +22,7 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
     private var line: TargetDataLine? = null
     private var job: Job? = null
     private var cleanupJob: Job? = null
-    private val scope = CoroutineScope(Dispatchers.Default)
+    private val scope = CoroutineScope(Dispatchers.Main)
 
     override fun start(output: File) {
         if (job?.isActive == true) {
@@ -57,7 +57,7 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
             job?.cancelAndJoin()
             line = null
             Log.i("AudioRecorderImpl.stop: stopped")
-            withContext(Dispatchers.Default) {
+            withContext(Dispatchers.Main) {
                 listener.onStopped()
             }
         }
