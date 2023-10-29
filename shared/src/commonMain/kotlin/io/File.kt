@@ -24,6 +24,11 @@ expect class File(path: String) {
     fun listFiles(): List<File>
 
     /**
+     * Returns the parent directory of this file, or null if this file does not have a parent.
+     */
+    val parentFile: File?
+
+    /**
      * Creates the directory and all its parent directories if they do not exist yet.
      *
      * @return true if the directory was created, false otherwise.

@@ -12,8 +12,8 @@ import ui.common.ScrollableColumn
 import ui.model.Screen
 
 object ThemeTypographyDemoScreen : Screen {
-    override val title: String
-        get() = "Theme Typography Demo"
+    @Composable
+    override fun getTitle(): String = "Theme Typography Demo"
 
     @Composable
     override fun Content() {

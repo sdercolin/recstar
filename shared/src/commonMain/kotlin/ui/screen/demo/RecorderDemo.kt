@@ -24,8 +24,8 @@ import ui.model.LocalAppContext
 import ui.model.Screen
 
 object RecorderDemoScreen : Screen {
-    override val title: String
-        get() = "Recorder Demo"
+    @Composable
+    override fun getTitle(): String = "Recorder Demo"
 
     @Composable
     override fun Content() = RecorderDemo()

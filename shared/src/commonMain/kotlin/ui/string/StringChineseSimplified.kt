@@ -12,5 +12,6 @@ fun Strings.zhHans(): String? =
         CommonBack -> "返回"
         AlertNeedManualPermissionGrantTitle -> "无权限"
         AlertNeedManualPermissionGrantMessage -> "应用需要您的录音权限，请在系统设置中授予。"
+        RecorderScreenCurrentSentenceLabel -> "正在录制："
         else -> null
     }

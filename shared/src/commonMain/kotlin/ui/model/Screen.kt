@@ -1,5 +1,8 @@
 package ui.model
 
+import androidx.compose.runtime.Composable
+
 interface Screen : cafe.adriel.voyager.core.screen.Screen {
-    val title: String
+    @Composable
+    fun getTitle(): String
 }

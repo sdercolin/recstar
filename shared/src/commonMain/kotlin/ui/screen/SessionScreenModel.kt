@@ -7,13 +7,17 @@ import androidx.compose.runtime.toMutableStateList
 import audio.AudioRecorder
 import audio.AudioRecorderProvider
 import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import io.File
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import ui.common.AlertDialogController
 import ui.common.requestConfirm
 import ui.model.AppContext
 import ui.model.Sentence
-import ui.string.Strings
-import ui.string.stringStatic
+import ui.string.*
+import util.Log
 
 class SessionScreenModel(
     sentences: List<String>,
@@ -44,7 +48,7 @@ class SessionScreenModel(
 
     private var isRequestedRecording: Boolean by mutableStateOf(false)
 
-    private val isBusy: Boolean
+    val isBusy: Boolean
         get() = isRequestedRecording != isRecording
 
     var isRecording: Boolean by mutableStateOf(false)
@@ -53,7 +57,16 @@ class SessionScreenModel(
     val currentSentence: Sentence
         get() = sentences[currentIndex]
 
-    var isPermissionGranted by mutableStateOf(context.checkAndRequestRecordingPermission())
+    private var isPermissionGranted = context.checkAndRequestRecordingPermission()
+
+    private val _requestScrollToCurrentSentenceFlow = MutableSharedFlow<Unit>()
+    val requestScrollToCurrentSentenceFlow: Flow<Unit> = _requestScrollToCurrentSentenceFlow
+
+    private fun requestScrollToCurrentSentence() {
+        screenModelScope.launch {
+            _requestScrollToCurrentSentenceFlow.emit(Unit)
+        }
+    }
 
     private fun getFile(sentence: String): File {
         return contentDirectory.resolve("$sentence.wav")
@@ -70,7 +83,15 @@ class SessionScreenModel(
         _sentences[currentIndex] = currentSentence.copy(isFinished = isFileExisting(currentSentence.text))
     }
 
-    fun startRecording() {
+    fun toggleRecording() {
+        if (isRecording) {
+            stopRecording()
+        } else {
+            startRecording()
+        }
+    }
+
+    private fun startRecording() {
         if (!isPermissionGranted) {
             // We have already checked/requested the permission when this screen is shown.
             // If the permission is not granted, we try to request it once again.
@@ -88,10 +109,19 @@ class SessionScreenModel(
             return
         }
         isRequestedRecording = true
+        prepareOutputFile()
         recorder.start(currentFile)
     }
 
-    fun stopRecording() {
+    private fun prepareOutputFile() {
+        currentFile.parentFile?.mkdirs()
+        if (currentFile.exists()) {
+            Log.i("Deleting existing file: $currentFile for recording")
+            currentFile.delete()
+        }
+    }
+
+    private fun stopRecording() {
         isRequestedRecording = false
         recorder.stop()
         updateCurrentSentence()
@@ -100,26 +130,29 @@ class SessionScreenModel(
     fun selectSentence(index: Int) {
         currentIndex = index
         updateCurrentSentence()
+        requestScrollToCurrentSentence()
     }
 
-    fun hasNext() = currentIndex < sentences.size - 1
+    val hasNext get() = currentIndex < sentences.size - 1
 
     fun next() {
-        if (!hasNext()) return
+        if (!hasNext) return
         if (isRecording) {
             stopRecording()
         }
         currentIndex++
+        requestScrollToCurrentSentence()
     }
 
-    fun hasPrevious() = currentIndex > 0
+    val hasPrevious get() = currentIndex > 0
 
     fun previous() {
-        if (!hasPrevious()) return
+        if (!hasPrevious) return
         if (isRecording) {
             stopRecording()
         }
         currentIndex--
+        requestScrollToCurrentSentence()
     }
 
     override fun onDispose() {

@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Color
  * - Secondary variant: Amber 800
  * - Surface: Grey 200
  * - Background: Grey 100
- * - Error: Red 700
+ * - Error: Red 600
  */
 val appLightColors = lightColors(
     primary = Color(0xffe65100),
@@ -23,7 +23,7 @@ val appLightColors = lightColors(
     secondaryVariant = Color(0xffff8f00),
     surface = Color(0xffEEEEEE),
     background = Color(0xfff5f5f5),
-    error = Color(0xffd32f2f),
+    error = Color(0xffe53935),
 )
 
 /**
@@ -34,6 +34,7 @@ val appLightColors = lightColors(
  * - Secondary variant: Yellow 600
  * - Surface: between Grey 800 and 900
  * - Background: larger than Grey 900
+ * - Error: Red 500
  */
 val appDarkColors = darkColors(
     primary = Color(0xfff9a825),

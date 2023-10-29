@@ -37,8 +37,8 @@ import ui.style.appDarkColors
 import ui.style.appLightColors
 
 object ThemeColorDemoScreen : Screen {
-    override val title: String
-        get() = "Theme Color Demo"
+    @Composable
+    override fun getTitle(): String = "Theme Color Demo"
 
     @Composable
     override fun Content() = ThemeDemo()

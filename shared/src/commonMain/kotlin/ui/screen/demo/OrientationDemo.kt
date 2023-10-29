@@ -10,8 +10,8 @@ import ui.model.LocalScreenOrientation
 import ui.model.Screen
 
 object OrientationDemoScreen : Screen {
-    override val title: String
-        get() = "Orientation Demo"
+    @Composable
+    override fun getTitle(): String = "Orientation Demo"
 
     @Composable
     override fun Content() = OrientationDemo()

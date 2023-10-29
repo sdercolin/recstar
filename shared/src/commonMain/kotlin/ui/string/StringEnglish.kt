@@ -12,4 +12,5 @@ fun Strings.en(): String =
         AlertNeedManualPermissionGrantTitle -> "Permission Required"
         AlertNeedManualPermissionGrantMessage ->
             "The app needs your permission to record audio. Please grant the permission in system settings."
+        RecorderScreenCurrentSentenceLabel -> "Current Recording: "
     }

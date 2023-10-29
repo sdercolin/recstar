@@ -1,4 +1,4 @@
-package ui.screen.demo
+package ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,11 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import const.APP_NAME
 import ui.model.Screen
+import ui.screen.demo.DemoShowcaseScreen
 
-object DemoShowcaseScreen : Screen {
+object MainScreen : Screen {
     @Composable
-    override fun getTitle(): String = "Demo Showcase"
+    override fun getTitle(): String = APP_NAME
 
     @Composable
     override fun Content() = DemoShowcase()
@@ -31,19 +33,14 @@ private fun DemoShowcase() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            DemoButton("File System Demo") { FileSystemDemoScreen }
-            DemoButton("Orientation Demo") { OrientationDemoScreen }
-            DemoButton("Recorder Demo") { RecorderDemoScreen }
-            DemoButton("Alert Demo") { AlertDemoScreen }
-            DemoButton("Theme Color Demo") { ThemeColorDemoScreen }
-            DemoButton("Theme Typography Demo") { ThemeTypographyDemoScreen }
-            DemoButton("Exception Demo") { ExceptionDemoScreen }
+            EntryButton("Session Screen") { SessionScreen("Dummy session") }
+            EntryButton("Feature Demos") { DemoShowcaseScreen }
         }
     }
 }
 
 @Composable
-private fun DemoButton(
+private fun EntryButton(
     text: String,
     target: () -> Screen,
 ) {

@@ -12,5 +12,6 @@ fun Strings.ja(): String? =
         CommonBack -> "戻る"
         AlertNeedManualPermissionGrantTitle -> "権限が必要です"
         AlertNeedManualPermissionGrantMessage -> "アプリは音声を録音するために権限が必要です。システム設定で権限を許可してください。"
+        RecorderScreenCurrentSentenceLabel -> "レコーディング中："
         else -> null
     }

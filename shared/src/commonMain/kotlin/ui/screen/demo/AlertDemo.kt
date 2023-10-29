@@ -25,8 +25,8 @@ import ui.common.show
 import ui.model.Screen
 
 object AlertDemoScreen : Screen {
-    override val title: String
-        get() = "Alert Demo"
+    @Composable
+    override fun getTitle(): String = "Alert Demo"
 
     @Composable
     override fun Content() = AlertDemo()

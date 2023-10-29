@@ -10,6 +10,7 @@ enum class Strings {
     CommonBack,
     AlertNeedManualPermissionGrantTitle,
     AlertNeedManualPermissionGrantMessage,
+    RecorderScreenCurrentSentenceLabel,
     ;
 
     fun get(language: Language): String =

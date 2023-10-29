@@ -17,8 +17,8 @@ import ui.model.LocalAppContext
 import ui.model.Screen
 
 object ExceptionDemoScreen : Screen {
-    override val title: String
-        get() = "ExceptionDemo"
+    @Composable
+    override fun getTitle(): String = "ExceptionDemo"
 
     @Composable
     override fun Content() = ExceptionDemo()

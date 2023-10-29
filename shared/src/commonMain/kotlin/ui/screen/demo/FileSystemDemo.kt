@@ -21,8 +21,8 @@ private val testExternalFile get() = Paths.contentRoot.resolve("test-external.tx
 private val testInternalFile get() = Paths.appRoot.resolve("test-internal.txt")
 
 object FileSystemDemoScreen : Screen {
-    override val title: String
-        get() = "File System Demo"
+    @Composable
+    override fun getTitle(): String = "File System Demo"
 
     @Composable
     override fun Content() = FileSystemDemo()

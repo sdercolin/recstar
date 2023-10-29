@@ -17,6 +17,7 @@ import platform.Foundation.create
 import platform.Foundation.dataUsingEncoding
 import platform.Foundation.dataWithContentsOfURL
 import platform.Foundation.stringByAppendingPathComponent
+import platform.Foundation.stringByDeletingLastPathComponent
 import platform.Foundation.writeToFile
 import util.toNSString
 import util.withNSError
@@ -52,6 +53,15 @@ actual class File actual constructor(private val path: String) {
             contents?.map {
                 File(nsStringPath.stringByAppendingPathComponent(it as String))
             }.orEmpty()
+        }
+
+    actual val parentFile: File?
+        get() = path.toNSString().stringByDeletingLastPathComponent().let {
+            if (it.isEmpty()) {
+                null
+            } else {
+                File(it)
+            }
         }
 
     actual fun mkdirs(): Boolean =

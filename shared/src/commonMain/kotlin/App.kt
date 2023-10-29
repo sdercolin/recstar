@@ -19,9 +19,8 @@ import ui.common.ToastController
 import ui.model.AppContext
 import ui.model.LocalAppContext
 import ui.model.Screen
-import ui.screen.demo.DemoShowcaseScreen
-import ui.string.Strings
-import ui.string.string
+import ui.screen.MainScreen
+import ui.string.*
 import ui.style.AppTheme
 
 @Composable
@@ -34,37 +33,42 @@ fun App(context: AppContext) {
         LocalToastController provides toastController,
     ) {
         AppTheme(isSystemInDarkTheme()) {
-            Surface {
-                Navigator(DemoShowcaseScreen) { navigator ->
-                    Scaffold(
-                        topBar = {
-                            TopAppBar(
-                                title = {
-                                    val currentTitle = (navigator.lastItem as Screen).title
-                                    Text(text = "RecStar - $currentTitle")
-                                },
-                                navigationIcon = if (navigator.size > 1) {
-                                    @Composable {
-                                        IconButton(onClick = { navigator.pop() }) {
-                                            Icon(
-                                                imageVector = Icons.Default.ArrowBack,
-                                                contentDescription = string(Strings.CommonBack),
-                                            )
-                                        }
-                                    }
-                                } else {
-                                    null
-                                },
-                            )
-                        },
-                        content = {
-                            SlideTransition(navigator) { screen -> screen.Content() }
-                        },
-                    )
-                }
-                alertDialogController.Compose()
-                toastController.Compose()
+            Navigator(MainScreen) { navigator ->
+                MainScaffold(navigator)
             }
+            alertDialogController.Compose()
+            toastController.Compose()
         }
     }
+}
+
+@Composable
+private fun MainScaffold(navigator: Navigator) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    val currentTitle = (navigator.lastItem as Screen).getTitle()
+                    Text(text = currentTitle)
+                },
+                navigationIcon = if (navigator.size > 1) {
+                    @Composable {
+                        IconButton(onClick = { navigator.pop() }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = string(Strings.CommonBack),
+                            )
+                        }
+                    }
+                } else {
+                    null
+                },
+            )
+        },
+        content = {
+            SlideTransition(navigator) { screen ->
+                Surface { screen.Content() }
+            }
+        },
+    )
 }
