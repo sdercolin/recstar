@@ -28,12 +28,12 @@ actual class File actual constructor(private val path: String) {
 
     actual fun exists(): Boolean = fileManager.fileExistsAtPath(path)
 
-    private fun isDir(): BooleanVar? =
+    private fun isDir(): Boolean? =
         memScoped {
             val isDirectory = alloc<BooleanVar>()
             val exists = fileManager.fileExistsAtPath(path, isDirectory.ptr)
             if (exists) {
-                isDirectory
+                isDirectory.value
             } else {
                 null
             }
@@ -42,9 +42,9 @@ actual class File actual constructor(private val path: String) {
     actual val absolutePath: String = path
 
     actual val isFile: Boolean
-        get() = isDir()?.value == false
+        get() = isDir() == false
     actual val isDirectory: Boolean
-        get() = isDir()?.value == true
+        get() = isDir() == true
 
     actual fun listFiles(): List<File> =
         withNSError { e ->
