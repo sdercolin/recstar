@@ -19,6 +19,7 @@ import platform.Foundation.appendData
 import platform.Foundation.create
 import platform.Foundation.dataUsingEncoding
 import platform.Foundation.dataWithContentsOfURL
+import platform.Foundation.lastPathComponent
 import platform.Foundation.stringByAppendingPathComponent
 import platform.Foundation.stringByDeletingLastPathComponent
 import platform.Foundation.stringEncodingForData
@@ -31,6 +32,12 @@ import util.withNSError
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 actual class File actual constructor(private val path: String) {
     private val fileManager: NSFileManager = NSFileManager.defaultManager
+
+    actual val name: String
+        get() = path.toNSString().lastPathComponent
+
+    actual val nameWithoutExtension: String
+        get() = name.substringBeforeLast('.', "")
 
     actual fun exists(): Boolean = fileManager.fileExistsAtPath(path)
 

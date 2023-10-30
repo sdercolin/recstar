@@ -11,6 +11,12 @@ actual class File actual constructor(path: String) {
 
     private val internalFile = JavaFile(path)
 
+    actual val name: String
+        get() = internalFile.name
+
+    actual val nameWithoutExtension: String
+        get() = internalFile.nameWithoutExtension
+
     actual fun exists(): Boolean = internalFile.exists()
 
     actual val absolutePath: String

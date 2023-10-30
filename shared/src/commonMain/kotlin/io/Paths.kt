@@ -10,6 +10,9 @@ expect object Paths {
 val Paths.logsDirectory: File
     get() = appRoot.resolve("logs")
 
+val Paths.sessionsDirectory: File
+    get() = contentRoot.resolve("sessions")
+
 fun ensurePaths() {
     listOf(Paths.appRoot, Paths.contentRoot).forEach {
         Log.i("ensurePaths: ${it.absolutePath}")

@@ -10,6 +10,10 @@ import util.Encoding
  * @param path The path to the file. This can be a relative or absolute path.
  */
 expect class File(path: String) {
+    val name: String
+
+    val nameWithoutExtension: String
+
     /** Returns true if the file exists. */
     fun exists(): Boolean
 
