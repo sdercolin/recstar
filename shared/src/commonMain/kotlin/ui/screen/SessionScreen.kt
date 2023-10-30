@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import io.Paths
 import kotlinx.coroutines.flow.collectLatest
@@ -56,6 +57,7 @@ import ui.model.Sentence
 import ui.string.*
 import ui.style.CustomColors
 import util.alpha
+import util.isMobile
 
 data class SessionScreen(val name: String) : Screen {
     @Composable
@@ -194,20 +196,7 @@ private fun Recorder(
     hasFixedHeight: Boolean,
 ) {
     Column(modifier = Modifier.fillMaxWidth().background(color = MaterialTheme.colors.background)) {
-        Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = string(Strings.RecorderScreenCurrentSentenceLabel),
-            modifier = Modifier.padding(horizontal = 32.dp),
-            style = MaterialTheme.typography.overline,
-        )
-        Text(
-            text = model.currentSentence.text,
-            modifier = Modifier.padding(horizontal = 32.dp),
-            style = MaterialTheme.typography.h4,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
-        )
-        Spacer(modifier = Modifier.height(24.dp))
+        RecorderTitleBar(model)
         Box(
             modifier = Modifier.fillMaxWidth()
                 .run {
@@ -223,7 +212,7 @@ private fun Recorder(
         Box(
             modifier = Modifier.fillMaxWidth()
                 .aspectRatio(
-                    if (LocalScreenOrientation.current == ScreenOrientation.Landscape) 7f else 4f,
+                    if (LocalScreenOrientation.current == ScreenOrientation.Landscape) 5f else 3f,
                 ),
         ) {
             RecorderControls(
@@ -237,6 +226,26 @@ private fun Recorder(
             )
         }
     }
+}
+
+@Composable
+private fun RecorderTitleBar(model: SessionScreenModel) {
+    val useSmallSizes = isMobile && LocalScreenOrientation.current == ScreenOrientation.Landscape
+    Spacer(modifier = Modifier.height(if (useSmallSizes) 12.dp else 24.dp))
+    Text(
+        text = string(Strings.RecorderScreenCurrentSentenceLabel),
+        modifier = Modifier.padding(horizontal = 32.dp),
+        style = MaterialTheme.typography.overline,
+        fontSize = if (useSmallSizes) 8.sp else MaterialTheme.typography.overline.fontSize,
+    )
+    Text(
+        text = model.currentSentence.text,
+        modifier = Modifier.padding(horizontal = 32.dp),
+        style = if (useSmallSizes) MaterialTheme.typography.h6 else MaterialTheme.typography.h4,
+        overflow = TextOverflow.Ellipsis,
+        maxLines = 1,
+    )
+    Spacer(modifier = Modifier.height(if (useSmallSizes) 12.dp else 24.dp))
 }
 
 @Composable
@@ -275,13 +284,13 @@ private fun RecorderControls(
             imageVector = Icons.Default.NavigateBefore,
             contentDescription = "",
         )
-        Spacer(modifier = Modifier.width(32.dp))
+        Spacer(modifier = Modifier.width(48.dp))
         RecordButton(
             isInteractionSuspended = isInteractionSuspended,
             isRecording = isRecording,
             onToggleRecording = onToggleRecording,
         )
-        Spacer(modifier = Modifier.width(32.dp))
+        Spacer(modifier = Modifier.width(48.dp))
         NavigateButton(
             isInteractionSuspended = isInteractionSuspended,
             onClick = onNext,
