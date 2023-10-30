@@ -1,4 +1,4 @@
-import java.util.Properties
+import java.util.*
 
 plugins {
     kotlin("multiplatform")
@@ -57,6 +57,9 @@ kotlin {
         }
         val sharedJvmMain by creating {
             dependsOn(commonMain)
+            dependencies {
+                implementation("org.apache.tika:tika-parser-text-module:2.4.1")
+            }
         }
         val androidMain by getting {
             dependsOn(sharedJvmMain)

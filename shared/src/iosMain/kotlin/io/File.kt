@@ -3,13 +3,16 @@ package io
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.BooleanVar
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.ObjCObjectVar
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
 import kotlinx.cinterop.value
+import platform.Foundation.NSData
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSMutableData
 import platform.Foundation.NSString
+import platform.Foundation.NSStringEncoding
 import platform.Foundation.NSURL
 import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.appendData
@@ -18,8 +21,11 @@ import platform.Foundation.dataUsingEncoding
 import platform.Foundation.dataWithContentsOfURL
 import platform.Foundation.stringByAppendingPathComponent
 import platform.Foundation.stringByDeletingLastPathComponent
+import platform.Foundation.stringEncodingForData
 import platform.Foundation.writeToFile
+import util.Encoding
 import util.toNSString
+import util.toNSStringEncoding
 import util.withNSError
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
@@ -80,7 +86,7 @@ actual class File actual constructor(private val path: String) {
             Unit
         }
 
-    actual fun readText(): String {
+    actual fun readText(encoding: Encoding?): String {
         if (!fileManager.fileExistsAtPath(path)) {
             throw RuntimeException("File does not exist at path: $path")
         }
@@ -90,11 +96,24 @@ actual class File actual constructor(private val path: String) {
             throw RuntimeException("Cannot read file at path: $path")
         }
 
-        val nsString = NSString.create(contents, NSUTF8StringEncoding)
-            ?: throw RuntimeException("Failed to decode file content from UTF-8 at path: $path")
+        val encodingToUse = encoding?.toNSStringEncoding() ?: detectEncoding(contents)
+
+        val nsString = NSString.create(contents, encodingToUse)
+            ?: throw RuntimeException("Failed to decode file content using encoding $encodingToUse at path: $path")
 
         return nsString.toString()
     }
+
+    private fun detectEncoding(data: NSData): NSStringEncoding =
+        memScoped {
+            val string = alloc<ObjCObjectVar<String?>>()
+            return NSString.stringEncodingForData(
+                data = data,
+                encodingOptions = null,
+                convertedString = string.ptr,
+                usedLossyConversion = null,
+            ).takeUnless { it == 0.toULong() } ?: NSUTF8StringEncoding
+        }
 
     actual fun appendText(text: String) {
         val fileManager = NSFileManager.defaultManager()

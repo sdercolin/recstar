@@ -1,7 +1,10 @@
 package io
 
+import util.Encoding
 import util.JavaFile
+import util.detectEncoding
 import util.toFile
+import java.nio.charset.Charset
 
 actual class File actual constructor(path: String) {
     constructor(file: JavaFile) : this(file.absolutePath)
@@ -28,9 +31,17 @@ actual class File actual constructor(path: String) {
 
     actual fun delete(): Boolean = internalFile.delete()
 
-    actual fun writeText(text: String) = internalFile.writeText(text)
+    actual fun readText(encoding: Encoding?): String {
+        return if (encoding != null) {
+            internalFile.readText(Charset.forName(encoding.name))
+        } else {
+            val bytes = internalFile.readBytes()
+            val detectedEncoding = bytes.detectEncoding()
+            internalFile.readText(Charset.forName(detectedEncoding))
+        }
+    }
 
-    actual fun readText(): String = internalFile.readText()
+    actual fun writeText(text: String) = internalFile.writeText(text)
 
     actual fun appendText(text: String) = internalFile.appendText(text)
 

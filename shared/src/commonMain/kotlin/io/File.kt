@@ -1,5 +1,7 @@
 package io
 
+import util.Encoding
+
 /**
  * A cross-platform File API abstraction based on the java.io.File API.
  * - On the Desktop or Android, this is a simple wrapper around java.io.File.
@@ -23,9 +25,7 @@ expect class File(path: String) {
     /** Returns all children of this directory. */
     fun listFiles(): List<File>
 
-    /**
-     * Returns the parent directory of this file, or null if this file does not have a parent.
-     */
+    /** Returns the parent directory of this file, or null if this file does not have a parent. */
     val parentFile: File?
 
     /**
@@ -42,11 +42,11 @@ expect class File(path: String) {
      */
     fun delete(): Boolean
 
+    /** Reads the entire file as a String with the given [encoding], or detects the encoding if [encoding] is null. */
+    fun readText(encoding: Encoding? = null): String
+
     /** Writes the given text to the file using UTF-8. */
     fun writeText(text: String)
-
-    /** Reads the entire file as a String using UTF-8. */
-    fun readText(): String
 
     /** Appends the given text to the file using UTF-8. */
     fun appendText(text: String)
