@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ui.model.AndroidContext
 import ui.model.AppContext
+import ui.model.androidNativeContext
 import util.Log
 
 class AudioRecorderImpl(
@@ -23,7 +24,7 @@ class AudioRecorderImpl(
     private var recorder: MediaRecorder? = null
 
     override fun start(output: File) {
-        val nativeContext = context.getAndroidNativeContext() ?: return
+        val nativeContext = context.androidNativeContext
         if (job?.isActive == true) {
             Log.w("AudioRecorderImpl.start: already started")
             return

@@ -9,6 +9,7 @@ import audio.AudioRecorderProvider
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import io.File
+import io.PermissionChecker
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -22,8 +23,9 @@ import util.Log
 class SessionScreenModel(
     sentences: List<String>,
     private val contentDirectory: File,
-    private val context: AppContext,
+    context: AppContext,
     private val alertDialogController: AlertDialogController,
+    private val permissionChecker: PermissionChecker,
 ) : ScreenModel {
     private val _sentences: MutableList<Sentence> =
         sentences.map { Sentence(it, isFileExisting(it)) }.toMutableStateList()
@@ -57,7 +59,7 @@ class SessionScreenModel(
     val currentSentence: Sentence
         get() = sentences[currentIndex]
 
-    private var isPermissionGranted = context.checkAndRequestRecordingPermission()
+    private var isPermissionGranted = permissionChecker.checkAndRequestRecordingPermission()
 
     private val _requestScrollToCurrentSentenceFlow = MutableSharedFlow<Unit>()
     val requestScrollToCurrentSentenceFlow: Flow<Unit> = _requestScrollToCurrentSentenceFlow
@@ -95,7 +97,7 @@ class SessionScreenModel(
         if (!isPermissionGranted) {
             // We have already checked/requested the permission when this screen is shown.
             // If the permission is not granted, we try to request it once again.
-            val isPermissionIgnored = context.checkRecordingPermissionIgnored()
+            val isPermissionIgnored = permissionChecker.checkRecordingPermissionIgnored()
             if (isPermissionIgnored) {
                 // Cannot request the permission again.
                 alertDialogController.requestConfirm(
@@ -105,7 +107,7 @@ class SessionScreenModel(
                 return
             }
             // Request the permission again.
-            isPermissionGranted = context.checkAndRequestRecordingPermission()
+            isPermissionGranted = permissionChecker.checkAndRequestRecordingPermission()
             return
         }
         isRequestedRecording = true

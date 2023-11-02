@@ -8,32 +8,25 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import ui.common.LocalAlertDialogController
 import ui.common.LocalToastController
-import ui.model.AppContext
-import ui.model.LocalAppContext
 import ui.model.Screen
 import ui.screen.MainScreen
 import ui.string.*
 import ui.style.AppTheme
 
 @Composable
-fun App(context: AppContext) {
-    CompositionLocalProvider(
-        LocalAppContext provides context,
-        LocalAlertDialogController provides context.alertDialogController,
-        LocalToastController provides context.toastController,
-    ) {
-        AppTheme(isSystemInDarkTheme()) {
-            Navigator(MainScreen) { navigator ->
-                MainScaffold(navigator)
-            }
-            context.alertDialogController.Compose()
-            context.toastController.Compose()
+fun App() {
+    val toastController = LocalToastController.current
+    val alertDialogController = LocalAlertDialogController.current
+    AppTheme(isSystemInDarkTheme()) {
+        Navigator(MainScreen) { navigator ->
+            MainScaffold(navigator)
         }
+        alertDialogController.Compose()
+        toastController.Compose()
     }
 }
 

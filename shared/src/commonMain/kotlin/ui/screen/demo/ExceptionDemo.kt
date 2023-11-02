@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import io.LocalFileInteractor
 import io.Paths
 import io.logsDirectory
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +28,7 @@ object ExceptionDemoScreen : Screen {
 @Composable
 private fun ExceptionDemo() {
     val context = LocalAppContext.current
+    val fileInteractor = LocalFileInteractor.current
     Column(
         Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -59,7 +61,7 @@ private fun ExceptionDemo() {
         }
         Button(
             onClick = {
-                context.requestOpenFolder(Paths.logsDirectory)
+                fileInteractor.requestOpenFolder(Paths.logsDirectory)
             },
         ) {
             Text("Open log position")

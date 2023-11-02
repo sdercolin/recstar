@@ -43,6 +43,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.rememberScreenModel
+import io.LocalPermissionChecker
 import kotlinx.coroutines.flow.collectLatest
 import model.Session
 import ui.common.LocalAlertDialogController
@@ -71,12 +72,14 @@ data class SessionScreen(val session: Session) : Screen {
 private fun SessionScreen.SessionScreenContent() {
     val context = LocalAppContext.current
     val alertDialogController = LocalAlertDialogController.current
+    val permissionChecker = LocalPermissionChecker.current
     val model = rememberScreenModel {
         SessionScreenModel(
             sentences = session.reclist.lines,
             contentDirectory = session.directory,
             context = context,
             alertDialogController = alertDialogController,
+            permissionChecker = permissionChecker,
         )
     }
     val screenOrientation = LocalScreenOrientation.current

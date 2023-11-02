@@ -1,5 +1,6 @@
 package repository
 
+import androidx.compose.runtime.staticCompositionLocalOf
 import io.File
 import io.Paths
 import io.reclistsDirectory
@@ -58,3 +59,5 @@ class ReclistRepository(private val context: AppContext) {
     /** Gets the reclist with the given name. */
     fun get(name: String): Reclist = map[name] ?: parseReclist(folder.resolve("$name.txt")).getOrThrow()
 }
+
+val LocalReclistRepository = staticCompositionLocalOf<ReclistRepository> { error("No ReclistRepository provided") }

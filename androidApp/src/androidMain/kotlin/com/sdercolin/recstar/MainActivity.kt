@@ -1,5 +1,6 @@
 package com.sdercolin.recstar
 
+import AppDependencies
 import MainView
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -15,8 +16,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         initializeApp()
         val context = AndroidContext(this, lifecycleScope)
+        val dependencies = AppDependencies(context)
         setContent {
-            MainView(context)
+            MainView(dependencies)
         }
     }
 

@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import audio.AudioRecorder
 import audio.AudioRecorderProvider
 import io.File
+import io.LocalFileInteractor
+import io.LocalPermissionChecker
 import io.Paths
 import kotlinx.datetime.Clock
 import ui.model.LocalAppContext
@@ -46,12 +48,14 @@ private fun RecorderDemo() {
             }
         }
     }
-    val localContext = LocalAppContext.current
+    val context = LocalAppContext.current
+    val fileInteractor = LocalFileInteractor.current
+    val permissionChecker = LocalPermissionChecker.current
     val recorder = remember {
-        AudioRecorderProvider(listener, localContext).get()
+        AudioRecorderProvider(listener, context).get()
     }
     var isPermissionGranted by remember {
-        mutableStateOf(localContext.checkAndRequestRecordingPermission())
+        mutableStateOf(permissionChecker.checkAndRequestRecordingPermission())
     }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -67,7 +71,7 @@ private fun RecorderDemo() {
                     val nextRequestedRecording = !isRequestedRecording
                     if (nextRequestedRecording) {
                         if (!isPermissionGranted) {
-                            isPermissionGranted = localContext.checkAndRequestRecordingPermission()
+                            isPermissionGranted = permissionChecker.checkAndRequestRecordingPermission()
                         }
                         if (isPermissionGranted && nextRequestedRecording) {
                             isRequestedRecording = nextRequestedRecording
@@ -83,7 +87,7 @@ private fun RecorderDemo() {
             ) {
                 Text(text = if (isRecording) "Stop recording" else "Start recording")
             }
-            Button(onClick = { localContext.requestOpenFolder(Paths.contentRoot) }) {
+            Button(onClick = { fileInteractor.requestOpenFolder(Paths.contentRoot) }) {
                 Text(text = "Show output directory")
             }
         }

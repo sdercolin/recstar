@@ -14,14 +14,17 @@ import ui.model.ScreenOrientation
 fun MainView() {
     val coroutineScope = rememberCoroutineScope()
     val context = remember { DesktopContext(coroutineScope) }
-    CompositionLocalProvider(LocalScreenOrientation provides ScreenOrientation.Landscape) {
-        // Currently always use landscape orientation on desktop
-        // Later we could use the window size or some settings to determine the orientation
-        App(context)
-        context.fileDialogRequest?.let {
-            when (it) {
-                is OpenFileDialogRequest -> OpenFileDialog(it)
-                is SaveFileDialogRequest -> SaveFileDialog(it)
+    val dependencies = remember(context) { AppDependencies(context) }
+    ProvideAppDependencies(dependencies) {
+        CompositionLocalProvider(LocalScreenOrientation provides ScreenOrientation.Landscape) {
+            // Currently always use landscape orientation on desktop
+            // Later we could use the window size or some settings to determine the orientation
+            App()
+            dependencies.fileInteractor.fileDialogRequest?.let {
+                when (it) {
+                    is OpenFileDialogRequest -> OpenFileDialog(it)
+                    is SaveFileDialogRequest -> SaveFileDialog(it)
+                }
             }
         }
     }

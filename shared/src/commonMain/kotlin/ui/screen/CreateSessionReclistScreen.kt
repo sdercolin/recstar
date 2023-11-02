@@ -16,11 +16,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
+import io.LocalFileInteractor
 import model.createSession
+import repository.LocalReclistRepository
 import ui.common.LocalAlertDialogController
 import ui.common.ScrollableLazyColumn
 import ui.common.requestConfirm
-import ui.model.LocalAppContext
 import ui.model.Screen
 import ui.string.*
 import util.Log
@@ -38,15 +39,16 @@ object CreateSessionReclistScreen : Screen {
 
 @Composable
 private fun ImportButton() {
-    val appContext = LocalAppContext.current
+    val repository = LocalReclistRepository.current
+    val fileInteractor = LocalFileInteractor.current
     IconButton(
         onClick = {
-            appContext.pickFile(
+            fileInteractor.pickFile(
                 title = stringStatic(Strings.CreateSessionReclistScreenActionImport),
                 allowedExtensions = listOf("txt"),
                 onFinish = { file ->
                     file ?: return@pickFile
-                    appContext.reclistRepository.import(file)
+                    repository.import(file)
                 },
             )
         },
@@ -60,13 +62,13 @@ private fun ImportButton() {
 
 @Composable
 private fun ScreenContent() {
-    val context = LocalAppContext.current
     val alertDialogController = LocalAlertDialogController.current
-    val items = context.reclistRepository.items.collectAsState()
+    val repository = LocalReclistRepository.current
+    val items = repository.items.collectAsState()
     val navigator = LocalNavigator.current
 
     fun next(reclistName: String) {
-        val reclist = context.reclistRepository.get(reclistName)
+        val reclist = repository.get(reclistName)
         val session = createSession(reclist)
             .onFailure {
                 Log.e(it)
@@ -78,8 +80,8 @@ private fun ScreenContent() {
         navigator?.pop()
         navigator?.push(SessionScreen(session))
     }
-    LaunchedEffect(context) {
-        context.reclistRepository.fetch()
+    LaunchedEffect(repository) {
+        repository.fetch()
     }
     ScrollableLazyColumn(modifier = Modifier.fillMaxSize()) {
         items(items.value, key = { it }) { name ->
