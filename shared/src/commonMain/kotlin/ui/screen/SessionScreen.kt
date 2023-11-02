@@ -43,8 +43,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.rememberScreenModel
-import io.Paths
 import kotlinx.coroutines.flow.collectLatest
+import model.Session
 import ui.common.LocalAlertDialogController
 import ui.common.ReversedRow
 import ui.common.ScrollableLazyColumn
@@ -59,28 +59,22 @@ import ui.style.CustomColors
 import util.alpha
 import util.isMobile
 
-data class SessionScreen(val name: String) : Screen {
+data class SessionScreen(val session: Session) : Screen {
     @Composable
-    override fun getTitle(): String = name
+    override fun getTitle(): String = session.name
 
     @Composable
     override fun Content() = SessionScreenContent()
 }
 
-private val dummyList = List(100) { index ->
-    "Sentence ${index + 1}"
-}
-
-private val dummyContentDirectory get() = Paths.contentRoot.resolve("Dummy Session")
-
 @Composable
-private fun Screen.SessionScreenContent() {
+private fun SessionScreen.SessionScreenContent() {
     val context = LocalAppContext.current
     val alertDialogController = LocalAlertDialogController.current
     val model = rememberScreenModel {
         SessionScreenModel(
-            sentences = dummyList,
-            contentDirectory = dummyContentDirectory,
+            sentences = session.reclist.lines,
+            contentDirectory = session.directory,
             context = context,
             alertDialogController = alertDialogController,
         )

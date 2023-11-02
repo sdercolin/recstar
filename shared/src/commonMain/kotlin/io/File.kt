@@ -14,6 +14,8 @@ expect class File(path: String) {
 
     val nameWithoutExtension: String
 
+    val extension: String
+
     /** Returns true if the file exists. */
     fun exists(): Boolean
 
@@ -54,6 +56,12 @@ expect class File(path: String) {
 
     /** Appends the given text to the file using UTF-8. */
     fun appendText(text: String)
+
+    /** Copies this file to the given [target] file. */
+    fun copyTo(
+        target: File,
+        overwrite: Boolean = false,
+    ): File
 
     /**
      * Returns a new file with the given [path] relative to this file, or if [path] is absolute, returns a new file with

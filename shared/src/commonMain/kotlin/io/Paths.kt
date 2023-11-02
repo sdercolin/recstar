@@ -13,6 +13,9 @@ val Paths.logsDirectory: File
 val Paths.sessionsDirectory: File
     get() = contentRoot.resolve("sessions")
 
+val Paths.reclistsDirectory: File
+    get() = contentRoot.resolve("reclists")
+
 fun ensurePaths() {
     listOf(Paths.appRoot, Paths.contentRoot).forEach {
         Log.i("ensurePaths: ${it.absolutePath}")

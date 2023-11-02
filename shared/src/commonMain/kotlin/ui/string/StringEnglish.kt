@@ -13,4 +13,8 @@ fun Strings.en(): String =
         AlertNeedManualPermissionGrantMessage ->
             "The app needs your permission to record audio. Please grant the permission in system settings."
         RecorderScreenCurrentSentenceLabel -> "Current Recording: "
+        CreateSessionReclistScreenTitle -> "Select Reclist"
+        CreateSessionReclistScreenActionImport -> "Import Reclist"
+        CreateSessionReclistScreenContinue -> "Finish"
+        CreateSessionReclistScreenFailure -> "Failed to create session."
     }

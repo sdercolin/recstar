@@ -22,18 +22,18 @@ object MainScreen : Screen {
     override fun getTitle(): String = APP_NAME
 
     @Composable
-    override fun Content() = DemoShowcase()
+    override fun Content() = MainScreenContent()
 }
 
 @Composable
-private fun DemoShowcase() {
+private fun MainScreenContent() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            EntryButton("Session Screen") { SessionScreen("Dummy session") }
+            EntryButton("New Session") { CreateSessionReclistScreen }
             EntryButton("Feature Demos") { DemoShowcaseScreen }
         }
     }

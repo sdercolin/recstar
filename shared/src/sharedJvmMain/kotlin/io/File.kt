@@ -17,6 +17,9 @@ actual class File actual constructor(path: String) {
     actual val nameWithoutExtension: String
         get() = internalFile.nameWithoutExtension
 
+    actual val extension: String
+        get() = internalFile.extension
+
     actual fun exists(): Boolean = internalFile.exists()
 
     actual val absolutePath: String
@@ -50,6 +53,11 @@ actual class File actual constructor(path: String) {
     actual fun writeText(text: String) = internalFile.writeText(text)
 
     actual fun appendText(text: String) = internalFile.appendText(text)
+
+    actual fun copyTo(
+        target: File,
+        overwrite: Boolean,
+    ) = internalFile.copyTo(target.internalFile, overwrite).toFile()
 
     actual fun resolve(path: String): File = File(internalFile.resolve(path))
 }

@@ -3,6 +3,7 @@ package ui.model
 import androidx.compose.runtime.staticCompositionLocalOf
 import io.File
 import kotlinx.coroutines.CoroutineScope
+import repository.ReclistRepository
 
 /**
  * This interface is used to provide platform specific functionality to the shared code.
@@ -11,11 +12,28 @@ import kotlinx.coroutines.CoroutineScope
  * - On Desktop, this is implemented by Java's Desktop API.
  */
 interface AppContext {
+    /** The [ReclistRepository] instance to manage reclist files. */
+    val reclistRepository: ReclistRepository
+
     /**
      * Opens the given folder in the platform's default file manager.
      * - On Android, this is currently not supported.
      */
     fun requestOpenFolder(folder: File)
+
+    /**
+     * Starts a file picker dialog to let the user pick a file.
+     *
+     * @param title The title of the file picker dialog.
+     * @param allowedExtensions The allowed file extensions. If empty, all files are allowed.
+     * @param onFinish The callback to be called when the dialog is dismissed. The parameter is the picked file, or null
+     *     if the user cancelled the dialog.
+     */
+    fun pickFile(
+        title: String,
+        allowedExtensions: List<String>,
+        onFinish: (File?) -> Unit,
+    )
 
     /**
      * Checks if the app has the permission to record audio and requests it if necessary. The response of the request

@@ -7,7 +7,6 @@ import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.LogLevel
 import io.github.aakira.napier.Napier
 import io.logsDirectory
-import kotlinx.datetime.Clock
 
 object Log {
     private val napierDisabled get() = isDesktop
@@ -153,7 +152,7 @@ private fun buildLog(
     throwable: Throwable?,
     message: String?,
 ): String {
-    val time = Clock.System.now().toString()
+    val time = DateTime.getNowString()
     val tagText = tag?.let { "[$it] " } ?: ""
     val baseLogString = "$time $priority: $tagText${message.orEmpty()}"
     return if (throwable != null) {

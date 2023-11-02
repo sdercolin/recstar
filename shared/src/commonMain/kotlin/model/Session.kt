@@ -5,8 +5,8 @@ import cafe.adriel.voyager.core.lifecycle.JavaSerializable
 import io.File
 import io.Paths
 import io.sessionsDirectory
-import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
+import util.DateTime
 
 /**
  * Model for a working session.
@@ -26,10 +26,11 @@ data class Session(
         get() = File(locationPath)
 }
 
-fun createSession(reclistFile: File): Result<Session> =
+fun createSession(reclist: Reclist): Result<Session> =
     runCatching {
-        val reclist = parseReclist(reclistFile).getOrThrow()
-        val timeSuffix = Clock.System.now().toString()
+        val timeSuffix = DateTime.getNowReadableString()
+            .replace(" ", "-")
+            .replace(":", "-")
         val sessionDefaultName = "${reclist.name}-$timeSuffix"
         Session(
             sessionDefaultName,

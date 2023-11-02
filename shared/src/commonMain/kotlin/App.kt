@@ -63,6 +63,9 @@ private fun MainScaffold(navigator: Navigator) {
                 } else {
                     null
                 },
+                actions = {
+                    (navigator.lastItem as Screen).Actions()
+                },
             )
         },
         content = {

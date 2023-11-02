@@ -11,6 +11,10 @@ enum class Strings {
     AlertNeedManualPermissionGrantTitle,
     AlertNeedManualPermissionGrantMessage,
     RecorderScreenCurrentSentenceLabel,
+    CreateSessionReclistScreenTitle,
+    CreateSessionReclistScreenActionImport,
+    CreateSessionReclistScreenContinue,
+    CreateSessionReclistScreenFailure,
     ;
 
     fun get(language: Language): String =
