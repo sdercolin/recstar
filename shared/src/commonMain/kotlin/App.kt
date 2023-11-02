@@ -9,13 +9,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
-import ui.common.AlertDialogController
 import ui.common.LocalAlertDialogController
 import ui.common.LocalToastController
-import ui.common.ToastController
 import ui.model.AppContext
 import ui.model.LocalAppContext
 import ui.model.Screen
@@ -25,19 +22,17 @@ import ui.style.AppTheme
 
 @Composable
 fun App(context: AppContext) {
-    val alertDialogController = remember(context) { AlertDialogController(context) }
-    val toastController = remember(context) { ToastController(context) }
     CompositionLocalProvider(
         LocalAppContext provides context,
-        LocalAlertDialogController provides alertDialogController,
-        LocalToastController provides toastController,
+        LocalAlertDialogController provides context.alertDialogController,
+        LocalToastController provides context.toastController,
     ) {
         AppTheme(isSystemInDarkTheme()) {
             Navigator(MainScreen) { navigator ->
                 MainScaffold(navigator)
             }
-            alertDialogController.Compose()
-            toastController.Compose()
+            context.alertDialogController.Compose()
+            context.toastController.Compose()
         }
     }
 }

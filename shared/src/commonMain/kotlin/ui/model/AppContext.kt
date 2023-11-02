@@ -4,6 +4,8 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import io.File
 import kotlinx.coroutines.CoroutineScope
 import repository.ReclistRepository
+import ui.common.AlertDialogController
+import ui.common.ToastController
 
 /**
  * This interface is used to provide platform specific functionality to the shared code.
@@ -14,6 +16,12 @@ import repository.ReclistRepository
 interface AppContext {
     /** The [ReclistRepository] instance to manage reclist files. */
     val reclistRepository: ReclistRepository
+
+    /** The [ToastController] instance to show toast messages. */
+    val toastController: ToastController
+
+    /** The [AlertDialogController] instance to show alert dialogs. */
+    val alertDialogController: AlertDialogController
 
     /**
      * Opens the given folder in the platform's default file manager.

@@ -10,6 +10,7 @@ enum class Strings {
     CommonBack,
     AlertNeedManualPermissionGrantTitle,
     AlertNeedManualPermissionGrantMessage,
+    ErrorReadFileFailedMessage,
     RecorderScreenCurrentSentenceLabel,
     CreateSessionReclistScreenTitle,
     CreateSessionReclistScreenActionImport,

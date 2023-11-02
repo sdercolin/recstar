@@ -3,29 +3,56 @@ package ui.model
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import io.File
+import io.PickFileDelegate
 import kotlinx.coroutines.CoroutineScope
+import repository.ReclistRepository
+import ui.common.AlertDialogController
 import ui.common.ToastController
 import ui.common.ToastDuration
+import ui.common.requestConfirm
 import ui.common.show
+import ui.string.*
+import util.Log
 import java.lang.ref.WeakReference
 
 class AndroidContext(
-    private val contextRef: WeakReference<android.content.Context>,
+    activity: AppCompatActivity,
     override val coroutineScope: CoroutineScope,
 ) : AppContext {
-    fun getAndroidNativeContext(): android.content.Context? = contextRef.get()
+    private val activityRef = WeakReference(activity)
 
-    var toastController: ToastController? = null
+    fun getAndroidNativeContext(): android.content.Context? = activityRef.get()
+
+    override val toastController = ToastController(this)
+
+    override val alertDialogController = AlertDialogController(this)
+
+    override val reclistRepository: ReclistRepository = ReclistRepository(this)
+
+    private val pickFileDelegate = PickFileDelegate(
+        activity,
+        onError = {
+            Log.e("Failed to load file", it)
+            alertDialogController.requestConfirm(message = stringStatic(Strings.ErrorReadFileFailedMessage))
+        },
+    )
 
     override fun requestOpenFolder(folder: File) {
-        toastController?.show("Not supported on Android: path=${folder.absolutePath}", ToastDuration.Long)
+        toastController.show("Not supported on Android: path=${folder.absolutePath}", ToastDuration.Long)
     }
 
+    override fun pickFile(
+        title: String,
+        allowedExtensions: List<String>,
+        onFinish: (File?) -> Unit,
+    ) = pickFileDelegate.launch(allowedExtensions, onFinish)
+
     override fun checkAndRequestRecordingPermission(): Boolean {
-        val context = contextRef.get()
+        val context = activityRef.get()
         if (context !is Activity) {
             return false
         }
@@ -46,7 +73,7 @@ class AndroidContext(
     }
 
     override fun checkRecordingPermissionIgnored(): Boolean {
-        val context = contextRef.get()
+        val context = activityRef.get()
         if (context !is Activity) {
             return false
         }
@@ -58,6 +85,7 @@ class AndroidContext(
 }
 
 private const val REQUEST_RECORD_AUDIO_PERMISSION = 1001
+private const val REQUEST_CODE_PICK_FILE = 1002
 
 val AppContext.androidContext: AndroidContext
     get() = this as AndroidContext

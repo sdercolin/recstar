@@ -13,11 +13,17 @@ import platform.AVFoundation.requestAccessForMediaType
 import platform.UIKit.UIDocumentPickerMode
 import platform.UIKit.UIDocumentPickerViewController
 import platform.UIKit.UIViewController
+import ui.common.AlertDialogController
+import ui.common.ToastController
 
 class ViewControllerContext(
     val uiViewController: UIViewController,
     override val coroutineScope: CoroutineScope,
 ) : AppContext {
+    override val toastController: ToastController = ToastController(this)
+
+    override val alertDialogController: AlertDialogController = AlertDialogController(this)
+
     override fun requestOpenFolder(folder: File) {
         val folderURL = folder.toNSURL()
         val documentPicker = UIDocumentPickerViewController(

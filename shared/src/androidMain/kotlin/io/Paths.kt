@@ -7,6 +7,7 @@ import java.lang.ref.WeakReference
 actual object Paths {
     actual val appRoot: File get() = File(context.filesDir)
     actual val contentRoot: File get() = File(contentRootFile)
+    val cacheRoot: File get() = File(context.cacheDir)
 
     private lateinit var contentRootFile: JavaFile
     private lateinit var contextRef: WeakReference<Context>

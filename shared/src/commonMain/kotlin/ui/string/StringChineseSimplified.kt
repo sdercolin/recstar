@@ -12,6 +12,7 @@ fun Strings.zhHans(): String? =
         CommonBack -> "返回"
         AlertNeedManualPermissionGrantTitle -> "无权限"
         AlertNeedManualPermissionGrantMessage -> "应用需要您的录音权限，请在系统设置中授予。"
+        ErrorReadFileFailedMessage -> "无法读取文件。"
         RecorderScreenCurrentSentenceLabel -> "正在录制："
         CreateSessionReclistScreenTitle -> "选择录音表"
         CreateSessionReclistScreenActionImport -> "导入录音表"
