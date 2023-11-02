@@ -153,7 +153,9 @@ private fun LwjglFileDialog(
     }
 }
 
-/** Sets directory mode for the Awt file dialog. */
+/**
+ * Sets directory mode for the Awt file dialog.
+ */
 private fun setAwtDirectoryMode(on: Boolean) {
     if (isMacOS) {
         System.setProperty("apple.awt.fileDialogForDirectories", on.toString())

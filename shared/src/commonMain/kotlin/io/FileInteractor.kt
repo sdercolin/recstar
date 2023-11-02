@@ -5,7 +5,9 @@ import ui.common.AlertDialogController
 import ui.common.ToastController
 import ui.model.AppContext
 
-/** A helper class to interact with the file system. */
+/**
+ * A helper class to interact with the file system.
+ */
 expect class FileInteractor(
     context: AppContext,
     toastController: ToastController,

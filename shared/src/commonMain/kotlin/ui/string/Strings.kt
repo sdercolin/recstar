@@ -26,7 +26,9 @@ enum class Strings {
         } ?: en()
 }
 
-/** Get a string in the current language. Recomposition will be triggered when [LocalLanguage] changes. */
+/**
+ * Get a string in the current language. Recomposition will be triggered when [LocalLanguage] changes.
+ */
 @Composable
 fun string(
     key: Strings,
@@ -42,7 +44,9 @@ fun stringStatic(
     vararg params: Any?,
 ): String = stringCertain(key, currentLanguage, *params)
 
-/** Get a string in the given [language]. */
+/**
+ * Get a string in the given [language].
+ */
 fun stringCertain(
     key: Strings,
     language: Language,

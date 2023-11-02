@@ -3,7 +3,9 @@ package ui.common
 import androidx.compose.runtime.Composable
 import ui.model.AppContext
 
-/** An app-wide controller for showing toasts. */
+/**
+ * An app-wide controller for showing toasts.
+ */
 expect class ToastController(context: AppContext) {
     fun show(request: ToastRequest)
 

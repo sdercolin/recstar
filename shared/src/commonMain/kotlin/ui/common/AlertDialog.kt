@@ -3,10 +3,11 @@ package ui.common
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import ui.model.AppContext
-import ui.string.Strings
-import ui.string.stringStatic
+import ui.string.*
 
-/** An app-wide controller for showing alert dialogs. */
+/**
+ * An app-wide controller for showing alert dialogs.
+ */
 expect class AlertDialogController(context: AppContext) {
     fun show(request: AlertDialogRequest)
 

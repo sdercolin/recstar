@@ -4,7 +4,8 @@ See the [README of the project template](README-compose.md) for instructions on 
 
 ## Other recommended settings
 
-1. Install the `Kotlin KDoc Formatter` plugin.
+1. Install the `Kotlin KDoc Formatter` plugin, and use the following settings:
+   [![KDoc Formatter settings](readme_images/kdoc_settings.png)](readme_images/kdoc_settings.png)
 2. Run `./gradlew addKtlintFormatGitPreCommitHook` once to add a pre-commit hook that will automatically format your
    code before committing.
 3. If in string definition files (e.g. [StringsEnglish.kt](shared/src/commonMain/kotlin/ui/string/StringEnglish.kt)), if

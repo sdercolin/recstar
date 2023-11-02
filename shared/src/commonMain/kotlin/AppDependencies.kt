@@ -13,7 +13,9 @@ import ui.common.ToastController
 import ui.model.AppContext
 import ui.model.LocalAppContext
 
-/** A class to hold all static dependencies of the app, bound to the lifecycle of the [context]. */
+/**
+ * A class to hold all static dependencies of the app, bound to the lifecycle of the [context].
+ */
 class AppDependencies(
     val context: AppContext,
     val toastController: ToastController = ToastController(context),

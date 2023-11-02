@@ -11,7 +11,9 @@ import model.parseReclist
 import ui.model.AppContext
 import util.Log
 
-/** A repository to manage reclist files. */
+/**
+ * A repository to manage reclist files.
+ */
 class ReclistRepository(private val context: AppContext) {
     private val folder = Paths.reclistsDirectory.also {
         if (!it.exists()) {
@@ -45,10 +47,14 @@ class ReclistRepository(private val context: AppContext) {
 
     private val _items = MutableStateFlow(emptyList<String>())
 
-    /** The list of reclist names. */
+    /**
+     * The list of reclist names.
+     */
     val items: StateFlow<List<String>> = _items
 
-    /** Fetches the list of reclists. */
+    /**
+     * Fetches the list of reclists.
+     */
     fun fetch() {
         val items = folder.listFiles()
             .filter { it.extension == "txt" }
@@ -56,7 +62,9 @@ class ReclistRepository(private val context: AppContext) {
         _items.value = items
     }
 
-    /** Gets the reclist with the given name. */
+    /**
+     * Gets the reclist with the given name.
+     */
     fun get(name: String): Reclist = map[name] ?: parseReclist(folder.resolve("$name.txt")).getOrThrow()
 }
 

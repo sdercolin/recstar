@@ -4,12 +4,18 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
-/** A helper class for getting the current date and time. */
+/**
+ * A helper class for getting the current date and time.
+ */
 object DateTime {
-    /** Gets the current time in milliseconds. */
+    /**
+     * Gets the current time in milliseconds.
+     */
     fun getNow(): Long = Clock.System.now().toEpochMilliseconds()
 
-    /** Gets the current time as a string. */
+    /**
+     * Gets the current time as a string.
+     */
     fun getNowString(): String = Clock.System.now().toString()
 
     /**

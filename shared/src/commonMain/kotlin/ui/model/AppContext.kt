@@ -10,7 +10,9 @@ import kotlinx.coroutines.CoroutineScope
  * - On Desktop, this is implemented by Java's Desktop API.
  */
 interface AppContext {
-    /** The app-level [CoroutineScope]. */
+    /**
+     * The app-level [CoroutineScope].
+     */
     val coroutineScope: CoroutineScope
 }
 

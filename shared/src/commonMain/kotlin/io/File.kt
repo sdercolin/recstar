@@ -16,22 +16,34 @@ expect class File(path: String) {
 
     val extension: String
 
-    /** Returns true if the file exists. */
+    /**
+     * Returns true if the file exists.
+     */
     fun exists(): Boolean
 
-    /** Returns the absolute path to the file. */
+    /**
+     * Returns the absolute path to the file.
+     */
     val absolutePath: String
 
-    /** Returns true if the file is existing and is a file (not a directory). */
+    /**
+     * Returns true if the file is existing and is a file (not a directory).
+     */
     val isFile: Boolean
 
-    /** Returns true if the file is existing and is a directory. */
+    /**
+     * Returns true if the file is existing and is a directory.
+     */
     val isDirectory: Boolean
 
-    /** Returns all children of this directory. */
+    /**
+     * Returns all children of this directory.
+     */
     fun listFiles(): List<File>
 
-    /** Returns the parent directory of this file, or null if this file does not have a parent. */
+    /**
+     * Returns the parent directory of this file, or null if this file does not have a parent.
+     */
     val parentFile: File?
 
     /**
@@ -48,16 +60,24 @@ expect class File(path: String) {
      */
     fun delete(): Boolean
 
-    /** Reads the entire file as a String with the given [encoding], or detects the encoding if [encoding] is null. */
+    /**
+     * Reads the entire file as a String with the given [encoding], or detects the encoding if [encoding] is null.
+     */
     fun readText(encoding: Encoding? = null): String
 
-    /** Writes the given text to the file using UTF-8. */
+    /**
+     * Writes the given text to the file using UTF-8.
+     */
     fun writeText(text: String)
 
-    /** Appends the given text to the file using UTF-8. */
+    /**
+     * Appends the given text to the file using UTF-8.
+     */
     fun appendText(text: String)
 
-    /** Copies this file to the given [target] file. */
+    /**
+     * Copies this file to the given [target] file.
+     */
     fun copyTo(
         target: File,
         overwrite: Boolean = false,

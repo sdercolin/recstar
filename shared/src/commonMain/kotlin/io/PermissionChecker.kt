@@ -3,7 +3,9 @@ package io
 import androidx.compose.runtime.staticCompositionLocalOf
 import ui.model.AppContext
 
-/** A helper class to check and request permissions. */
+/**
+ * A helper class to check and request permissions.
+ */
 expect class PermissionChecker(appContext: AppContext) {
     /**
      * Checks if the app has the permission to record audio and requests it if necessary. The response of the request
