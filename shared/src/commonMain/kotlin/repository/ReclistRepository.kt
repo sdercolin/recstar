@@ -26,6 +26,7 @@ class ReclistRepository(private val context: AppContext) {
      * @return true if the import was successful, false otherwise.
      */
     fun import(file: File): Boolean {
+        Log.i("ReclistRepository.import: ${file.absolutePath}")
         val reclist = parseReclist(file)
             .onFailure {
                 Log.e("ReclistRepository.import: failed to parse ${file.absolutePath}", it)

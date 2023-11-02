@@ -25,6 +25,7 @@ import platform.Foundation.stringByDeletingLastPathComponent
 import platform.Foundation.stringEncodingForData
 import platform.Foundation.writeToFile
 import util.Encoding
+import util.Log
 import util.toNSString
 import util.toNSStringEncoding
 import util.withNSError
@@ -38,6 +39,9 @@ actual class File actual constructor(private val path: String) {
 
     actual val nameWithoutExtension: String
         get() = name.substringBeforeLast('.', "")
+
+    actual val extension: String
+        get() = name.substringAfterLast('.', "")
 
     actual fun exists(): Boolean = fileManager.fileExistsAtPath(path)
 
@@ -134,6 +138,26 @@ actual class File actual constructor(private val path: String) {
             writeText(text)
         }
         Unit
+    }
+
+    actual fun copyTo(
+        target: File,
+        overwrite: Boolean,
+    ): File {
+        Log.d("File.copyTo: $path -> ${target.absolutePath}")
+        if (exists().not()) {
+            throw RuntimeException("File does not exist at path: $path")
+        }
+        if (target.exists()) {
+            if (!overwrite) {
+                throw RuntimeException("File already exists at path: ${target.absolutePath}")
+            }
+            target.delete()
+        }
+        withNSError { e ->
+            fileManager.copyItemAtPath(path, target.absolutePath, e)
+        }
+        return target
     }
 
     actual fun resolve(path: String): File {

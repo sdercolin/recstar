@@ -26,6 +26,7 @@ object Log {
         setupUncaughtExceptionHandler { throwable ->
             e(throwable)
         }
+        i("Log initialized")
     }
 
     fun d(message: String) {

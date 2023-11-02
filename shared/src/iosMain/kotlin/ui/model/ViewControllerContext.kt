@@ -1,6 +1,8 @@
 package ui.model
 
+import io.DocumentPickerDelegate
 import io.File
+import io.Uti
 import kotlinx.coroutines.CoroutineScope
 import platform.AVFoundation.AVAuthorizationStatusAuthorized
 import platform.AVFoundation.AVAuthorizationStatusDenied
@@ -13,16 +15,36 @@ import platform.AVFoundation.requestAccessForMediaType
 import platform.UIKit.UIDocumentPickerMode
 import platform.UIKit.UIDocumentPickerViewController
 import platform.UIKit.UIViewController
+import repository.ReclistRepository
 import ui.common.AlertDialogController
 import ui.common.ToastController
+import ui.common.requestConfirm
+import ui.string.*
+import util.Log
 
 class ViewControllerContext(
     val uiViewController: UIViewController,
     override val coroutineScope: CoroutineScope,
 ) : AppContext {
+    override val reclistRepository: ReclistRepository = ReclistRepository(this)
+
     override val toastController: ToastController = ToastController(this)
 
     override val alertDialogController: AlertDialogController = AlertDialogController(this)
+
+    private var documentPickerDelegateCallback: ((File?) -> Unit)? = null
+
+    // We need to keep a reference to the delegate, otherwise it will be garbage collected and the picker won't work.
+    private val documentPickerDelegate = DocumentPickerDelegate { url ->
+        url ?: return@DocumentPickerDelegate documentPickerDelegateCallback?.invoke(null) ?: Unit
+        try {
+            documentPickerDelegateCallback?.invoke(url.path?.let { path -> File(path) })
+            documentPickerDelegateCallback = null
+        } catch (t: Throwable) {
+            Log.e("Failed to load file", t)
+            alertDialogController.requestConfirm(message = stringStatic(Strings.ErrorReadFileFailedMessage))
+        }
+    }
 
     override fun requestOpenFolder(folder: File) {
         val folderURL = folder.toNSURL()
@@ -34,6 +56,21 @@ class ViewControllerContext(
         }
 
         uiViewController.presentViewController(documentPicker, animated = true, completion = null)
+    }
+
+    override fun pickFile(
+        title: String,
+        allowedExtensions: List<String>,
+        onFinish: (File?) -> Unit,
+    ) {
+        documentPickerDelegateCallback = onFinish
+        val types = Uti.mapExtensions(allowedExtensions)
+        val documentPicker = UIDocumentPickerViewController(
+            forOpeningContentTypes = types,
+            asCopy = true,
+        )
+        documentPicker.delegate = documentPickerDelegate
+        uiViewController.presentModalViewController(documentPicker, animated = true)
     }
 
     override fun checkAndRequestRecordingPermission(): Boolean {
