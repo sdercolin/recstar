@@ -106,9 +106,11 @@ class SessionScreenModel(
                 )
                 return
             }
-            // Request the permission again.
+            // Check/request the permission again.
             isPermissionGranted = permissionChecker.checkAndRequestRecordingPermission()
-            return
+            if (!isPermissionGranted) {
+                return
+            }
         }
         isRequestedRecording = true
         prepareOutputFile()

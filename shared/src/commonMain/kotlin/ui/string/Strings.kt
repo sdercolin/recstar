@@ -11,9 +11,13 @@ enum class Strings {
     AlertNeedManualPermissionGrantTitle,
     AlertNeedManualPermissionGrantMessage,
     ErrorReadFileFailedMessage,
+    MainScreenAllSessions,
+    MainScreenNewSession,
+    MainScreenEmpty,
     RecorderScreenCurrentSentenceLabel,
     CreateSessionReclistScreenTitle,
     CreateSessionReclistScreenActionImport,
+    CreateSessionReclistScreenEmpty,
     CreateSessionReclistScreenContinue,
     CreateSessionReclistScreenFailure,
     ;

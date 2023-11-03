@@ -5,7 +5,9 @@ import io.LocalFileInteractor
 import io.LocalPermissionChecker
 import io.PermissionChecker
 import repository.LocalReclistRepository
+import repository.LocalSessionRepository
 import repository.ReclistRepository
+import repository.SessionRepository
 import ui.common.AlertDialogController
 import ui.common.LocalAlertDialogController
 import ui.common.LocalToastController
@@ -22,7 +24,8 @@ class AppDependencies(
     val alertDialogController: AlertDialogController = AlertDialogController(context),
     val fileInteractor: FileInteractor = FileInteractor(context, toastController, alertDialogController),
     val permissionChecker: PermissionChecker = PermissionChecker(context),
-    val reclistRepository: ReclistRepository = ReclistRepository(context),
+    val reclistRepository: ReclistRepository = ReclistRepository(),
+    val sessionRepository: SessionRepository = SessionRepository(reclistRepository),
 )
 
 @Composable
@@ -32,11 +35,12 @@ fun ProvideAppDependencies(
 ) {
     CompositionLocalProvider(
         LocalAppContext provides dependencies.context,
-        LocalAlertDialogController provides dependencies.alertDialogController,
         LocalToastController provides dependencies.toastController,
-        LocalReclistRepository provides dependencies.reclistRepository,
+        LocalAlertDialogController provides dependencies.alertDialogController,
         LocalFileInteractor provides dependencies.fileInteractor,
         LocalPermissionChecker provides dependencies.permissionChecker,
+        LocalReclistRepository provides dependencies.reclistRepository,
+        LocalSessionRepository provides dependencies.sessionRepository,
     ) {
         content()
     }

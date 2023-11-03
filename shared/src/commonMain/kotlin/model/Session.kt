@@ -3,10 +3,7 @@ package model
 import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.lifecycle.JavaSerializable
 import io.File
-import io.Paths
-import io.sessionsDirectory
 import kotlinx.serialization.Serializable
-import util.DateTime
 
 /**
  * Model for a working session.
@@ -25,16 +22,3 @@ data class Session(
     val directory: File
         get() = File(locationPath)
 }
-
-fun createSession(reclist: Reclist): Result<Session> =
-    runCatching {
-        val timeSuffix = DateTime.getNowReadableString()
-            .replace(" ", "-")
-            .replace(":", "-")
-        val sessionDefaultName = "${reclist.name}-$timeSuffix"
-        Session(
-            sessionDefaultName,
-            reclist,
-            Paths.sessionsDirectory.resolve(sessionDefaultName).absolutePath,
-        )
-    }

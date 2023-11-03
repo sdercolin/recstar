@@ -40,6 +40,14 @@ kotlin {
         }
     }
 
+    targets.all {
+        compilations.all {
+            compilerOptions.configure {
+                freeCompilerArgs = listOf("-Xexpect-actual-classes")
+            }
+        }
+    }
+
     sourceSets {
         val commonMain by getting {
             dependencies {

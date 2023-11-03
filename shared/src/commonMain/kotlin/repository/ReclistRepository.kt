@@ -8,13 +8,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import model.Reclist
 import model.parseReclist
-import ui.model.AppContext
 import util.Log
 
 /**
  * A repository to manage reclist files.
  */
-class ReclistRepository(private val context: AppContext) {
+class ReclistRepository {
     private val folder = Paths.reclistsDirectory.also {
         if (!it.exists()) {
             it.mkdirs()
