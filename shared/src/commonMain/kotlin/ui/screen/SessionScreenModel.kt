@@ -54,7 +54,7 @@ class SessionScreenModel(
     val sentences: List<Sentence>
         get() = _sentences
 
-    fun reload(session: Session) {
+    private fun reload(session: Session) {
         name = session.name
         contentDirectory = session.directory
         _sentences.clear()
@@ -107,7 +107,7 @@ class SessionScreenModel(
         return getFile(sentence).isFile
     }
 
-    val currentFile: File
+    private val currentFile: File
         get() = getFile(currentSentence.text)
 
     private fun updateCurrentSentence() {
