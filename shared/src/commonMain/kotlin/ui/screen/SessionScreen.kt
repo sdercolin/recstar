@@ -48,17 +48,25 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.core.model.rememberScreenModel
+import exception.SessionRenameExistingException
+import exception.SessionRenameInvalidException
 import io.ExportDataRequest
 import io.LocalFileInteractor
-import io.LocalPermissionChecker
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import model.Session
+import repository.LocalSessionRepository
 import ui.common.LocalAlertDialogController
 import ui.common.LocalProgressController
 import ui.common.ReversedRow
 import ui.common.ScrollableLazyColumn
 import ui.common.plainClickable
+import ui.common.requestConfirm
+import ui.common.requestConfirmError
+import ui.common.requestInput
 import ui.model.LocalAppContext
 import ui.model.LocalScreenOrientation
 import ui.model.Screen
@@ -66,81 +74,122 @@ import ui.model.ScreenOrientation
 import ui.model.Sentence
 import ui.string.*
 import ui.style.CustomColors
+import util.Log
 import util.alpha
 import util.isDesktop
 import util.isIos
 import util.isMobile
 
-data class SessionScreen(val session: Session) : Screen {
+data class SessionScreen(val initialSession: Session) : Screen {
     @Composable
-    override fun getTitle(): String = session.name
+    override fun getTitle(): String = rememberSessionScreenModel(initialSession).name
 
     @Composable
-    override fun Actions() {
-        var showMenu by remember { mutableStateOf(false) }
-        IconButton(onClick = { showMenu = !showMenu }) {
-            Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = string(Strings.CommonMore),
-            )
-        }
-        DropdownMenu(
-            expanded = showMenu,
-            onDismissRequest = { showMenu = false },
-        ) {
-            val fileInteractor = LocalFileInteractor.current
-            val progressController = LocalProgressController.current
-            val useOpenDirectory = isDesktop || isIos
-            val useExport = isMobile
-            if (useOpenDirectory) {
-                DropdownMenuItem(
-                    onClick = {
-                        showMenu = false
-                        fileInteractor.requestOpenFolder(session.directory)
-                    },
-                ) {
-                    Text(text = string(Strings.SessionScreenActionOpenDirectory))
-                }
-            }
-            if (useExport) {
-                DropdownMenuItem(
-                    onClick = {
-                        showMenu = false
-                        val request = ExportDataRequest(
-                            folder = session.directory,
-                            allowedExtension = listOf("wav"),
-                            onStart = { progressController.show() },
-                            onSuccess = { progressController.hide() },
-                            onCancel = { progressController.hide() },
-                            onError = { progressController.hide() },
-                        )
-                        fileInteractor.exportData(request)
-                    },
-                ) {
-                    Text(text = string(Strings.SessionScreenActionExport))
-                }
-            }
-        }
-    }
+    override fun Actions() = ScreenActions()
 
     @Composable
-    override fun Content() = SessionScreenContent()
+    override fun Content() = ScreenContent()
 }
 
 @Composable
-private fun SessionScreen.SessionScreenContent() {
-    val context = LocalAppContext.current
-    val alertDialogController = LocalAlertDialogController.current
-    val permissionChecker = LocalPermissionChecker.current
-    val model = rememberScreenModel {
-        SessionScreenModel(
-            sentences = session.reclist.lines,
-            contentDirectory = session.directory,
-            context = context,
-            alertDialogController = alertDialogController,
-            permissionChecker = permissionChecker,
+private fun SessionScreen.ScreenActions() {
+    var showMenu by remember { mutableStateOf(false) }
+    val model = rememberSessionScreenModel(initialSession)
+    IconButton(
+        enabled = model.isRecording.not() && model.isBusy.not(),
+        onClick = { showMenu = !showMenu },
+    ) {
+        Icon(
+            imageVector = Icons.Default.MoreVert,
+            contentDescription = string(Strings.CommonMore),
         )
     }
+    DropdownMenu(
+        expanded = showMenu,
+        onDismissRequest = { showMenu = false },
+    ) {
+        val fileInteractor = LocalFileInteractor.current
+        val progressController = LocalProgressController.current
+        val alertDialogController = LocalAlertDialogController.current
+        val sessionRepository = LocalSessionRepository.current
+        val coroutineScope = LocalAppContext.current.coroutineScope
+
+        fun renameSession(newName: String) {
+            coroutineScope.launch(Dispatchers.IO) {
+                runCatching {
+                    val newSession = sessionRepository.rename(model.name, newName).getOrThrow()
+                    model.reload(newSession)
+                }.onFailure {
+                    withContext(Dispatchers.Main) {
+                        Log.e("Failed to rename session", it)
+                        when (it) {
+                            is SessionRenameInvalidException,
+                            is SessionRenameExistingException,
+                            -> {
+                                alertDialogController.requestConfirmError(
+                                    message = it.message,
+                                )
+                            }
+                            else -> {
+                                alertDialogController.requestConfirm(
+                                    message = stringStatic(Strings.ExceptionRenameSessionUnexpected),
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        val useOpenDirectory = isDesktop || isIos
+        val useExport = isMobile
+        if (useOpenDirectory) {
+            DropdownMenuItem(
+                onClick = {
+                    showMenu = false
+                    fileInteractor.requestOpenFolder(model.contentDirectory)
+                },
+            ) {
+                Text(text = string(Strings.SessionScreenActionOpenDirectory))
+            }
+        }
+        if (useExport) {
+            DropdownMenuItem(
+                onClick = {
+                    showMenu = false
+                    val request = ExportDataRequest(
+                        folder = model.contentDirectory,
+                        allowedExtension = listOf("wav"),
+                        onStart = { progressController.show() },
+                        onSuccess = { progressController.hide() },
+                        onCancel = { progressController.hide() },
+                        onError = { progressController.hide() },
+                    )
+                    fileInteractor.exportData(request)
+                },
+            ) {
+                Text(text = string(Strings.SessionScreenActionExport))
+            }
+        }
+        DropdownMenuItem(
+            onClick = {
+                showMenu = false
+                alertDialogController.requestInput(
+                    title = stringStatic(Strings.SessionScreenActionRenameSession),
+                    initialValue = model.name,
+                    selected = true,
+                    onConfirmInput = ::renameSession,
+                )
+            },
+        ) {
+            Text(text = string(Strings.SessionScreenActionRenameSession))
+        }
+    }
+}
+
+@Composable
+private fun SessionScreen.ScreenContent() {
+    val model = rememberSessionScreenModel(initialSession)
     val screenOrientation = LocalScreenOrientation.current
     if (screenOrientation == ScreenOrientation.Landscape) {
         Row(modifier = Modifier.fillMaxSize()) {

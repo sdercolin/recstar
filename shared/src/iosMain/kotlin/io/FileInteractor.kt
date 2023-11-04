@@ -15,7 +15,7 @@ import platform.UIKit.UIApplication
 import platform.UIKit.UIDocumentPickerViewController
 import ui.common.AlertDialogController
 import ui.common.ToastController
-import ui.common.requestConfirm
+import ui.common.requestConfirmError
 import ui.common.show
 import ui.model.AppContext
 import ui.model.uiViewControllerContext
@@ -40,7 +40,7 @@ actual class FileInteractor actual constructor(
             documentPickerDelegateCallback = null
         } catch (t: Throwable) {
             Log.e("Failed to load file", t)
-            alertDialogController.requestConfirm(message = stringStatic(Strings.ErrorReadFileFailedMessage))
+            alertDialogController.requestConfirmError(message = stringStatic(Strings.ErrorReadFileFailedMessage))
         }
     }
 
@@ -78,7 +78,7 @@ actual class FileInteractor actual constructor(
         fun onError(t: Throwable) {
             Log.e("Failed to export data", t)
             request.onError?.invoke(t)
-            alertDialogController.requestConfirm(message = stringStatic(Strings.ErrorExportDataFailedMessage))
+            alertDialogController.requestConfirmError(message = stringStatic(Strings.ErrorExportDataFailedMessage))
         }
 
         val fileManager = NSFileManager.defaultManager
@@ -123,7 +123,7 @@ actual class FileInteractor actual constructor(
                             request.onError?.invoke(
                                 RuntimeException("Failed to export data: ${error.localizedDescription}"),
                             )
-                            alertDialogController.requestConfirm(
+                            alertDialogController.requestConfirmError(
                                 message = stringStatic(Strings.ErrorExportDataFailedMessage),
                             )
                         }

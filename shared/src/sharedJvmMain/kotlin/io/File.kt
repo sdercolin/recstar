@@ -38,7 +38,7 @@ actual class File actual constructor(path: String) {
 
     actual fun mkdirs(): Boolean = internalFile.mkdirs()
 
-    actual fun delete(): Boolean = internalFile.delete()
+    actual fun delete(): Boolean = internalFile.deleteRecursively()
 
     actual fun readText(encoding: Encoding?): String {
         return if (encoding != null) {
@@ -57,7 +57,9 @@ actual class File actual constructor(path: String) {
     actual fun copyTo(
         target: File,
         overwrite: Boolean,
-    ) = internalFile.copyTo(target.internalFile, overwrite).toFile()
+    ) {
+        internalFile.copyRecursively(target.internalFile, overwrite)
+    }
 
     actual fun resolve(path: String): File = File(internalFile.resolve(path))
 }

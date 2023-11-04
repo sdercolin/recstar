@@ -1,6 +1,8 @@
 package repository
 
 import androidx.compose.runtime.staticCompositionLocalOf
+import exception.SessionRenameExistingException
+import exception.SessionRenameInvalidException
 import io.Paths
 import io.sessionsDirectory
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,6 +12,7 @@ import model.Session
 import model.SessionParams
 import model.toParams
 import util.DateTime
+import util.isValidFileName
 import util.parseJson
 import util.stringifyJson
 
@@ -78,6 +81,46 @@ class SessionRepository(private val reclistRepository: ReclistRepository) {
                 reclist,
                 directory.absolutePath,
             )
+        }
+
+    /**
+     * Rename the session with the given [oldName] to [newName]. This will cause the session folder to be renamed as
+     * well.
+     */
+    fun rename(
+        oldName: String,
+        newName: String,
+    ): Result<Session> =
+        runCatching {
+            if (oldName == newName) {
+                return@runCatching get(oldName).getOrThrow()
+            }
+            if (newName.isValidFileName().not()) {
+                throw SessionRenameInvalidException(newName)
+            }
+            val oldDirectory = folder.resolve(oldName)
+            val newDirectory = folder.resolve(newName)
+            if (newDirectory.exists()) {
+                throw SessionRenameExistingException(newName)
+            }
+            oldDirectory.copyTo(newDirectory)
+            oldDirectory.delete()
+            val file = newDirectory.resolve(SESSION_PARAMS_FILE_NAME)
+            val params = file.readText().parseJson<SessionParams>()
+            val reclist = reclistRepository.get(params.reclistName)
+            Session(
+                newName,
+                reclist,
+                newDirectory.absolutePath,
+            )
+        }.onSuccess {
+            _items.value = _items.value.map { name ->
+                if (name == oldName) {
+                    newName
+                } else {
+                    name
+                }
+            }
         }
 
     private fun save(session: Session) {

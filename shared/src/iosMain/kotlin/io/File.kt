@@ -143,7 +143,7 @@ actual class File actual constructor(private val path: String) {
     actual fun copyTo(
         target: File,
         overwrite: Boolean,
-    ): File {
+    ) {
         Log.d("File.copyTo: $path -> ${target.absolutePath}")
         if (exists().not()) {
             throw RuntimeException("File does not exist at path: $path")
@@ -157,7 +157,6 @@ actual class File actual constructor(private val path: String) {
         withNSError { e ->
             fileManager.copyItemAtPath(path, target.absolutePath, e)
         }
-        return target
     }
 
     actual fun resolve(path: String): File {

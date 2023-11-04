@@ -31,6 +31,7 @@ val LocalAlertDialogController = staticCompositionLocalOf<AlertDialogController>
  *     clicking outside / back button etc.
  * @property cancelOnClickOutside Whether the dialog should be dismissed when clicking outside. This is not effective on
  *     iOS.
+ * @property textInput The text input to be shown in the dialog. If null, the dialog will not have a text input.
  */
 class AlertDialogRequest(
     val title: String? = null,
@@ -40,7 +41,23 @@ class AlertDialogRequest(
     val onConfirm: (() -> Unit)? = null,
     val onDismiss: (() -> Unit)? = null,
     val cancelOnClickOutside: Boolean = true,
-)
+    val textInput: TextInput? = null,
+) {
+    /**
+     * A text input to be shown in the dialog.
+     *
+     * @param label The label of the text input.
+     * @param initialValue The initial value of the text input.
+     * @param selected Whether the text input should be selected when the dialog is shown.
+     * @param onConfirmInput The callback to be invoked when the confirm button is clicked.
+     */
+    data class TextInput(
+        val label: String? = null,
+        val initialValue: String = "",
+        val selected: Boolean = false,
+        val onConfirmInput: (String) -> Unit,
+    )
+}
 
 fun AlertDialogController.requestConfirm(
     title: String? = null,
@@ -54,6 +71,17 @@ fun AlertDialogController.requestConfirm(
     onConfirm = onFinish,
     onDismiss = onFinish,
 ).let { show(it) }
+
+fun AlertDialogController.requestConfirmError(
+    message: String? = null,
+    confirmButton: String = stringStatic(Strings.CommonOkay),
+    onFinish: (() -> Unit)? = null,
+) = requestConfirm(
+    title = stringStatic(Strings.CommonError),
+    message = message,
+    confirmButton = confirmButton,
+    onFinish = onFinish,
+)
 
 fun AlertDialogController.requestConfirmCancellable(
     title: String? = null,
@@ -87,4 +115,32 @@ fun AlertDialogController.requestYesNo(
     onConfirm = onConfirm,
     onDismiss = onDismiss,
     cancelOnClickOutside = cancelOnClickOutside,
+).let { show(it) }
+
+fun AlertDialogController.requestInput(
+    title: String? = null,
+    message: String? = null,
+    confirmButton: String = stringStatic(Strings.CommonOkay),
+    dismissButton: String = stringStatic(Strings.CommonCancel),
+    onConfirm: (() -> Unit)? = null,
+    onDismiss: (() -> Unit)? = null,
+    cancelOnClickOutside: Boolean = false,
+    label: String? = null,
+    initialValue: String = "",
+    selected: Boolean = false,
+    onConfirmInput: (String) -> Unit,
+) = AlertDialogRequest(
+    title = title,
+    message = message,
+    confirmButton = confirmButton,
+    dismissButton = dismissButton,
+    onConfirm = onConfirm,
+    onDismiss = onDismiss,
+    cancelOnClickOutside = cancelOnClickOutside,
+    textInput = AlertDialogRequest.TextInput(
+        label = label,
+        initialValue = initialValue,
+        selected = selected,
+        onConfirmInput = onConfirmInput,
+    ),
 ).let { show(it) }

@@ -81,7 +81,7 @@ expect class File(path: String) {
     fun copyTo(
         target: File,
         overwrite: Boolean = false,
-    ): File
+    )
 
     /**
      * Returns a new file with the given [path] relative to this file, or if [path] is absolute, returns a new file with

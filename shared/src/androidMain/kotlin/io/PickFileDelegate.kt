@@ -7,7 +7,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import ui.common.AlertDialogController
-import ui.common.requestConfirm
+import ui.common.requestConfirmError
 import ui.string.*
 import util.Log
 import util.toJavaFile
@@ -18,7 +18,7 @@ class PickFileDelegate(activity: AppCompatActivity, private val alertDialogContr
 
     private fun onError(t: Throwable) {
         Log.e("Failed to load file", t)
-        alertDialogController.requestConfirm(message = stringStatic(Strings.ErrorReadFileFailedMessage))
+        alertDialogController.requestConfirmError(message = stringStatic(Strings.ErrorReadFileFailedMessage))
     }
 
     private val pickFileContract: ActivityResultLauncher<String> =

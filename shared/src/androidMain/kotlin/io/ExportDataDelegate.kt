@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ui.common.AlertDialogController
 import ui.common.ToastController
-import ui.common.requestConfirm
+import ui.common.requestConfirmError
 import ui.common.show
 import ui.string.*
 import util.Log
@@ -45,7 +45,7 @@ class ExportDataDelegate(
     private val onError = { t: Throwable ->
         Log.e("Failed to export data", t)
         request?.onError?.invoke(t)
-        alertDialogController.requestConfirm(message = stringStatic(Strings.ErrorExportDataFailedMessage))
+        alertDialogController.requestConfirmError(message = stringStatic(Strings.ErrorExportDataFailedMessage))
     }
 
     private val exportDataContract: ActivityResultLauncher<Intent> =

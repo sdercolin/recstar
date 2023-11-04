@@ -1,37 +1,57 @@
 package ui.screen
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import audio.AudioRecorder
 import audio.AudioRecorderProvider
 import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import io.File
+import io.LocalPermissionChecker
 import io.PermissionChecker
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import model.Session
 import ui.common.AlertDialogController
+import ui.common.LocalAlertDialogController
 import ui.common.requestConfirm
 import ui.model.AppContext
+import ui.model.LocalAppContext
 import ui.model.Sentence
 import ui.string.*
 import util.Log
 
 class SessionScreenModel(
-    sentences: List<String>,
-    private val contentDirectory: File,
+    session: Session,
     context: AppContext,
     private val alertDialogController: AlertDialogController,
     private val permissionChecker: PermissionChecker,
 ) : ScreenModel {
-    private val _sentences: MutableList<Sentence> =
-        sentences.map { Sentence(it, isFileExisting(it)) }.toMutableStateList()
+    var name: String by mutableStateOf(session.name)
+        private set
+
+    var contentDirectory: File by mutableStateOf(session.directory)
+        private set
+
+    private val _sentences: SnapshotStateList<Sentence> = session.reclist.lines
+        .map { Sentence(it, isFileExisting(it)) }.toMutableStateList()
 
     val sentences: List<Sentence>
         get() = _sentences
+
+    fun reload(session: Session) {
+        name = session.name
+        contentDirectory = session.directory
+        _sentences.clear()
+        _sentences.addAll(session.reclist.lines.map { Sentence(it, isFileExisting(it)) })
+        currentIndex = currentIndex.coerceAtMost(sentences.size - 1)
+    }
 
     private val recorderListener = object : AudioRecorder.Listener {
         override fun onStarted() {
@@ -162,5 +182,20 @@ class SessionScreenModel(
     override fun onDispose() {
         recorder.dispose()
         super.onDispose()
+    }
+}
+
+@Composable
+fun SessionScreen.rememberSessionScreenModel(session: Session): SessionScreenModel {
+    val context = LocalAppContext.current
+    val alertDialogController = LocalAlertDialogController.current
+    val permissionChecker = LocalPermissionChecker.current
+    return rememberScreenModel {
+        SessionScreenModel(
+            session = session,
+            context = context,
+            alertDialogController = alertDialogController,
+            permissionChecker = permissionChecker,
+        )
     }
 }

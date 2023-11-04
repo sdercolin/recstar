@@ -6,6 +6,7 @@ import platform.UIKit.UIAlertActionStyleCancel
 import platform.UIKit.UIAlertActionStyleDefault
 import platform.UIKit.UIAlertController
 import platform.UIKit.UIAlertControllerStyleAlert
+import platform.UIKit.UITextField
 import ui.model.AppContext
 import ui.model.uiViewControllerContext
 
@@ -17,12 +18,30 @@ actual class AlertDialogController actual constructor(private val context: AppCo
             UIAlertControllerStyleAlert,
         )
 
+        var inputField: UITextField? = null
+        if (request.textInput != null) {
+            alertController.addTextFieldWithConfigurationHandler { textField ->
+                textField ?: return@addTextFieldWithConfigurationHandler
+                textField.text = request.textInput.initialValue
+                request.textInput.label?.let { label ->
+                    textField.placeholder = label
+                }
+                if (request.textInput.selected) {
+                    textField.selectAll(null)
+                }
+                inputField = textField
+            }
+        }
+
         alertController.addAction(
             UIAlertAction.actionWithTitle(
                 request.confirmButton,
                 UIAlertActionStyleDefault,
             ) { _ ->
                 request.onConfirm?.invoke()
+                inputField?.text?.let { text ->
+                    request.textInput?.onConfirmInput?.invoke(text)
+                }
             },
         )
 
