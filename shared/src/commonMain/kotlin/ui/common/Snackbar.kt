@@ -20,7 +20,9 @@ fun SnackbarContainer(hostState: SnackbarHostState) {
             Snackbar(
                 shape = MaterialTheme.shapes.medium,
                 snackbarData = it,
-                actionColor = MaterialTheme.colors.primary,
+                actionColor = MaterialTheme.colors.onBackground,
+                backgroundColor = MaterialTheme.colors.surface,
+                contentColor = MaterialTheme.colors.onBackground,
             )
         }
     }

@@ -45,4 +45,9 @@ actual class FileInteractor actual constructor(
             },
         )
     }
+
+    actual fun exportData(request: ExportDataRequest) {
+        // on desktop, we can directly open the folder by the file manager
+        // and let the user copy the files manually
+    }
 }

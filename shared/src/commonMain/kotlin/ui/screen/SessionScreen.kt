@@ -67,6 +67,8 @@ import ui.model.Sentence
 import ui.string.*
 import ui.style.CustomColors
 import util.alpha
+import util.isDesktop
+import util.isIos
 import util.isMobile
 
 data class SessionScreen(val session: Session) : Screen {
@@ -88,7 +90,19 @@ data class SessionScreen(val session: Session) : Screen {
         ) {
             val fileInteractor = LocalFileInteractor.current
             val progressController = LocalProgressController.current
-            if (isMobile) {
+            val useOpenDirectory = isDesktop || isIos
+            val useExport = isMobile
+            if (useOpenDirectory) {
+                DropdownMenuItem(
+                    onClick = {
+                        showMenu = false
+                        fileInteractor.requestOpenFolder(session.directory)
+                    },
+                ) {
+                    Text(text = string(Strings.SessionScreenActionOpenDirectory))
+                }
+            }
+            if (useExport) {
                 DropdownMenuItem(
                     onClick = {
                         showMenu = false
@@ -104,15 +118,6 @@ data class SessionScreen(val session: Session) : Screen {
                     },
                 ) {
                     Text(text = string(Strings.SessionScreenActionExport))
-                }
-            } else {
-                DropdownMenuItem(
-                    onClick = {
-                        showMenu = false
-                        fileInteractor.requestOpenFolder(session.directory)
-                    },
-                ) {
-                    Text(text = string(Strings.SessionScreenActionOpenDirectory))
                 }
             }
         }

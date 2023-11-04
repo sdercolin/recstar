@@ -16,10 +16,7 @@ actual class PermissionChecker actual constructor(appContext: AppContext) {
 
         when (authStatus) {
             AVAuthorizationStatusNotDetermined -> {
-                AVCaptureDevice.requestAccessForMediaType(AVMediaTypeAudio) { granted ->
-                    // You can handle the response here if needed.
-                    // For example, update UI or state based on whether 'granted' is true or false.
-                }
+                AVCaptureDevice.requestAccessForMediaType(AVMediaTypeAudio) { _ -> }
             }
             AVAuthorizationStatusAuthorized -> {
                 // Already authorized.
