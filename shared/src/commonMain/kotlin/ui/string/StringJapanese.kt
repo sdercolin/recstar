@@ -30,6 +30,7 @@ fun Strings.ja(): String? =
         MainScreenDeleteItemsConfirmationTitle -> "セッションを削除"
         MainScreenDeleteItemsConfirmationMessage -> "本当に {0} 件のセッションを削除しますか？録音ファイルは完全に削除されます。"
         SessionScreenCurrentSentenceLabel -> "録音中："
+        SessionScreenNoData -> "データがありません。"
         SessionScreenActionOpenDirectory -> "ディレクトリを開く"
         SessionScreenActionExport -> "エクスポート"
         SessionScreenActionRenameSession -> "セッション名を編集"

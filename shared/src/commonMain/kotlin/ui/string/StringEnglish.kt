@@ -31,6 +31,7 @@ fun Strings.en(): String =
         MainScreenDeleteItemsConfirmationMessage ->
             "Are you sure you want to delete {0} sessions? The recordings will be completely removed from the device."
         SessionScreenCurrentSentenceLabel -> "Current Recording: "
+        SessionScreenNoData -> "No data."
         SessionScreenActionOpenDirectory -> "Open Directory"
         SessionScreenActionExport -> "Export"
         SessionScreenActionRenameSession -> "Rename Session"

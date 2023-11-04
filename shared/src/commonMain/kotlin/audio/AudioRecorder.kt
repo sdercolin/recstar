@@ -1,6 +1,7 @@
 package audio
 
 import io.File
+import kotlinx.coroutines.flow.Flow
 import ui.model.AppContext
 
 /**
@@ -35,6 +36,11 @@ interface AudioRecorder {
      * Disposes of the resources used by the recorder.
      */
     fun dispose()
+
+    /**
+     * A [Flow] of the recorded audio data.
+     */
+    val waveDataFlow: Flow<FloatArray>
 }
 
 expect class AudioRecorderProvider(listener: AudioRecorder.Listener, context: AppContext) {

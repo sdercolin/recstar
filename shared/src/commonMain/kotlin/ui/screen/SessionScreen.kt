@@ -1,6 +1,7 @@
 package ui.screen
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -36,12 +37,14 @@ import androidx.compose.material.icons.filled.Square
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
@@ -50,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.ExportDataRequest
 import io.LocalFileInteractor
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import model.Session
 import ui.common.LocalAlertDialogController
@@ -271,7 +275,11 @@ private fun Recorder(
                     }
                 },
         ) {
-            RecorderWaveform(model.currentSentence.isFinished)
+            RecorderWaveform(
+                hasFile = model.currentSentence.isFinished,
+                isRecording = model.isRecording,
+                flow = model.waveformFlow,
+            )
         }
         Box(
             modifier = Modifier.fillMaxWidth()
@@ -313,16 +321,52 @@ private fun RecorderTitleBar(model: SessionScreenModel) {
 }
 
 @Composable
-private fun RecorderWaveform(hasFile: Boolean) {
+private fun RecorderWaveform(
+    hasFile: Boolean,
+    isRecording: Boolean,
+    flow: Flow<Array<FloatArray>>,
+) {
     val isDarkMode = isSystemInDarkTheme()
     val paperColor = if (isDarkMode) Color.Black else Color.White
     Box(modifier = Modifier.fillMaxSize().background(color = paperColor)) {
-        Text(
-            text = if (hasFile) "(Placeholder) Recorded" else "(Placeholder) Not Recorded",
-            style = MaterialTheme.typography.caption,
-            color = if (hasFile) MaterialTheme.colors.onBackground else MaterialTheme.colors.error,
-            modifier = Modifier.align(Alignment.Center),
-        )
+        if (!hasFile && !isRecording) {
+            Text(
+                text = string(Strings.SessionScreenNoData),
+                style = MaterialTheme.typography.caption,
+                color = MaterialTheme.colors.onBackground,
+                modifier = Modifier.align(Alignment.Center),
+            )
+        }
+        val data by flow.collectAsState(initial = emptyArray())
+        val color = if (isRecording) MaterialTheme.colors.secondary else MaterialTheme.colors.primary
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val width = size.width.toInt()
+            val height = size.height.toInt()
+            val halfHeight = height / 2
+            val dataLength = data.size
+            val ratio = (dataLength.toFloat() / width).coerceAtLeast(1f)
+            val offset = (dataLength - width).coerceAtMost(0)
+            for (i in 0 until width) {
+                val x = i.toFloat()
+                val dataPosStart = (i * ratio).toInt() + offset
+                val dataPosEnd = ((i + 1) * ratio).toInt() + offset
+                if (dataPosStart < 0 || dataPosStart >= dataLength ||
+                    dataPosEnd - 1 < 0 || dataPosEnd - 1 >= dataLength
+                ) {
+                    continue
+                }
+                val dataInPoint = data.copyOfRange(dataPosStart, dataPosEnd)
+                val max = dataInPoint.maxOfOrNull { it[0] } ?: continue
+                val min = dataInPoint.minOfOrNull { it[1] } ?: continue
+                val maxY = max * halfHeight
+                val minY = min * halfHeight
+                drawLine(
+                    color = color,
+                    start = Offset(x, halfHeight + maxY),
+                    end = Offset(x, halfHeight + minY),
+                )
+            }
+        }
     }
 }
 

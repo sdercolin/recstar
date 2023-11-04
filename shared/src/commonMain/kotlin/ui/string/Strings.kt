@@ -28,6 +28,7 @@ enum class Strings {
     MainScreenDeleteItemsConfirmationTitle,
     MainScreenDeleteItemsConfirmationMessage,
     SessionScreenCurrentSentenceLabel,
+    SessionScreenNoData,
     SessionScreenActionOpenDirectory,
     SessionScreenActionExport,
     SessionScreenActionRenameSession,

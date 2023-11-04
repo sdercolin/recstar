@@ -13,6 +13,7 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import exception.SessionRenameExistingException
 import exception.SessionRenameInvalidException
+import graph.WaveformPainter
 import io.File
 import io.LocalPermissionChecker
 import io.PermissionChecker
@@ -34,6 +35,7 @@ import ui.model.LocalAppContext
 import ui.model.Sentence
 import ui.string.*
 import util.Log
+import util.savedMutableStateOf
 
 class SessionScreenModel(
     session: Session,
@@ -73,8 +75,11 @@ class SessionScreenModel(
     }
 
     private val recorder = AudioRecorderProvider(recorderListener, context).get()
+    private val waveformPainter = WaveformPainter(recorder.waveDataFlow, screenModelScope)
 
-    var currentIndex: Int by mutableStateOf(0)
+    val waveformFlow: Flow<Array<FloatArray>> = waveformPainter.flow
+
+    var currentIndex: Int by savedMutableStateOf(0) { waveformPainter.switch(currentFile) }
         private set
 
     private var isRequestedRecording: Boolean by mutableStateOf(false)
@@ -144,6 +149,7 @@ class SessionScreenModel(
         isRequestedRecording = true
         prepareOutputFile()
         recorder.start(currentFile)
+        waveformPainter.onStartRecording()
     }
 
     private fun prepareOutputFile() {
@@ -157,6 +163,7 @@ class SessionScreenModel(
     private fun stopRecording() {
         isRequestedRecording = false
         recorder.stop()
+        waveformPainter.onStopRecording()
         updateCurrentSentence()
     }
 
