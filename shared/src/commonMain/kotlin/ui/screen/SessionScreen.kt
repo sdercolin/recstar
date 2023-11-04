@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
@@ -27,13 +29,17 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.NavigateBefore
 import androidx.compose.material.icons.filled.NavigateNext
 import androidx.compose.material.icons.filled.Square
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,10 +49,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.model.rememberScreenModel
+import io.ExportDataRequest
+import io.LocalFileInteractor
 import io.LocalPermissionChecker
 import kotlinx.coroutines.flow.collectLatest
 import model.Session
 import ui.common.LocalAlertDialogController
+import ui.common.LocalProgressController
 import ui.common.ReversedRow
 import ui.common.ScrollableLazyColumn
 import ui.common.plainClickable
@@ -63,6 +72,51 @@ import util.isMobile
 data class SessionScreen(val session: Session) : Screen {
     @Composable
     override fun getTitle(): String = session.name
+
+    @Composable
+    override fun Actions() {
+        var showMenu by remember { mutableStateOf(false) }
+        IconButton(onClick = { showMenu = !showMenu }) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = string(Strings.CommonMore),
+            )
+        }
+        DropdownMenu(
+            expanded = showMenu,
+            onDismissRequest = { showMenu = false },
+        ) {
+            val fileInteractor = LocalFileInteractor.current
+            val progressController = LocalProgressController.current
+            if (isMobile) {
+                DropdownMenuItem(
+                    onClick = {
+                        showMenu = false
+                        val request = ExportDataRequest(
+                            folder = session.directory,
+                            allowedExtension = listOf("wav"),
+                            onStart = { progressController.show() },
+                            onSuccess = { progressController.hide() },
+                            onCancel = { progressController.hide() },
+                            onError = { progressController.hide() },
+                        )
+                        fileInteractor.exportData(request)
+                    },
+                ) {
+                    Text(text = string(Strings.SessionScreenActionExport))
+                }
+            } else {
+                DropdownMenuItem(
+                    onClick = {
+                        showMenu = false
+                        fileInteractor.requestOpenFolder(session.directory)
+                    },
+                ) {
+                    Text(text = string(Strings.SessionScreenActionOpenDirectory))
+                }
+            }
+        }
+    }
 
     @Composable
     override fun Content() = SessionScreenContent()
@@ -230,7 +284,7 @@ private fun RecorderTitleBar(model: SessionScreenModel) {
     val useSmallSizes = isMobile && LocalScreenOrientation.current == ScreenOrientation.Landscape
     Spacer(modifier = Modifier.height(if (useSmallSizes) 12.dp else 24.dp))
     Text(
-        text = string(Strings.RecorderScreenCurrentSentenceLabel),
+        text = string(Strings.SessionScreenCurrentSentenceLabel),
         modifier = Modifier.padding(horizontal = 32.dp),
         style = MaterialTheme.typography.overline,
         fontSize = if (useSmallSizes) 8.sp else MaterialTheme.typography.overline.fontSize,

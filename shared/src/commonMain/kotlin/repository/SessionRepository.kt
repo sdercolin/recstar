@@ -46,15 +46,13 @@ class SessionRepository(private val reclistRepository: ReclistRepository) {
      */
     fun create(reclist: Reclist): Result<Session> =
         runCatching {
-            val timeSuffix = DateTime.getNowReadableString()
-                .replace(" ", "-")
-                .replace(":", "-")
-            val defaultName = "${reclist.name}-$timeSuffix"
+            val timeSuffix = DateTime.getNowReadableString(withTime = false)
+            val defaultName = "${reclist.name} $timeSuffix"
             var name = defaultName
             var repeat = 0
             while (name in _items.value) {
                 repeat++
-                name = "$defaultName-$repeat"
+                name = "$defaultName ($repeat)"
             }
             Session(
                 name,

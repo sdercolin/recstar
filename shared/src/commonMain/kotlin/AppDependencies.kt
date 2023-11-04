@@ -10,7 +10,9 @@ import repository.ReclistRepository
 import repository.SessionRepository
 import ui.common.AlertDialogController
 import ui.common.LocalAlertDialogController
+import ui.common.LocalProgressController
 import ui.common.LocalToastController
+import ui.common.ProgressController
 import ui.common.ToastController
 import ui.model.AppContext
 import ui.model.LocalAppContext
@@ -22,6 +24,7 @@ class AppDependencies(
     val context: AppContext,
     val toastController: ToastController = ToastController(context),
     val alertDialogController: AlertDialogController = AlertDialogController(context),
+    val progressController: ProgressController = ProgressController(),
     val fileInteractor: FileInteractor = FileInteractor(context, toastController, alertDialogController),
     val permissionChecker: PermissionChecker = PermissionChecker(context),
     val reclistRepository: ReclistRepository = ReclistRepository(),
@@ -37,6 +40,7 @@ fun ProvideAppDependencies(
         LocalAppContext provides dependencies.context,
         LocalToastController provides dependencies.toastController,
         LocalAlertDialogController provides dependencies.alertDialogController,
+        LocalProgressController provides dependencies.progressController,
         LocalFileInteractor provides dependencies.fileInteractor,
         LocalPermissionChecker provides dependencies.permissionChecker,
         LocalReclistRepository provides dependencies.reclistRepository,

@@ -6,11 +6,20 @@ import android.provider.OpenableColumns
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import ui.common.AlertDialogController
+import ui.common.requestConfirm
+import ui.string.*
+import util.Log
 import util.toJavaFile
 import java.lang.ref.WeakReference
 
-class PickFileDelegate(activity: AppCompatActivity, private val onError: (Throwable) -> Unit) {
+class PickFileDelegate(activity: AppCompatActivity, private val alertDialogController: AlertDialogController) {
     private val activityRef = WeakReference(activity)
+
+    private fun onError(t: Throwable) {
+        Log.e("Failed to load file", t)
+        alertDialogController.requestConfirm(message = stringStatic(Strings.ErrorReadFileFailedMessage))
+    }
 
     private val pickFileContract: ActivityResultLauncher<String> =
         activity.registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->

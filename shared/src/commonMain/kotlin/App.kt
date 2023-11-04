@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import ui.common.LocalAlertDialogController
+import ui.common.LocalProgressController
 import ui.common.LocalToastController
 import ui.model.Screen
 import ui.screen.MainScreen
@@ -21,12 +22,14 @@ import ui.style.AppTheme
 fun App() {
     val toastController = LocalToastController.current
     val alertDialogController = LocalAlertDialogController.current
+    val progressController = LocalProgressController.current
     AppTheme(isSystemInDarkTheme()) {
         Navigator(MainScreen) { navigator ->
             MainScaffold(navigator)
         }
         alertDialogController.Compose()
         toastController.Compose()
+        progressController.Compose()
     }
 }
 

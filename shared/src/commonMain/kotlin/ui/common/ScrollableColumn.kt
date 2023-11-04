@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import util.isDesktop
+import util.runIf
 
 @Composable
 fun ScrollableColumn(
@@ -28,8 +30,8 @@ fun ScrollableColumn(
     if (showScrollBar) {
         Box(modifier = modifier) {
             Column(
-                modifier = Modifier
-                    .run { if (!wrapWidth) fillMaxWidth() else this }
+                modifier = Modifier.wrapContentWidth()
+                    .runIf(!wrapWidth) { fillMaxWidth() }
                     .verticalScroll(scrollState),
                 verticalArrangement = verticalArrangement,
                 horizontalAlignment = horizontalAlignment,

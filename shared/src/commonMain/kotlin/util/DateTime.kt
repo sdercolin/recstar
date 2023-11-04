@@ -22,18 +22,33 @@ object DateTime {
      * Gets the current time as a string that is readable by humans.
      *
      * @param localTime Whether to use the local time or UTC.
+     * @param withTime Whether to include the time. If false, [withSecond] and [withMilliSecond] are ignored.
+     * @param withSecond Whether to include the seconds. If false, [withMilliSecond] is ignored.
+     * @param withMilliSecond Whether to include milliseconds.
      */
-    fun getNowReadableString(localTime: Boolean = true): String =
+    fun getNowReadableString(
+        localTime: Boolean = true,
+        withTime: Boolean = true,
+        withSecond: Boolean = true,
+        withMilliSecond: Boolean = false,
+    ): String =
         Clock.System.now()
             .run {
                 if (localTime) {
-                    toLocalDateTime(TimeZone.currentSystemDefault())
+                    toLocalDateTime(TimeZone.currentSystemDefault()).toString()
                 } else {
-                    this
+                    toString()
                 }
             }
-            .toString()
-            .replace("T", " ")
             .replace("Z", "")
-            .substringBeforeLast(".")
+            .runIf(!withTime) {
+                substringBefore("T")
+            }
+            .runIf(!withSecond) {
+                substringBeforeLast(":")
+            }
+            .runIf(!withMilliSecond) {
+                substringBeforeLast(".")
+            }
+            .replace("T", " ")
 }
