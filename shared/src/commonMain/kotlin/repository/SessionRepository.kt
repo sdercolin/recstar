@@ -123,6 +123,17 @@ class SessionRepository(private val reclistRepository: ReclistRepository) {
             }
         }
 
+    /**
+     * Deletes the sessions with the given names.
+     */
+    fun delete(names: List<String>) {
+        names.forEach { name ->
+            val directory = folder.resolve(name)
+            directory.delete()
+        }
+        _items.value = _items.value.filterNot { it in names }
+    }
+
     private fun save(session: Session) {
         val directory = folder.resolve(session.name)
         if (directory.exists().not()) {
