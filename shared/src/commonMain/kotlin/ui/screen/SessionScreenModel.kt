@@ -11,16 +11,24 @@ import audio.AudioRecorderProvider
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import exception.SessionRenameExistingException
+import exception.SessionRenameInvalidException
 import io.File
 import io.LocalPermissionChecker
 import io.PermissionChecker
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import model.Session
+import repository.LocalSessionRepository
+import repository.SessionRepository
 import ui.common.AlertDialogController
 import ui.common.LocalAlertDialogController
 import ui.common.requestConfirm
+import ui.common.requestConfirmError
 import ui.model.AppContext
 import ui.model.LocalAppContext
 import ui.model.Sentence
@@ -30,6 +38,7 @@ import util.Log
 class SessionScreenModel(
     session: Session,
     context: AppContext,
+    private val sessionRepository: SessionRepository,
     private val alertDialogController: AlertDialogController,
     private val permissionChecker: PermissionChecker,
 ) : ScreenModel {
@@ -179,6 +188,33 @@ class SessionScreenModel(
         requestScrollToCurrentSentence()
     }
 
+    fun renameSession(newName: String) {
+        screenModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                val newSession = sessionRepository.rename(name, newName).getOrThrow()
+                reload(newSession)
+            }.onFailure {
+                withContext(Dispatchers.Main) {
+                    Log.e("Failed to rename session", it)
+                    when (it) {
+                        is SessionRenameInvalidException,
+                        is SessionRenameExistingException,
+                        -> {
+                            alertDialogController.requestConfirmError(
+                                message = it.message,
+                            )
+                        }
+                        else -> {
+                            alertDialogController.requestConfirm(
+                                message = stringStatic(Strings.ExceptionRenameSessionUnexpected),
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     override fun onDispose() {
         recorder.dispose()
         super.onDispose()
@@ -190,10 +226,12 @@ fun SessionScreen.rememberSessionScreenModel(session: Session): SessionScreenMod
     val context = LocalAppContext.current
     val alertDialogController = LocalAlertDialogController.current
     val permissionChecker = LocalPermissionChecker.current
+    val sessionRepository = LocalSessionRepository.current
     return rememberScreenModel {
         SessionScreenModel(
             session = session,
             context = context,
+            sessionRepository = sessionRepository,
             alertDialogController = alertDialogController,
             permissionChecker = permissionChecker,
         )

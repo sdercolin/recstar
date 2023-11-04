@@ -48,33 +48,22 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import exception.SessionRenameExistingException
-import exception.SessionRenameInvalidException
 import io.ExportDataRequest
 import io.LocalFileInteractor
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import model.Session
-import repository.LocalSessionRepository
 import ui.common.LocalAlertDialogController
 import ui.common.LocalProgressController
 import ui.common.ReversedRow
 import ui.common.ScrollableLazyColumn
 import ui.common.plainClickable
-import ui.common.requestConfirm
-import ui.common.requestConfirmError
 import ui.common.requestInput
-import ui.model.LocalAppContext
 import ui.model.LocalScreenOrientation
 import ui.model.Screen
 import ui.model.ScreenOrientation
 import ui.model.Sentence
 import ui.string.*
 import ui.style.CustomColors
-import util.Log
 import util.alpha
 import util.isDesktop
 import util.isIos
@@ -111,36 +100,6 @@ private fun SessionScreen.ScreenActions() {
         val fileInteractor = LocalFileInteractor.current
         val progressController = LocalProgressController.current
         val alertDialogController = LocalAlertDialogController.current
-        val sessionRepository = LocalSessionRepository.current
-        val coroutineScope = LocalAppContext.current.coroutineScope
-
-        fun renameSession(newName: String) {
-            coroutineScope.launch(Dispatchers.IO) {
-                runCatching {
-                    val newSession = sessionRepository.rename(model.name, newName).getOrThrow()
-                    model.reload(newSession)
-                }.onFailure {
-                    withContext(Dispatchers.Main) {
-                        Log.e("Failed to rename session", it)
-                        when (it) {
-                            is SessionRenameInvalidException,
-                            is SessionRenameExistingException,
-                            -> {
-                                alertDialogController.requestConfirmError(
-                                    message = it.message,
-                                )
-                            }
-                            else -> {
-                                alertDialogController.requestConfirm(
-                                    message = stringStatic(Strings.ExceptionRenameSessionUnexpected),
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         val useOpenDirectory = isDesktop || isIos
         val useExport = isMobile
         if (useOpenDirectory) {
@@ -178,7 +137,7 @@ private fun SessionScreen.ScreenActions() {
                     title = stringStatic(Strings.SessionScreenActionRenameSession),
                     initialValue = model.name,
                     selected = true,
-                    onConfirmInput = ::renameSession,
+                    onConfirmInput = model::renameSession,
                 )
             },
         ) {
