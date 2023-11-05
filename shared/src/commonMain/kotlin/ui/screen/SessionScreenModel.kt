@@ -80,13 +80,15 @@ class SessionScreenModel(
 
     private val recorderListener = object : AudioRecorder.Listener {
         var waveformPainter: WaveformPainter? = null
+        var lastSentenceIndex: Int? = null
 
         override fun onStarted() {
             isRecording = true
+            lastSentenceIndex = currentIndex
         }
 
         override fun onStopped() {
-            updateCurrentSentence()
+            lastSentenceIndex?.let { updateSentence(it) }
             isRecording = false
             waveformPainter?.onStopRecording()
         }
@@ -122,7 +124,11 @@ class SessionScreenModel(
         get() = getFile(currentSentence.text)
 
     private fun updateCurrentSentence() {
-        _sentences[currentIndex] = currentSentence.copy(isFinished = isFileExisting(currentSentence.text))
+        updateSentence(currentIndex)
+    }
+
+    private fun updateSentence(index: Int) {
+        _sentences[index] = sentences[index].copy(isFinished = isFileExisting(sentences[index].text))
     }
 
     fun toggleRecording() {
@@ -172,8 +178,13 @@ class SessionScreenModel(
     }
 
     fun selectSentence(index: Int) {
+        if (index == currentIndex) return
         currentIndex = index
-        updateCurrentSentence()
+        if (isRecording) {
+            stopRecording()
+        } else {
+            updateCurrentSentence()
+        }
         requestScrollToCurrentSentence()
     }
 
@@ -181,22 +192,14 @@ class SessionScreenModel(
 
     fun next() {
         if (!hasNext) return
-        if (isRecording) {
-            stopRecording()
-        }
-        currentIndex++
-        requestScrollToCurrentSentence()
+        selectSentence(currentIndex + 1)
     }
 
     val hasPrevious get() = currentIndex > 0
 
     fun previous() {
         if (!hasPrevious) return
-        if (isRecording) {
-            stopRecording()
-        }
-        currentIndex--
-        requestScrollToCurrentSentence()
+        selectSentence(currentIndex - 1)
     }
 
     fun renameSession(newName: String) {
@@ -228,6 +231,7 @@ class SessionScreenModel(
 
     override fun onDispose() {
         recorder.dispose()
+        waveformPainter.dispose()
         super.onDispose()
     }
 }

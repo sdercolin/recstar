@@ -5,6 +5,7 @@ import io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -21,7 +22,16 @@ class WaveformPainter(
 
     private val wavReader = WavReader()
 
+    private var pendingFile: File? = null
+
     fun switch(file: File) {
+        pendingFile = file
+        if (job?.isActive == true) return
+        consumePendingFile()
+    }
+
+    private fun consumePendingFile() {
+        val file = pendingFile ?: return
         if (file.isFile) {
             runCatching {
                 wavReader.read(file)
@@ -65,7 +75,16 @@ class WaveformPainter(
     }
 
     fun onStopRecording() {
+        coroutineScope.launch {
+            job?.cancelAndJoin()
+            job = null
+            consumePendingFile()
+        }
+    }
+
+    fun dispose() {
         job?.cancel()
         job = null
+        pendingFile = null
     }
 }

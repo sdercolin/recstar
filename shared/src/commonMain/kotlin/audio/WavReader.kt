@@ -16,7 +16,18 @@ class WavReader {
         val chunkId = source.readString(4)
         val chunkSize = source.readIntLe()
         val format = source.readString(4)
-        val subchunk1Id = source.readString(4)
+
+        require(chunkId == WavFormat.CHUNK_ID) {
+            "Invalid WAV file: chunkId: $chunkId"
+        }
+        require(format == WavFormat.FORMAT) {
+            "Invalid WAV file: format: $format"
+        }
+        var subchunk1Id = source.readString(4)
+        while (subchunk1Id != WavFormat.SUBCHUNK_1_ID) {
+            source.skip(source.readIntLe().toLong())
+            subchunk1Id = source.readString(4)
+        }
         val subchunk1Size = source.readIntLe()
         val audioFormat = source.readShortLe()
         val numChannels = source.readShortLe()
@@ -24,19 +35,20 @@ class WavReader {
         val byteRate = source.readIntLe()
         val blockAlign = source.readShortLe()
         val bitsPerSample = source.readShortLe()
-        val subchunk2Id = source.readString(4)
+
+        require(audioFormat == WavFormat.AUDIO_FORMAT) {
+            "Invalid WAV file: audioFormat: $audioFormat"
+        }
+        require(bitsPerSample == 16.toShort()) {
+            "Only 16-bit WAV files are supported"
+        }
+
+        var subchunk2Id = source.readString(4)
+        while (subchunk2Id != WavFormat.SUBCHUNK_2_ID) {
+            source.skip(source.readIntLe().toLong())
+            subchunk2Id = source.readString(4)
+        }
         val subchunk2Size = source.readIntLe()
-        if (chunkId != WavFormat.CHUNK_ID ||
-            format != WavFormat.FORMAT ||
-            subchunk1Id != WavFormat.SUBCHUNK_1_ID ||
-            audioFormat != WavFormat.AUDIO_FORMAT ||
-            subchunk2Id != WavFormat.SUBCHUNK_2_ID
-        ) {
-            throw IllegalArgumentException("Invalid WAV file")
-        }
-        if (bitsPerSample != 16.toShort()) {
-            throw IllegalArgumentException("Only 16-bit WAV files are supported")
-        }
 
         val data = mutableListOf<Float>()
         var read = 0

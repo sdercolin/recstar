@@ -41,8 +41,8 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
                 WavFormat.SAMPLE_RATE.toFloat(),
                 WavFormat.BITS_PER_SAMPLE,
                 WavFormat.CHANNELS,
-                true,
-                true,
+                true, // signed
+                false, // little endian
             )
             val line = AudioSystem.getTargetDataLine(format).apply {
                 open(format)

@@ -131,6 +131,7 @@ class AudioRecorderImpl(
             }
         }.onFailure {
             Log.e(it)
+            dispose()
         }
     }
 
