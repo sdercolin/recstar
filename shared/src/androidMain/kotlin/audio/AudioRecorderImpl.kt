@@ -6,7 +6,6 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import const.WavFormat
 import io.File
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -26,8 +25,9 @@ import util.writeRawString
 
 class AudioRecorderImpl(
     private val listener: AudioRecorder.Listener,
+    context: AppContext,
 ) : AudioRecorder {
-    private val coroutineScope = CoroutineScope(Dispatchers.Main)
+    private val coroutineScope = context.coroutineScope
     private var job: Job? = null
     private var cleanupJob: Job? = null
     private var audioRecord: AudioRecord? = null
@@ -138,14 +138,16 @@ class AudioRecorderImpl(
     override fun isRecording(): Boolean = audioRecord != null
 
     override fun dispose() {
-        runCatching {
-            job?.cancel()
-            cleanupJob?.cancel()
-            audioRecord?.release()
-            job = null
-            audioRecord = null
-            cleanupJob = null
-        }.onFailure { Log.e(it) }
+        coroutineScope.launch {
+            runCatching {
+                job?.cancelAndJoin()
+                cleanupJob?.cancelAndJoin()
+                audioRecord?.release()
+                job = null
+                audioRecord = null
+                cleanupJob = null
+            }.onFailure { Log.e(it) }
+        }
     }
 
     private val waveData = mutableListOf<Float>()
@@ -160,13 +162,9 @@ class AudioRecorderImpl(
     override val waveDataFlow: Flow<FloatArray> = _waveDataFlow
 }
 
-actual class AudioRecorderProvider(
+actual class AudioRecorderProvider actual constructor(
     private val listener: AudioRecorder.Listener,
+    private val context: AppContext,
 ) {
-    actual constructor(
-        listener: AudioRecorder.Listener,
-        context: AppContext,
-    ) : this(listener)
-
-    actual fun get(): AudioRecorder = AudioRecorderImpl(listener)
+    actual fun get(): AudioRecorder = AudioRecorderImpl(listener, context)
 }

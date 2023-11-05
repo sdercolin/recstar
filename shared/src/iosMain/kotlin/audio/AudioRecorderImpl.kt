@@ -2,7 +2,6 @@ package audio
 
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.get
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
@@ -29,12 +28,12 @@ import util.withNSError
 import util.withNSErrorCatching
 
 @OptIn(ExperimentalForeignApi::class)
-class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRecorder {
+class AudioRecorderImpl(private val listener: AudioRecorder.Listener, context: AppContext) : AudioRecorder {
     private var recorder: AVAudioRecorder? = null
     private var engine: AVAudioEngine? = null
     private var job: Job? = null
     private var cleanupJob: Job? = null
-    private val scope = CoroutineScope(Dispatchers.Main)
+    private val scope = context.coroutineScope
 
     override fun start(output: io.File) {
         runCatching {
@@ -72,7 +71,7 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
                         engine.startAndReturnError(e0)
                     }
                     recorder?.record()
-                    withContext(Dispatchers.Default) {
+                    withContext(Dispatchers.Main) {
                         listener.onStarted()
                     }
                 }
@@ -110,16 +109,14 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
     override fun isRecording(): Boolean = recorder?.recording == true
 
     override fun dispose() {
-        try {
+        runCatching {
             cleanupJob?.cancel()
             job?.cancel()
             recorder?.takeIf { it.recording }?.stop()
             recorder = null
             engine?.takeIf { it.running }?.stop()
             engine = null
-        } catch (e: Exception) {
-            Log.e(e)
-        }
+        }.onFailure { Log.e(it) }
     }
 
     private fun addWaveData(buffer: AVAudioPCMBuffer) {
@@ -138,7 +135,7 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
 
 actual class AudioRecorderProvider actual constructor(
     private val listener: AudioRecorder.Listener,
-    context: AppContext,
+    private val context: AppContext,
 ) {
-    actual fun get(): AudioRecorder = AudioRecorderImpl(listener)
+    actual fun get(): AudioRecorder = AudioRecorderImpl(listener, context)
 }
