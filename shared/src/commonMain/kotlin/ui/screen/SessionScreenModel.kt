@@ -70,14 +70,10 @@ class SessionScreenModel(
         }
 
         override fun onStopped() {
+            updateCurrentSentence()
             isRecording = false
         }
     }
-
-    private val recorder = AudioRecorderProvider(recorderListener, context).get()
-    private val waveformPainter = WaveformPainter(recorder.waveDataFlow, screenModelScope)
-
-    val waveformFlow: Flow<Array<FloatArray>> = waveformPainter.flow
 
     var currentIndex: Int by savedMutableStateOf(0) { waveformPainter.switch(currentFile) }
         private set
@@ -92,6 +88,13 @@ class SessionScreenModel(
 
     val currentSentence: Sentence
         get() = sentences[currentIndex]
+
+    private val recorder = AudioRecorderProvider(recorderListener, context).get()
+    private val waveformPainter = WaveformPainter(recorder.waveDataFlow, screenModelScope).apply {
+        switch(currentFile)
+    }
+
+    val waveformFlow: Flow<Array<FloatArray>> = waveformPainter.flow
 
     private var isPermissionGranted = permissionChecker.checkAndRequestRecordingPermission()
 
@@ -164,7 +167,6 @@ class SessionScreenModel(
         isRequestedRecording = false
         recorder.stop()
         waveformPainter.onStopRecording()
-        updateCurrentSentence()
     }
 
     fun selectSentence(index: Int) {

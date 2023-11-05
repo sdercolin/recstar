@@ -1,5 +1,8 @@
 package io
 
+import kotlinx.io.Source
+import kotlinx.io.asSource
+import kotlinx.io.buffered
 import util.Encoding
 import util.JavaFile
 import util.detectEncoding
@@ -62,6 +65,8 @@ actual class File actual constructor(path: String) {
     }
 
     actual fun resolve(path: String): File = File(internalFile.resolve(path))
+
+    actual fun source(): Source = internalFile.inputStream().asSource().buffered()
 }
 
 fun String.toFile(): File = File(this)

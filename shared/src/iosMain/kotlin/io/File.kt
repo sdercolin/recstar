@@ -8,8 +8,12 @@ import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
 import kotlinx.cinterop.value
+import kotlinx.io.Source
+import kotlinx.io.asSource
+import kotlinx.io.buffered
 import platform.Foundation.NSData
 import platform.Foundation.NSFileManager
+import platform.Foundation.NSInputStream
 import platform.Foundation.NSMutableData
 import platform.Foundation.NSString
 import platform.Foundation.NSStringEncoding
@@ -168,6 +172,8 @@ actual class File actual constructor(private val path: String) {
             File(resolvedPath)
         }
     }
+
+    actual fun source(): Source = NSInputStream(toNSURL()).asSource().buffered()
 
     fun toNSURL() = NSURL.fileURLWithPath(this.absolutePath)
 }

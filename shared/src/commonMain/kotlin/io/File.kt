@@ -1,5 +1,6 @@
 package io
 
+import kotlinx.io.Source
 import util.Encoding
 
 /**
@@ -88,4 +89,9 @@ expect class File(path: String) {
      * the absolute path.
      */
     fun resolve(path: String): File
+
+    /**
+     * Returns a multiplatform [Source] for this file.
+     */
+    fun source(): Source
 }

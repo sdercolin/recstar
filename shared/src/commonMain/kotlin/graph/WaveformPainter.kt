@@ -1,5 +1,6 @@
 package graph
 
+import audio.WavReader
 import io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -7,6 +8,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import util.Log
 
 class WaveformPainter(
     private val recordingFlow: Flow<FloatArray>,
@@ -17,9 +19,20 @@ class WaveformPainter(
     private val _flow = MutableStateFlow(emptyArray<FloatArray>())
     val flow: Flow<Array<FloatArray>> = _flow
 
+    private val wavReader = WavReader()
+
     fun switch(file: File) {
-        // TODO: load file and draw
-        _flow.value = emptyArray()
+        if (file.isFile) {
+            runCatching {
+                wavReader.read(file)
+            }.onFailure {
+                Log.e(it)
+            }.onSuccess {
+                _flow.value = getSampledData(it)
+            }
+        } else {
+            _flow.value = emptyArray()
+        }
     }
 
     private var job: Job? = null
