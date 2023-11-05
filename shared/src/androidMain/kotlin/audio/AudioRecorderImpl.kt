@@ -19,11 +19,9 @@ import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 import kotlinx.io.writeIntLe
 import kotlinx.io.writeShortLe
-import ui.model.AndroidContext
 import ui.model.AppContext
 import util.Log
 import util.toJavaFile
-import util.writeInt
 import util.writeRawString
 
 class AudioRecorderImpl(
@@ -59,13 +57,6 @@ class AudioRecorderImpl(
         buffer.writeRawString(WavFormat.SUBCHUNK_2_ID)
         buffer.writeIntLe(dataSize)
         return buffer.readByteArray()
-    }
-
-    private fun ByteArray.updateHeader() {
-        val totalSize = size
-        val contentSize = totalSize - 44
-        writeInt(4, totalSize)
-        writeInt(40, contentSize)
     }
 
     @SuppressLint("MissingPermission")
@@ -170,12 +161,11 @@ class AudioRecorderImpl(
 
 actual class AudioRecorderProvider(
     private val listener: AudioRecorder.Listener,
-    private val context: AndroidContext,
 ) {
     actual constructor(
         listener: AudioRecorder.Listener,
         context: AppContext,
-    ) : this(listener, context as AndroidContext)
+    ) : this(listener)
 
     actual fun get(): AudioRecorder = AudioRecorderImpl(listener)
 }
