@@ -21,3 +21,17 @@ fun ByteArray.writeInt(
     this[offset + 2] = (value shr 16 and 0xff).toByte()
     this[offset + 3] = (value shr 24 and 0xff).toByte()
 }
+
+fun ByteArray.toShortArray(
+    target: ShortArray = ShortArray(size / 2),
+    isLittleEndian: Boolean = false,
+): ShortArray {
+    for (i in target.indices) {
+        if (isLittleEndian) {
+            target[i] = (this[i * 2 + 1].toInt() and 0xff or (this[i * 2].toInt() shl 8)).toShort()
+        } else {
+            target[i] = (this[i * 2].toInt() and 0xff or (this[i * 2 + 1].toInt() shl 8)).toShort()
+        }
+    }
+    return target
+}

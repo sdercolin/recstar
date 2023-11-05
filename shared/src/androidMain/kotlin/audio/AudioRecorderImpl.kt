@@ -132,7 +132,6 @@ class AudioRecorderImpl(
                 audioRecord?.release()
                 audioRecord = null
                 waveData.clear()
-                _waveDataFlow.value = FloatArray(0)
                 rawData.clear()
                 Log.i("AudioRecorderImpl.stop: stopped")
                 withContext(Dispatchers.Main) {

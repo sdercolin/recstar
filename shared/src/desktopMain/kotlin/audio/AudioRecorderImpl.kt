@@ -1,11 +1,14 @@
 package audio
 
 import androidx.compose.runtime.Stable
+import const.WavFormat
 import io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ui.model.AppContext
@@ -23,6 +26,7 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
     private var job: Job? = null
     private var cleanupJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.Main)
+    private var stream: InterceptedAudioInputStream? = null
 
     override fun start(output: File) {
         if (job?.isActive == true) {
@@ -32,16 +36,26 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
         job = scope.launch {
             cleanupJob?.join()
             cleanupJob = null
-            val format = AudioFormat(44100.0f, 16, 1, true, true)
-            line = AudioSystem.getTargetDataLine(format).apply {
+            _waveDataFlow.value = FloatArray(0)
+            val format = AudioFormat(
+                WavFormat.SAMPLE_RATE.toFloat(),
+                WavFormat.BITS_PER_SAMPLE,
+                WavFormat.CHANNELS,
+                true,
+                true,
+            )
+            val line = AudioSystem.getTargetDataLine(format).apply {
                 open(format)
                 start()
             }
+            this@AudioRecorderImpl.line = line
             Log.i("AudioRecorderImpl.start: path: ${output.absolutePath}")
             listener.onStarted()
             withContext(Dispatchers.IO) {
+                val stream = InterceptedAudioInputStream(line, 1792, _waveDataFlow)
+                this@AudioRecorderImpl.stream = stream
                 AudioSystem.write(
-                    AudioInputStream(line),
+                    AudioInputStream(stream, format, AudioSystem.NOT_SPECIFIED.toLong()),
                     AudioFileFormat.Type.WAVE,
                     output.toJavaFile(),
                 )
@@ -54,6 +68,8 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
             line?.stop()
             line?.flush()
             line?.close()
+            stream?.close()
+            stream = null
             job?.cancelAndJoin()
             line = null
             Log.i("AudioRecorderImpl.stop: stopped")
@@ -73,6 +89,9 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
         line?.close()
         line = null
     }
+
+    private val _waveDataFlow = MutableStateFlow(FloatArray(0))
+    override val waveDataFlow: Flow<FloatArray> = _waveDataFlow
 }
 
 actual class AudioRecorderProvider(private val listener: AudioRecorder.Listener) {
