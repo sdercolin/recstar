@@ -101,7 +101,17 @@ actual class File actual constructor(private val path: String) {
             Unit
         }
 
-    actual fun readText(encoding: Encoding?): String {
+    actual fun readText(encoding: Encoding): String =
+        readTextWith {
+            encoding.toNSStringEncoding()
+        }
+
+    actual fun readTextDetectEncoding(): String =
+        readTextWith {
+            detectEncoding(it)
+        }
+
+    private fun readTextWith(encoding: (NSData) -> NSStringEncoding): String {
         if (!fileManager.fileExistsAtPath(path)) {
             throw RuntimeException("File does not exist at path: $path")
         }
@@ -111,7 +121,7 @@ actual class File actual constructor(private val path: String) {
             throw RuntimeException("Cannot read file at path: $path")
         }
 
-        val encodingToUse = encoding?.toNSStringEncoding() ?: detectEncoding(contents)
+        val encodingToUse = encoding(contents)
 
         val nsString = NSString.create(contents, encodingToUse)
             ?: throw RuntimeException("Failed to decode file content using encoding $encodingToUse at path: $path")

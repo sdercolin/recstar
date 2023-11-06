@@ -62,9 +62,14 @@ expect class File(path: String) {
     fun delete(): Boolean
 
     /**
-     * Reads the entire file as a String with the given [encoding], or detects the encoding if [encoding] is null.
+     * Reads the entire file as a String with the given [encoding].
      */
-    fun readText(encoding: Encoding? = null): String
+    fun readText(encoding: Encoding = Encoding.UTF8): String
+
+    /**
+     * Reads the entire file as a String with the detected encoding.
+     */
+    fun readTextDetectEncoding(): String
 
     /**
      * Writes the given text to the file using UTF-8.

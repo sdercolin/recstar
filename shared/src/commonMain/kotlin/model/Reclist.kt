@@ -23,6 +23,6 @@ data class Reclist(
 
 fun parseReclist(file: File): Result<Reclist> =
     runCatching {
-        val lines = file.readText().lines().filter { it.isValidFileName() }
+        val lines = file.readTextDetectEncoding().lines().filter { it.isValidFileName() }
         Reclist(file.nameWithoutExtension, file.absolutePath, lines)
     }

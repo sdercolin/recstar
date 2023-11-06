@@ -43,14 +43,14 @@ actual class File actual constructor(path: String) {
 
     actual fun delete(): Boolean = internalFile.deleteRecursively()
 
-    actual fun readText(encoding: Encoding?): String {
-        return if (encoding != null) {
-            internalFile.readText(Charset.forName(encoding.name))
-        } else {
-            val bytes = internalFile.readBytes()
-            val detectedEncoding = bytes.detectEncoding()
-            internalFile.readText(Charset.forName(detectedEncoding))
-        }
+    actual fun readText(encoding: Encoding): String {
+        return internalFile.readText(Charset.forName(encoding.name))
+    }
+
+    actual fun readTextDetectEncoding(): String {
+        val bytes = internalFile.readBytes()
+        val detectedEncoding = bytes.detectEncoding()
+        return internalFile.readText(Charset.forName(detectedEncoding))
     }
 
     actual fun writeText(text: String) = internalFile.writeText(text)
