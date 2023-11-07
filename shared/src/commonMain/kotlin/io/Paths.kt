@@ -29,3 +29,8 @@ fun ensurePaths() {
         }
     }
 }
+
+private val splitters = charArrayOf('\\', '/')
+
+val String.pathSections get() = trim(*splitters).split(*splitters)
+val String.lastPathSection get() = pathSections.last()

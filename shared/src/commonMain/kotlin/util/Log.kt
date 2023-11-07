@@ -26,7 +26,7 @@ object Log {
         setupUncaughtExceptionHandler { throwable ->
             e(throwable)
         }
-        i("Log initialized")
+        i("Log initialized. isDebug: $isDebug, locale: $Locale")
     }
 
     fun d(message: String) {

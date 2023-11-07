@@ -1,10 +1,22 @@
+import com.codingfeline.buildkonfig.compiler.FieldSpec
 import java.util.*
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.20")
+        classpath("com.codingfeline.buildkonfig:buildkonfig-gradle-plugin:0.15.0")
+    }
+}
 
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization") version "1.9.10"
     id("com.android.library")
     id("org.jetbrains.compose")
+    id("com.codingfeline.buildkonfig") version "+"
 }
 
 val localProperties =
@@ -128,5 +140,17 @@ android {
     }
     kotlin {
         jvmToolchain(17)
+    }
+}
+
+buildkonfig {
+    packageName = "com.sdercolin.recstar"
+
+    defaultConfigs {
+        buildConfigField(FieldSpec.Type.BOOLEAN, "isDebug", "false")
+    }
+
+    defaultConfigs("debug") {
+        buildConfigField(FieldSpec.Type.BOOLEAN, "isDebug", "true")
     }
 }

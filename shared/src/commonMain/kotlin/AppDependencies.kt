@@ -1,5 +1,6 @@
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import io.FileInteractor
 import io.LocalFileInteractor
 import io.LocalPermissionChecker
@@ -16,12 +17,17 @@ import ui.common.ProgressController
 import ui.common.ToastController
 import ui.model.AppContext
 import ui.model.LocalAppContext
+import ui.string.*
+import util.Locale
+import util.Log
+import util.isDebug
 
 /**
  * A class to hold all static dependencies of the app, bound to the lifecycle of the [context].
  */
 class AppDependencies(
     val context: AppContext,
+    val language: Language = findBestMatchedLanguage(),
     val appRecordStore: AppRecordStore = createAppRecordStore(context.coroutineScope),
     val appActionStore: AppActionStore = AppActionStore(context.coroutineScope),
     val toastController: ToastController = ToastController(context),
@@ -33,13 +39,27 @@ class AppDependencies(
     val sessionRepository: SessionRepository = SessionRepository(reclistRepository),
 )
 
+private fun findBestMatchedLanguage(): Language {
+    if (isDebug) {
+        // before UI to select languages is implemented, we use English for debug builds
+        return Language.default
+    }
+    val detected = Language.find(Locale)
+    Log.i("Locale: $Locale, Language: $detected")
+    return detected ?: Language.default
+}
+
 @Composable
 fun ProvideAppDependencies(
     dependencies: AppDependencies,
     content: @Composable () -> Unit,
 ) {
+    LaunchedEffect(dependencies.language) {
+        currentLanguage = dependencies.language
+    }
     CompositionLocalProvider(
         LocalAppContext provides dependencies.context,
+        LocalLanguage provides dependencies.language,
         LocalAppRecordStore provides dependencies.appRecordStore,
         LocalAppActionStore provides dependencies.appActionStore,
         LocalToastController provides dependencies.toastController,
