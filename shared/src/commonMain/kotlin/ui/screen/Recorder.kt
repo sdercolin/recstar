@@ -33,8 +33,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -106,13 +110,31 @@ private fun RecorderTitleBar(model: SessionScreenModel) {
         style = MaterialTheme.typography.overline,
         fontSize = if (useSmallSizes) 8.sp else MaterialTheme.typography.overline.fontSize,
     )
-    Text(
-        text = model.currentSentence.text,
-        modifier = Modifier.padding(horizontal = 32.dp),
-        style = if (useSmallSizes) MaterialTheme.typography.h6 else MaterialTheme.typography.h4,
-        overflow = TextOverflow.Ellipsis,
-        maxLines = 1,
-    )
+    val style = if (useSmallSizes) MaterialTheme.typography.h6 else MaterialTheme.typography.h4
+    val text = model.currentSentence.text
+    val boxHeight = if (useSmallSizes) 32.dp else 52.dp
+    var fontSize by remember(text) { mutableStateOf(style.fontSize) }
+    var readyToDraw by remember(text) { mutableStateOf(false) }
+    Box(Modifier.height(boxHeight).fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
+        Text(
+            text = model.currentSentence.text,
+            modifier = Modifier.padding(start = 32.dp, end = 16.dp)
+                .drawWithContent {
+                    if (readyToDraw) drawContent()
+                },
+            style = style,
+            fontSize = fontSize,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
+            onTextLayout = {
+                if (it.hasVisualOverflow) {
+                    fontSize = fontSize.times(0.9f)
+                } else {
+                    readyToDraw = true
+                }
+            },
+        )
+    }
     Spacer(modifier = Modifier.height(if (useSmallSizes) 12.dp else 24.dp))
 }
 
