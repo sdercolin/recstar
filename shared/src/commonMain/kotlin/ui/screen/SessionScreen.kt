@@ -1,5 +1,6 @@
 package ui.screen
 
+import LocalAppActionStore
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +14,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,12 +22,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import io.ExportDataRequest
 import io.LocalFileInteractor
+import kotlinx.coroutines.flow.collectLatest
+import model.Action
+import model.Actions
 import model.Session
+import repository.LocalReclistRepository
 import ui.common.LocalAlertDialogController
 import ui.common.LocalProgressController
-import ui.common.requestInput
+import ui.common.LocalToastController
 import ui.model.LocalScreenOrientation
 import ui.model.Screen
 import ui.model.ScreenOrientation
@@ -71,7 +79,7 @@ private fun SessionScreen.ScreenActions() {
             DropdownMenuItem(
                 onClick = {
                     showMenu = false
-                    fileInteractor.requestOpenFolder(model.contentDirectory)
+                    Actions.openDirectory(fileInteractor, model.contentDirectory)
                 },
             ) {
                 Text(text = string(Strings.SessionScreenActionOpenDirectory))
@@ -98,12 +106,7 @@ private fun SessionScreen.ScreenActions() {
         DropdownMenuItem(
             onClick = {
                 showMenu = false
-                alertDialogController.requestInput(
-                    title = stringStatic(Strings.SessionScreenActionRenameSession),
-                    initialValue = model.name,
-                    selected = true,
-                    onConfirmInput = model::renameSession,
-                )
+                Actions.renameSession(alertDialogController, model)
             },
         ) {
             Text(text = string(Strings.SessionScreenActionRenameSession))
@@ -114,7 +117,31 @@ private fun SessionScreen.ScreenActions() {
 @Composable
 private fun SessionScreen.ScreenContent() {
     val model = rememberSessionScreenModel(initialSession)
+    val navigator = LocalNavigator.currentOrThrow
     val screenOrientation = LocalScreenOrientation.current
+    val actionStore = LocalAppActionStore.current
+    val fileInteractor = LocalFileInteractor.current
+    val reclistRepository = LocalReclistRepository.current
+    val toastController = LocalToastController.current
+    val alertDialogController = LocalAlertDialogController.current
+    LaunchedEffect(model, actionStore) {
+        actionStore.actions.collectLatest { action ->
+            when (action) {
+                Action.NewSession -> {
+                    navigator.popUntilRoot()
+                    navigator push CreateSessionReclistScreen
+                }
+                Action.ImportReclist -> Actions.importReclist(fileInteractor, reclistRepository, toastController)
+                Action.OpenDirectory -> Actions.openDirectory(fileInteractor, model.contentDirectory)
+                Action.Exit -> navigator.pop()
+                Action.RenameSession -> Actions.renameSession(alertDialogController, model)
+                Action.ToggleRecording -> model.toggleRecording()
+                Action.NextSentence -> model.next()
+                Action.PreviousSentence -> model.previous()
+                else -> Unit
+            }
+        }
+    }
     if (screenOrientation == ScreenOrientation.Landscape) {
         Layout(
             modifier = Modifier.fillMaxSize(),

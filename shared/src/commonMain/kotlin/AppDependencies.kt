@@ -23,6 +23,7 @@ import ui.model.LocalAppContext
 class AppDependencies(
     val context: AppContext,
     val appRecordStore: AppRecordStore = createAppRecordStore(context.coroutineScope),
+    val appActionStore: AppActionStore = AppActionStore(context.coroutineScope),
     val toastController: ToastController = ToastController(context),
     val alertDialogController: AlertDialogController = AlertDialogController(context),
     val progressController: ProgressController = ProgressController(),
@@ -40,6 +41,7 @@ fun ProvideAppDependencies(
     CompositionLocalProvider(
         LocalAppContext provides dependencies.context,
         LocalAppRecordStore provides dependencies.appRecordStore,
+        LocalAppActionStore provides dependencies.appActionStore,
         LocalToastController provides dependencies.toastController,
         LocalAlertDialogController provides dependencies.alertDialogController,
         LocalProgressController provides dependencies.progressController,

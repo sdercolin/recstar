@@ -1,5 +1,6 @@
 package ui.screen
 
+import LocalAppActionStore
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -22,10 +23,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import io.LocalFileInteractor
+import kotlinx.coroutines.flow.collectLatest
+import model.Action
+import model.Actions
 import repository.LocalReclistRepository
 import repository.LocalSessionRepository
 import ui.common.LocalAlertDialogController
+import ui.common.LocalToastController
 import ui.common.ScrollableLazyColumn
 import ui.common.requestConfirm
 import ui.model.Screen
@@ -45,19 +51,11 @@ object CreateSessionReclistScreen : Screen {
 
 @Composable
 private fun ImportButton() {
-    val repository = LocalReclistRepository.current
     val fileInteractor = LocalFileInteractor.current
+    val repository = LocalReclistRepository.current
+    val toastController = LocalToastController.current
     IconButton(
-        onClick = {
-            fileInteractor.pickFile(
-                title = stringStatic(Strings.CreateSessionReclistScreenActionImport),
-                allowedExtensions = listOf("txt"),
-                onFinish = { file ->
-                    file ?: return@pickFile
-                    repository.import(file)
-                },
-            )
-        },
+        onClick = { Actions.importReclist(fileInteractor, repository, toastController) },
     ) {
         Icon(
             imageVector = Icons.Default.Add,
@@ -72,7 +70,20 @@ private fun ScreenContent() {
     val reclistRepository = LocalReclistRepository.current
     val sessionRepository = LocalSessionRepository.current
     val reclists by reclistRepository.items.collectAsState()
-    val navigator = LocalNavigator.current
+    val navigator = LocalNavigator.currentOrThrow
+    val appActionStore = LocalAppActionStore.current
+    val fileInteractor = LocalFileInteractor.current
+    val toastController = LocalToastController.current
+
+    LaunchedEffect(appActionStore) {
+        appActionStore.actions.collectLatest {
+            when (it) {
+                Action.ImportReclist -> Actions.importReclist(fileInteractor, reclistRepository, toastController)
+                Action.Exit -> navigator.pop()
+                else -> Unit
+            }
+        }
+    }
 
     fun next(reclistName: String) {
         val reclist = reclistRepository.get(reclistName)
@@ -84,8 +95,8 @@ private fun ScreenContent() {
                 )
             }
             .getOrNull() ?: return
-        navigator?.pop()
-        navigator?.push(SessionScreen(session))
+        navigator.pop()
+        navigator.push(SessionScreen(session))
     }
     LaunchedEffect(reclistRepository) {
         reclistRepository.fetch()

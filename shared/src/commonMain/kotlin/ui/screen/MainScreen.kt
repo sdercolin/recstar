@@ -1,5 +1,6 @@
 package ui.screen
 
+import LocalAppActionStore
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +40,12 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import const.APP_NAME
+import io.LocalFileInteractor
+import kotlinx.coroutines.flow.collectLatest
+import model.Action
+import model.Actions
+import repository.LocalReclistRepository
+import ui.common.LocalToastController
 import ui.common.ScrollableLazyColumn
 import ui.common.plainClickable
 import ui.model.Screen
@@ -60,6 +68,20 @@ object MainScreen : Screen {
 private fun MainScreen.ScreenAction() {
     val navigator = LocalNavigator.currentOrThrow
     val model = rememberMainScreenModel()
+    val appActionStore = LocalAppActionStore.current
+    val fileInteractor = LocalFileInteractor.current
+    val repository = LocalReclistRepository.current
+    val toastController = LocalToastController.current
+    LaunchedEffect(appActionStore, model) {
+        appActionStore.actions.collectLatest {
+            when (it) {
+                Action.NewSession -> navigator push CreateSessionReclistScreen
+                Action.ImportReclist -> Actions.importReclist(fileInteractor, repository, toastController)
+                Action.EditSessionList -> model.startSelectingForDeletion()
+                else -> Unit
+            }
+        }
+    }
     if (model.isSelectingForDeletion) {
         TextButton(
             onClick = { model.cancelSelectingForDeletion() },

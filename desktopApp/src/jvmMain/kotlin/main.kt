@@ -29,13 +29,16 @@ fun main() =
         val context = remember { DesktopContext(coroutineScope) }
         val dependencies = remember(context) { AppDependencies(context) }
         val windowState = rememberResizableWindowState(dependencies.appRecordStore.stateFlow)
-        Window(
-            title = APP_NAME,
-            state = windowState,
-            onCloseRequest = ::exitApplication,
-        ) {
-            LaunchSaveWindowSize(windowState, dependencies.appRecordStore)
-            MainView(dependencies)
+        ProvideAppDependencies(dependencies) {
+            Window(
+                title = APP_NAME,
+                state = windowState,
+                onCloseRequest = ::exitApplication,
+            ) {
+                LaunchSaveWindowSize(windowState, dependencies.appRecordStore)
+                MainView()
+                Menu()
+            }
         }
     }
 

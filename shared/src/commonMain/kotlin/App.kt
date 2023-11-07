@@ -8,6 +8,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import ui.common.LocalAlertDialogController
@@ -35,6 +36,10 @@ fun App() {
 
 @Composable
 private fun MainScaffold(navigator: Navigator) {
+    val appActionStore = LocalAppActionStore.current
+    LaunchedEffect(navigator.lastItem) {
+        appActionStore.onScreenChange(navigator.lastItem as Screen)
+    }
     Scaffold(
         topBar = {
             TopAppBar(

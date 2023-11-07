@@ -21,6 +21,8 @@ enum class Strings {
     ExceptionRenameSessionUnexpected,
     ToastExportDataSuccess,
     ToastExportDataCancel,
+    ToastImportReclistSuccess,
+    ToastImportReclistFailure,
     MainScreenAllSessions,
     MainScreenItemSelecting,
     MainScreenNewSession,
@@ -37,6 +39,18 @@ enum class Strings {
     CreateSessionReclistScreenEmpty,
     CreateSessionReclistScreenContinue,
     CreateSessionReclistScreenFailure,
+    MenuFile,
+    MenuFileNewSession,
+    MenuFileImportReclist,
+    MenuFileOpenDirectory,
+    MenuFileBack,
+    MenuEdit,
+    MenuEditRenameSession,
+    MenuEditEditSessionList,
+    MenuAction,
+    MenuActionNextSentence,
+    MenuActionPreviousSentence,
+    MenuActionToggleRecording,
     ;
 
     fun get(language: Language): String =
