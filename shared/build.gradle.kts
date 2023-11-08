@@ -29,7 +29,7 @@ val localProperties =
 val isMac = System.getProperty("os.name").lowercase().contains("mac")
 val includeIos = isMac && localProperties.getProperty("ios.disabled", "false").toBoolean().not()
 
-val voyagerVersion = "1.0.0-rc09"
+val voyagerVersion = "1.0.0-rc10"
 
 fun voyager(module: String) = "cafe.adriel.voyager:voyager-$module:$voyagerVersion"
 
