@@ -210,10 +210,14 @@ private fun ColumnScope.RecorderWaveform(
             Box(
                 modifier = Modifier.fillMaxSize()
                     .clickable(enabled = isInteractionSuspended.not(), onClick = onTogglePlaying)
-                    .padding(24.dp),
+                    .padding(if (isMobile) 12.dp else 24.dp),
             ) {
                 val icon = if (playingProgress != null) Icons.Default.Square else Icons.Default.PlayArrow
-                val size = if (playingProgress != null) 18.dp else 24.dp
+                val size = if (isMobile) {
+                    if (playingProgress != null) 14.dp else 20.dp
+                } else {
+                    if (playingProgress != null) 18.dp else 24.dp
+                }
                 Icon(
                     modifier = Modifier.size(size),
                     imageVector = icon,
