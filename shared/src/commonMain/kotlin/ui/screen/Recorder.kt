@@ -213,16 +213,18 @@ private fun ColumnScope.RecorderWaveform(
                     .padding(if (isMobile) 12.dp else 24.dp),
             ) {
                 val icon = if (playingProgress != null) Icons.Default.Square else Icons.Default.PlayArrow
-                val size = if (isMobile) {
-                    if (playingProgress != null) 14.dp else 20.dp
+                val size = if (isMobile) 20.dp else 24.dp
+                val padding = if (playingProgress != null) 3.dp else 0.dp
+                val color = if (isDarkMode) {
+                    MaterialTheme.colors.primary.alpha(0.7f)
                 } else {
-                    if (playingProgress != null) 18.dp else 24.dp
+                    MaterialTheme.colors.primaryVariant
                 }
                 Icon(
-                    modifier = Modifier.size(size),
+                    modifier = Modifier.size(size).padding(padding),
                     imageVector = icon,
                     contentDescription = string(Strings.SessionScreenTogglePlaying),
-                    tint = MaterialTheme.colors.primary.alpha(0.7f),
+                    tint = color,
                 )
             }
         }

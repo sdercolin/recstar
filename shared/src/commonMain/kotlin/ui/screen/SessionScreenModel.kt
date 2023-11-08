@@ -218,7 +218,6 @@ class SessionScreenModel(
     }
 
     private fun stopPlaying() {
-        println("stopPlaying")
         isRequestedPlaying = false
         player.stop()
     }
