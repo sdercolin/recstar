@@ -26,7 +26,14 @@ object Log {
         setupUncaughtExceptionHandler { throwable ->
             e(throwable)
         }
-        i("Log initialized. isDebug: $isDebug, locale: $Locale")
+        val launchInfo = mapOf(
+            "target" to Platform.target,
+            "os" to Platform.os,
+            "appVersion" to appVersion,
+            "debug" to isDebug,
+            "locale" to Locale,
+        )
+        i("Launched via ${launchInfo.entries.joinToString(", ") { "${it.key}=${it.value}" }}")
     }
 
     fun d(message: String) {

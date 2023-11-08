@@ -2,6 +2,7 @@ package util
 
 expect object Platform {
     val target: PlatformTarget
+    val os: String
 }
 
 enum class PlatformTarget {
