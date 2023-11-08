@@ -155,3 +155,14 @@ buildkonfig {
         buildConfigField(FieldSpec.Type.BOOLEAN, "isDebug", "true")
     }
 }
+
+task("updateProjectVersions") {
+    doLast {
+        val versionName = findProperty("app.versionName")?.toString() ?: "0.1.0"
+        val versionCode = findProperty("app.versionCode")?.toString()?.toInt() ?: 1
+        val shellScriptFile = rootProject.file("tools/update_ios_version.sh")
+        exec {
+            commandLine("sh", shellScriptFile.absolutePath, versionName, versionCode)
+        }
+    }
+}
