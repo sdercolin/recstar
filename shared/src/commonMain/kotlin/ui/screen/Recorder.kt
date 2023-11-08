@@ -196,8 +196,8 @@ private fun ColumnScope.RecorderWaveform(
                     end = Offset(x, halfHeight + minY),
                 )
             }
-            if (playingProgress != null) {
-                val x = playingProgress.coerceIn(0f, 1f) * width
+            if (playingProgress != null && playingProgress in 0f..1f) {
+                val x = playingProgress * width
                 drawLine(
                     color = playerCursorColor,
                     start = Offset(x, 0f),

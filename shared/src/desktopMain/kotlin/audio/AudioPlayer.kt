@@ -1,7 +1,6 @@
 package audio
 
 import io.File
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -15,20 +14,16 @@ import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.Clip
 import javax.sound.sampled.SourceDataLine
 
-class AudioPlayerImpl(private val listener: AudioPlayer.Listener) : AudioPlayer {
+class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppContext) : AudioPlayer {
+    private val scope = context.coroutineScope
     private var line: SourceDataLine? = null
     private lateinit var clip: Clip
     private var job: Job? = null
     private var cleanupJob: Job? = null
     private var countingJob: Job? = null
-    private val initJob: Job
-    private val scope = CoroutineScope(Dispatchers.Main)
     private var isPlaying = false
-
-    init {
-        initJob = scope.launch(Dispatchers.IO) {
-            clip = AudioSystem.getClip()
-        }
+    private val initJob: Job = scope.launch(Dispatchers.IO) {
+        clip = AudioSystem.getClip()
     }
 
     override fun play(file: File) {
@@ -106,7 +101,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener) : AudioPlayer 
 
 actual class AudioPlayerProvider actual constructor(
     private val listener: AudioPlayer.Listener,
-    context: AppContext,
+    private val context: AppContext,
 ) {
-    actual fun get(): AudioPlayer = AudioPlayerImpl(listener)
+    actual fun get(): AudioPlayer = AudioPlayerImpl(listener, context)
 }
