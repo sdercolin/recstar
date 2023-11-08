@@ -3,6 +3,7 @@ package ui.screen
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
@@ -28,6 +30,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.NavigateBefore
 import androidx.compose.material.icons.filled.NavigateNext
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Square
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -50,6 +53,7 @@ import ui.common.plainClickable
 import ui.model.LocalScreenOrientation
 import ui.model.ScreenOrientation
 import ui.string.*
+import util.alpha
 import util.isMobile
 
 @Composable
@@ -76,6 +80,9 @@ fun Recorder(
                 hasFile = model.currentSentence.isFinished,
                 isRecording = model.isRecording,
                 flow = model.waveformFlow,
+                playingProgress = model.playingProgress,
+                isInteractionSuspended = model.isBusy,
+                onTogglePlaying = model::togglePlaying,
             )
             if (isSystemInDarkTheme().not()) {
                 Divider(color = MaterialTheme.colors.surface)
@@ -89,6 +96,7 @@ fun Recorder(
         ) {
             RecorderControls(
                 isInteractionSuspended = model.isBusy,
+                isPlaying = model.isPlaying,
                 isRecording = model.isRecording,
                 onToggleRecording = model::toggleRecording,
                 hasNext = model.hasNext,
@@ -143,6 +151,9 @@ private fun ColumnScope.RecorderWaveform(
     hasFile: Boolean,
     isRecording: Boolean,
     flow: Flow<Array<FloatArray>>,
+    playingProgress: Float?,
+    isInteractionSuspended: Boolean,
+    onTogglePlaying: () -> Unit,
 ) {
     val isDarkMode = isSystemInDarkTheme()
     val paperColor = if (isDarkMode) Color.Black else Color.White
@@ -157,6 +168,7 @@ private fun ColumnScope.RecorderWaveform(
         }
         val data by flow.collectAsState(initial = emptyArray())
         val color = if (isDarkMode) MaterialTheme.colors.primary else MaterialTheme.colors.onBackground
+        val playerCursorColor = if (isDarkMode) MaterialTheme.colors.secondary else MaterialTheme.colors.primaryVariant
         Canvas(modifier = Modifier.fillMaxSize()) {
             val width = size.width.toInt()
             val height = size.height.toInt()
@@ -184,6 +196,31 @@ private fun ColumnScope.RecorderWaveform(
                     end = Offset(x, halfHeight + minY),
                 )
             }
+            if (playingProgress != null) {
+                val x = playingProgress.coerceIn(0f, 1f) * width
+                drawLine(
+                    color = playerCursorColor,
+                    start = Offset(x, 0f),
+                    end = Offset(x, height.toFloat()),
+                    strokeWidth = 2f,
+                )
+            }
+        }
+        if (hasFile && !isRecording) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+                    .clickable(enabled = isInteractionSuspended.not(), onClick = onTogglePlaying)
+                    .padding(24.dp),
+            ) {
+                val icon = if (playingProgress != null) Icons.Default.Square else Icons.Default.PlayArrow
+                val size = if (playingProgress != null) 18.dp else 24.dp
+                Icon(
+                    modifier = Modifier.size(size),
+                    imageVector = icon,
+                    contentDescription = string(Strings.SessionScreenTogglePlaying),
+                    tint = MaterialTheme.colors.primary.alpha(0.7f),
+                )
+            }
         }
     }
 }
@@ -191,6 +228,7 @@ private fun ColumnScope.RecorderWaveform(
 @Composable
 private fun RecorderControls(
     isInteractionSuspended: Boolean,
+    isPlaying: Boolean,
     isRecording: Boolean,
     onToggleRecording: () -> Unit,
     hasNext: Boolean,
@@ -212,7 +250,7 @@ private fun RecorderControls(
         )
         Spacer(modifier = Modifier.width(48.dp))
         RecordButton(
-            isInteractionSuspended = isInteractionSuspended,
+            isInteractionSuspended = isInteractionSuspended || isPlaying,
             isRecording = isRecording,
             onToggleRecording = onToggleRecording,
         )

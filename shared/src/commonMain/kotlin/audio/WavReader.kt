@@ -6,6 +6,7 @@ import kotlinx.io.readIntLe
 import kotlinx.io.readShortLe
 import kotlinx.io.readString
 
+@Suppress("UNUSED_VARIABLE")
 class WavReader {
     /**
      * Reads the given [file] and returns the audio data as a [FloatArray] (-1~1). If the file has multiple channels,

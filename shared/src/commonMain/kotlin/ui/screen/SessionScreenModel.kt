@@ -6,6 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
+import audio.AudioPlayer
+import audio.AudioPlayerProvider
 import audio.AudioRecorder
 import audio.AudioRecorderProvider
 import cafe.adriel.voyager.core.model.ScreenModel
@@ -69,14 +71,38 @@ class SessionScreenModel(
 
     private var isRequestedRecording: Boolean by mutableStateOf(false)
 
-    val isBusy: Boolean
-        get() = isRequestedRecording != isRecording
-
     var isRecording: Boolean by mutableStateOf(false)
         private set
 
+    var playingProgress: Float? by mutableStateOf(null)
+        private set
+
+    val isPlaying get() = playingProgress != null
+
+    var isRequestedPlaying: Boolean by mutableStateOf(false)
+        private set
+
+    val isBusy: Boolean
+        get() = isRequestedRecording != isRecording || isRequestedPlaying != isPlaying
+
     val currentSentence: Sentence
         get() = sentences[currentIndex]
+
+    private val playerListener = object : AudioPlayer.Listener {
+        override fun onStarted() {
+            // No-op
+        }
+
+        override fun onProgress(progress: Float) {
+            playingProgress = progress
+        }
+
+        override fun onStopped() {
+            playingProgress = null
+            // this can be called without user's request
+            isRequestedPlaying = false
+        }
+    }
 
     private val recorderListener = object : AudioRecorder.Listener {
         var waveformPainter: WaveformPainter? = null
@@ -93,6 +119,7 @@ class SessionScreenModel(
             waveformPainter?.onStopRecording()
         }
     }
+    private val player = AudioPlayerProvider(playerListener, context).get()
     private val recorder = AudioRecorderProvider(recorderListener, context).get()
     private val waveformPainter = WaveformPainter(recorder.waveDataFlow, screenModelScope).apply {
         switch(currentFile)
@@ -177,13 +204,35 @@ class SessionScreenModel(
         recorder.stop()
     }
 
+    fun togglePlaying() {
+        if (isPlaying) {
+            stopPlaying()
+        } else {
+            startPlaying()
+        }
+    }
+
+    private fun startPlaying() {
+        isRequestedPlaying = true
+        player.play(currentFile)
+    }
+
+    private fun stopPlaying() {
+        println("stopPlaying")
+        isRequestedPlaying = false
+        player.stop()
+    }
+
     fun selectSentence(index: Int) {
         if (index == currentIndex) return
         currentIndex = index
-        if (isRecording) {
+        if (isRecording || isRequestedRecording) {
             stopRecording()
         } else {
             updateCurrentSentence()
+        }
+        if (isPlaying || isRequestedPlaying) {
+            stopPlaying()
         }
         requestScrollToCurrentSentence()
     }
@@ -231,6 +280,7 @@ class SessionScreenModel(
 
     override fun onDispose() {
         recorder.dispose()
+        player.dispose()
         waveformPainter.dispose()
         super.onDispose()
     }

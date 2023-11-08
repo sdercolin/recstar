@@ -34,6 +34,7 @@ enum class Strings {
     SessionScreenActionOpenDirectory,
     SessionScreenActionExport,
     SessionScreenActionRenameSession,
+    SessionScreenTogglePlaying,
     CreateSessionReclistScreenTitle,
     CreateSessionReclistScreenActionImport,
     CreateSessionReclistScreenEmpty,

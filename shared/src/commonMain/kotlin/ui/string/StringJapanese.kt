@@ -36,6 +36,7 @@ fun Strings.ja(): String? =
         SessionScreenActionOpenDirectory -> "ディレクトリを開く"
         SessionScreenActionExport -> "エクスポート"
         SessionScreenActionRenameSession -> "セッション名を編集"
+        SessionScreenTogglePlaying -> "再生/停止"
         CreateSessionReclistScreenTitle -> "録音リストを選択"
         CreateSessionReclistScreenActionImport -> "録音リストをインポート"
         CreateSessionReclistScreenEmpty -> "録音リストをインポートしてください。"

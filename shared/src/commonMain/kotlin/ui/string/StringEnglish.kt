@@ -37,6 +37,7 @@ fun Strings.en(): String =
         SessionScreenActionOpenDirectory -> "Open Directory"
         SessionScreenActionExport -> "Export"
         SessionScreenActionRenameSession -> "Rename Session"
+        SessionScreenTogglePlaying -> "Toggle Playback"
         CreateSessionReclistScreenTitle -> "Select Reclist"
         CreateSessionReclistScreenActionImport -> "Import Reclist"
         CreateSessionReclistScreenEmpty -> "Please import a reclist first."

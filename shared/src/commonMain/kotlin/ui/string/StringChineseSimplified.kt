@@ -36,6 +36,7 @@ fun Strings.zhHans(): String? =
         SessionScreenActionOpenDirectory -> "打开目录"
         SessionScreenActionExport -> "导出"
         SessionScreenActionRenameSession -> "重命名会话"
+        SessionScreenTogglePlaying -> "播放/停止"
         CreateSessionReclistScreenTitle -> "选择录音表"
         CreateSessionReclistScreenActionImport -> "导入录音表"
         CreateSessionReclistScreenEmpty -> "请先导入录音表。"
