@@ -39,7 +39,7 @@ jobs:
           java-version: '17'
           distribution: 'corretto'
 
-      - name: Build with Gradle
+      - name: Build with Gradle Debug
         uses: gradle/gradle-build-action@v2
         with:
           arguments: assembleDebug
@@ -55,3 +55,32 @@ jobs:
         with:
           prerelease: true
           files: recstar-${{ github.ref_name }}.apk
+
+      - name: Build with Gradle Release
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: bundleRelease
+
+      - uses: r0adkll/sign-android-release@v1
+        name: Sign app aab file
+        id: sign_app
+        with:
+          releaseDirectory: androidApp/build/outputs/bundle/release
+          signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
+          alias: ${{ secrets.ANDROID_KEYSTORE_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          keyPassword: ${{ secrets.ANDROID_KEYSTORE_KEY_PASSWORD }}
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Upload AAB file as artifact
+          path: ${{steps.sign_app.outputs.signedReleaseFile}}
+
+      - name: Upload to Google Play
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}
+          packageName: com.sdercolin.recstar
+          releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
+          track: production
+          status: completed
