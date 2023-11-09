@@ -1,0 +1,57 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: Release Windows
+
+on:
+  push:
+    tags:
+      - "*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check version
+        run: |
+          $TAG = "${{ github.ref_name }}"
+          $PROPERTIES_PATH = "gradle.properties"
+          $APP_VERSION = (Select-String -Path $PROPERTIES_PATH -Pattern "^app\.versionName=" | ForEach-Object { $_.ToString().Split("=")[1] }).Trim()
+          if ($TAG -ne $APP_VERSION) {
+            Write-Output "Tag $TAG does not match app version $APP_VERSION"
+            exit 1
+          }
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: createDistributable
+
+      - name: Zip
+        run: |
+          $VERSION="${{ github.ref_name }}"
+          echo $VERSION
+          Compress-Archive ./desktopApp/build/compose/binaries/main/app/RecStar/* ./recstar-$VERSION-win64.zip
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: true
+          files: recstar-${{ github.ref_name }}-win64.zip
