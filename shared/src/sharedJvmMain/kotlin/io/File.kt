@@ -67,6 +67,9 @@ actual class File actual constructor(path: String) {
     actual fun resolve(path: String): File = File(internalFile.resolve(path))
 
     actual fun source(): Source = internalFile.inputStream().asSource().buffered()
+
+    override fun equals(other: Any?): Boolean =
+        internalFile.absolutePath == (other as? File)?.internalFile?.absolutePath
 }
 
 fun String.toFile(): File = File(this)

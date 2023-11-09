@@ -186,4 +186,6 @@ actual class File actual constructor(private val path: String) {
     actual fun source(): Source = NSInputStream(toNSURL()).asSource().buffered()
 
     fun toNSURL() = NSURL.fileURLWithPath(this.absolutePath)
+
+    override fun equals(other: Any?): Boolean = absolutePath == (other as? File)?.absolutePath
 }

@@ -1,30 +1,113 @@
 package audio
 
 import io.File
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import platform.AVFAudio.AVAudioPlayer
 import ui.model.AppContext
+import util.Log
+import util.withNSError
 
-class AudioPlayerImpl : AudioPlayer {
+@OptIn(ExperimentalForeignApi::class)
+class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppContext) : AudioPlayer {
+    private val scope = context.coroutineScope
+    private var audioPlayer: AVAudioPlayer? = null
+    private var fileDuration: Double = 0.0
+    private var job: Job? = null
+    private var cleanupJob: Job? = null
+    private var countingJob: Job? = null
+    private var lastLoadedFile: File? = null
+
+    private val delegate = AVAudioPlayerDelegate {
+        scope.launch(Dispatchers.Main) {
+            stop()
+        }
+    }
+
     override fun play(file: File) {
-        // TODO
+        runCatching {
+            if (job?.isActive == true) {
+                Log.w("AudioRecorderImpl.start: already started")
+                return
+            }
+            job = scope.launch(Dispatchers.IO) {
+                if (lastLoadedFile != file) {
+                    val url = file.toNSURL()
+                    withNSError { e ->
+                        audioPlayer = AVAudioPlayer(contentsOfURL = url, error = e).apply {
+                            delegate = this@AudioPlayerImpl.delegate
+                            prepareToPlay()
+                            play()
+                            fileDuration = duration
+                        }
+                    }
+                } else {
+                    audioPlayer?.setCurrentTime(0.0)
+                    audioPlayer?.play()
+                }
+                lastLoadedFile = file
+                withContext(Dispatchers.Main) {
+                    listener.onStarted()
+                }
+                startCounting()
+            }
+        }.onFailure {
+            Log.e(it)
+            dispose()
+        }
     }
 
     override fun stop() {
-        // TODO
+        runCatching {
+            cleanupJob = scope.launch(Dispatchers.IO) {
+                audioPlayer?.takeIf { it.isPlaying() }?.pause()
+                stopCounting()
+                withContext(Dispatchers.Main) {
+                    listener.onStopped()
+                }
+            }
+        }.onFailure {
+            Log.e(it)
+            dispose()
+        }
     }
 
-    override fun isPlaying(): Boolean {
-        // TODO
-        return false
-    }
+    override fun isPlaying(): Boolean = audioPlayer?.isPlaying() ?: false
 
     override fun dispose() {
-        // TODO
+        runCatching {
+            stopCounting()
+            audioPlayer?.takeIf { it.isPlaying() }?.stop()
+            audioPlayer = null
+        }.onFailure { Log.e(it) }
+    }
+
+    private fun startCounting() {
+        countingJob?.cancel()
+        countingJob = scope.launch {
+            while (isActive && isPlaying()) {
+                val elapsedTime = audioPlayer?.currentTime ?: 0.0
+                val progress = (elapsedTime / fileDuration).toFloat()
+                listener.onProgress(progress)
+                delay(5L)
+            }
+        }
+    }
+
+    private fun stopCounting() {
+        countingJob?.cancel()
     }
 }
 
 actual class AudioPlayerProvider actual constructor(
-    listener: AudioPlayer.Listener,
-    context: AppContext,
+    private val listener: AudioPlayer.Listener,
+    private val context: AppContext,
 ) {
-    actual fun get(): AudioPlayer = AudioPlayerImpl()
+    actual fun get(): AudioPlayer = AudioPlayerImpl(listener, context)
 }

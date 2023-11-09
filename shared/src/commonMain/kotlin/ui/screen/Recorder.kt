@@ -215,7 +215,7 @@ private fun ColumnScope.RecorderWaveform(
                 val icon = if (playingProgress != null) Icons.Default.Square else Icons.Default.PlayArrow
                 val size = if (isMobile) 20.dp else 24.dp
                 val padding = if (playingProgress != null) 3.dp else 0.dp
-                val color = if (isDarkMode) {
+                val tint = if (isDarkMode) {
                     MaterialTheme.colors.primary.alpha(0.7f)
                 } else {
                     MaterialTheme.colors.primaryVariant
@@ -224,7 +224,7 @@ private fun ColumnScope.RecorderWaveform(
                     modifier = Modifier.size(size).padding(padding),
                     imageVector = icon,
                     contentDescription = string(Strings.SessionScreenTogglePlaying),
-                    tint = color,
+                    tint = tint,
                 )
             }
         }
