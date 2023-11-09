@@ -43,21 +43,26 @@ jobs:
         env:
           MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+          KEYCHAIN_NAME: build.keychain
           KEYCHAIN_PWD: ${{ secrets.KEYCHAIN_PWD }}
         run: |
-          CERTIFICATE_EXISTS=$(security find-identity -v build.keychain | grep -c "${{ secrets.MACOS_CERTIFICATE_IDENTITY }}")
-          if [ "$CERTIFICATE_EXISTS" -eq "0" ]; then
-            echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
-            security create-keychain -p $KEYCHAIN_PWD build.keychain
-            security default-keychain -s build.keychain
-            security unlock-keychain -p $KEYCHAIN_PWD build.keychain
-            security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign -T /usr/bin/productsign -T /System/Library/PrivateFrameworks/AOSKit.framework/Versions/A/XPCServices/com.apple.iCloudHelper.xpc/Contents/MacOS/com.apple.iCloudHelper
-            security find-identity -v
-            security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $KEYCHAIN_PWD build.keychain
-          else
-            security unlock-keychain -p $KEYCHAIN_PWD build.keychain
-          fi
-          echo $'compose.desktop.mac.sign=true\ncompose.desktop.mac.signing.identity=${{ secrets.MACOS_CERTIFICATE_IDENTITY }}\ncompose.desktop.mac.notarization.appleID=${{ secrets.APPLE_ID }}\ncompose.desktop.mac.notarization.password=${{ secrets.MACOS_APP_PWD }}' >local.properties
+          # Unlock the keychain
+          security unlock-keychain -p "$KEYCHAIN_PWD" "$KEYCHAIN_NAME"
+          
+          # Set keychain settings to prevent it from locking automatically
+          security set-keychain-settings "$KEYCHAIN_NAME"
+          
+          # Set the keychain to be searched by default, which is necessary for codesign to find the certificate
+          security list-keychains -s "$KEYCHAIN_NAME"
+          
+          # Verify that the certificate is available in the keychain
+          security find-identity -vp codesigning "$KEYCHAIN_NAME"
+          
+          # Configure the local.properties file with the necessary information for signing
+          echo "compose.desktop.mac.sign=true" > local.properties
+          echo "compose.desktop.mac.signing.identity=${MACOS_CERTIFICATE_IDENTITY}" >> local.properties
+          echo "compose.desktop.mac.notarization.appleID=${{ secrets.APPLE_ID }}" >> local.properties
+          echo "compose.desktop.mac.notarization.password=${{ secrets.MACOS_APP_PWD }}" >> local.properties
           cat local.properties
 
       - name: Build with Gradle

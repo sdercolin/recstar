@@ -1,4 +1,6 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.internal.utils.localPropertiesFile
+import java.util.*
 
 plugins {
     kotlin("multiplatform")
@@ -36,6 +38,22 @@ compose.desktop {
             )
             macOS {
                 bundleID = "com.sdercolin.recstar"
+
+                if (project.localPropertiesFile.exists()) {
+                    val properties = Properties().apply { load(project.localPropertiesFile.inputStream()) }
+                    signing {
+                        properties.getOrDefault("compose.desktop.mac.sign", "false").toString().toBoolean()
+                            .let { sign.set(it) }
+                        properties.getOrDefault("compose.desktop.mac.signing.identity", "").toString()
+                            .let { identity.set(it) }
+                    }
+                    notarization {
+                        properties.getOrDefault("compose.desktop.mac.notarization.appleID", "").toString()
+                            .let { appleID.set(it) }
+                        properties.getOrDefault("compose.desktop.mac.notarization.password", "").toString()
+                            .let { password.set(it) }
+                    }
+                }
             }
         }
     }
