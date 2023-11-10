@@ -42,3 +42,7 @@ See the [README of the project template](README-compose.md) for instructions on 
 3. If in string definition files (e.g. [StringsEnglish.kt](shared/src/commonMain/kotlin/ui/string/StringEnglish.kt)), if
    the formatter of your Android Studio is always turning the wildcard imports into single imports, adjust the settings
    to allow wildcard imports on package `ui.string`.
+
+### Contributors
+
+Logo designed by InochiPM.
