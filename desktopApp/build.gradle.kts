@@ -38,6 +38,7 @@ compose.desktop {
             )
             macOS {
                 bundleID = "com.sdercolin.recstar"
+                iconFile.set(project.file("src/jvmMain/resources/icon.icns"))
 
                 if (project.localPropertiesFile.exists()) {
                     val properties = Properties().apply { load(project.localPropertiesFile.inputStream()) }
@@ -54,6 +55,12 @@ compose.desktop {
                             .let { password.set(it) }
                     }
                 }
+            }
+            windows {
+                iconFile.set(project.file("src/jvmMain/resources/icon.ico"))
+            }
+            linux {
+                iconFile.set(project.file("src/jvmMain/resources/icon.png"))
             }
         }
     }
