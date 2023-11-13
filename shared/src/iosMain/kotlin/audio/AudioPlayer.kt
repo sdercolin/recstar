@@ -23,6 +23,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
     private var cleanupJob: Job? = null
     private var countingJob: Job? = null
     private var lastLoadedFile: File? = null
+    private var lastLoadedFileModified: Long? = null
 
     private val delegate = AVAudioPlayerDelegate {
         scope.launch(Dispatchers.Main) {
@@ -37,7 +38,8 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                 return
             }
             job = scope.launch(Dispatchers.IO) {
-                if (lastLoadedFile != file) {
+                val lastModified = file.lastModified
+                if (lastLoadedFile != file || lastLoadedFileModified != lastModified) {
                     val url = file.toNSURL()
                     withNSError { e ->
                         audioPlayer = AVAudioPlayer(contentsOfURL = url, error = e).apply {
@@ -52,6 +54,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                     audioPlayer?.play()
                 }
                 lastLoadedFile = file
+                lastLoadedFileModified = lastModified
                 withContext(Dispatchers.Main) {
                     listener.onStarted()
                 }
@@ -85,6 +88,8 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
             stopCounting()
             audioPlayer?.takeIf { it.isPlaying() }?.stop()
             audioPlayer = null
+            lastLoadedFile = null
+            lastLoadedFileModified = null
         }.onFailure { Log.e(it) }
     }
 

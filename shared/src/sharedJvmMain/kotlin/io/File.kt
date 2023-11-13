@@ -43,6 +43,9 @@ actual class File actual constructor(path: String) {
 
     actual fun delete(): Boolean = internalFile.deleteRecursively()
 
+    actual val lastModified: Long
+        get() = internalFile.lastModified()
+
     actual fun readText(encoding: Encoding): String {
         return internalFile.readText(Charset.forName(encoding.name))
     }

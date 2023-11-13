@@ -12,13 +12,12 @@ import util.Log
 import util.toJavaFile
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.Clip
-import javax.sound.sampled.SourceDataLine
 
 class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppContext) : AudioPlayer {
     private val scope = context.coroutineScope
-    private var line: SourceDataLine? = null
     private lateinit var clip: Clip
     private var lastLoadedFile: File? = null
+    private var lastLoadedFileModified: Long? = null
     private var job: Job? = null
     private var cleanupJob: Job? = null
     private var countingJob: Job? = null
@@ -40,11 +39,12 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                 cleanupJob?.join()
                 cleanupJob = null
                 withContext(Dispatchers.IO) {
-                    if (lastLoadedFile != file) {
+                    if (lastLoadedFile != file || lastLoadedFileModified != file.lastModified) {
                         clip.close()
                         val audioInputStream = AudioSystem.getAudioInputStream(file.toJavaFile())
                         clip.open(audioInputStream)
                     }
+                    clip.framePosition = 0
                     clip.start()
                     countingJob = scope.launch {
                         while (clip.isRunning) {
@@ -57,6 +57,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                         stop()
                     }
                     lastLoadedFile = file
+                    lastLoadedFileModified = file.lastModified
                     listener.onStarted()
                     isPlaying = true
                 }
@@ -73,12 +74,6 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
             cleanupJob = scope.launch(Dispatchers.IO) {
                 job?.cancelAndJoin()
                 countingJob?.cancelAndJoin()
-                line?.apply {
-                    stop()
-                    flush()
-                    close()
-                }
-                line = null
                 clip.apply {
                     stop()
                     flush()
@@ -98,9 +93,8 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
             cleanupJob?.cancel()
             countingJob?.cancel()
             clip.close()
-            line?.close()
-            line = null
             lastLoadedFile = null
+            lastLoadedFileModified = null
         }.onFailure {
             Log.e(it)
         }

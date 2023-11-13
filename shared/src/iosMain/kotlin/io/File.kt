@@ -12,7 +12,9 @@ import kotlinx.io.Source
 import kotlinx.io.asSource
 import kotlinx.io.buffered
 import platform.Foundation.NSData
+import platform.Foundation.NSDate
 import platform.Foundation.NSFileManager
+import platform.Foundation.NSFileModificationDate
 import platform.Foundation.NSInputStream
 import platform.Foundation.NSMutableData
 import platform.Foundation.NSString
@@ -27,6 +29,7 @@ import platform.Foundation.lastPathComponent
 import platform.Foundation.stringByAppendingPathComponent
 import platform.Foundation.stringByDeletingLastPathComponent
 import platform.Foundation.stringEncodingForData
+import platform.Foundation.timeIntervalSince1970
 import platform.Foundation.writeToFile
 import util.Encoding
 import util.Log
@@ -93,6 +96,13 @@ actual class File actual constructor(private val path: String) {
     actual fun delete(): Boolean =
         withNSError { e ->
             return fileManager.removeItemAtPath(path, e)
+        }
+
+    actual val lastModified: Long
+        get() = withNSError { e ->
+            val attributes = requireNotNull(fileManager.attributesOfItemAtPath(path, e))
+            val date = attributes[NSFileModificationDate] as NSDate
+            date.timeIntervalSince1970.toLong()
         }
 
     actual fun writeText(text: String) =

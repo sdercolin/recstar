@@ -14,13 +14,17 @@ import util.Log
 class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppContext) : AudioPlayer {
     private val scope = context.coroutineScope
     private var mediaPlayer: MediaPlayer? = null
-    private var lastPlayedFile: String? = null
+    private var lastLoadedFile: String? = null
+    private var lastLoadedFileModified: Long? = null
     private var countingJob: Job? = null
     private var startTime: Long = 0
 
     override fun play(file: File) {
         runCatching {
-            if (file.absolutePath == lastPlayedFile && mediaPlayer != null) {
+            if (file.absolutePath == lastLoadedFile &&
+                lastLoadedFileModified == file.lastModified &&
+                mediaPlayer != null
+            ) {
                 mediaPlayer?.seekTo(0)
                 mediaPlayer?.start()
                 listener.onStarted()
@@ -45,7 +49,8 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                     stopCounting()
                 }
             }
-            lastPlayedFile = file.absolutePath
+            lastLoadedFile = file.absolutePath
+            lastLoadedFileModified = file.lastModified
         }.onFailure {
             Log.e(it)
             dispose()
@@ -64,7 +69,8 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
         stopCounting()
         mediaPlayer?.release()
         mediaPlayer = null
-        lastPlayedFile = null
+        lastLoadedFile = null
+        lastLoadedFileModified = null
     }
 
     private fun startCounting() {
