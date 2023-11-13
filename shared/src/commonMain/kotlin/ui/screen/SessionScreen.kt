@@ -2,6 +2,7 @@ package ui.screen
 
 import LocalAppActionStore
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -127,12 +128,12 @@ private fun SessionScreen.ScreenContent() {
             content = {
                 Surface(
                     modifier = Modifier.fillMaxHeight(),
-                    elevation = 2.dp,
+                    elevation = 10.dp,
                 ) {
-                    SentenceList(model)
+                    SentenceList(model, isUpperLayer = true)
                 }
                 Box(modifier = Modifier.fillMaxHeight()) {
-                    Recorder(model, hasFixedHeight = true)
+                    Recorder(model, hasFixedHeight = true, isUpperLayer = false)
                 }
             },
         ) { measureables, constraints ->
@@ -157,31 +158,15 @@ private fun SessionScreen.ScreenContent() {
             }
         }
     } else {
-        Layout(
-            modifier = Modifier.fillMaxSize(),
-            content = {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    elevation = 2.dp,
-                ) {
-                    SentenceList(model)
-                }
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    Recorder(model, hasFixedHeight = false)
-                }
-            },
-        ) { measureables, constraints ->
-            val recorder = measureables[1].measure(constraints.copy(minHeight = 0))
-            val remainingHeight = constraints.maxHeight - recorder.height
-            val sentenceList = measureables[0].measure(
-                constraints.copy(
-                    minHeight = remainingHeight,
-                    maxHeight = remainingHeight,
-                ),
-            )
-            layout(constraints.maxWidth, constraints.maxHeight) {
-                recorder.placeRelative(0, remainingHeight)
-                sentenceList.placeRelative(0, 0)
+        Column(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                SentenceList(model, isUpperLayer = false)
+            }
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = 10.dp,
+            ) {
+                Recorder(model, hasFixedHeight = false, isUpperLayer = true)
             }
         }
     }

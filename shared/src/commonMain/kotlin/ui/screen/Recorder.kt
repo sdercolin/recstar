@@ -60,8 +60,14 @@ import util.isMobile
 fun Recorder(
     model: SessionScreenModel,
     hasFixedHeight: Boolean,
+    isUpperLayer: Boolean,
 ) {
-    Column(modifier = Modifier.fillMaxWidth().background(color = MaterialTheme.colors.background)) {
+    val backgroundColor = if (isUpperLayer) {
+        MaterialTheme.colors.surface
+    } else {
+        MaterialTheme.colors.background
+    }
+    Column(modifier = Modifier.fillMaxWidth().background(color = backgroundColor)) {
         RecorderTitleBar(model)
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -88,12 +94,12 @@ fun Recorder(
                 Divider(color = MaterialTheme.colors.surface)
             }
         }
-        Box(
-            modifier = Modifier.fillMaxWidth()
-                .aspectRatio(
-                    if (LocalScreenOrientation.current == ScreenOrientation.Landscape) 5f else 3f,
-                ),
-        ) {
+        val controlsAspectRatio = if (LocalScreenOrientation.current == ScreenOrientation.Landscape) {
+            if (isMobile) 7f else 5f
+        } else {
+            3f
+        }
+        Box(modifier = Modifier.fillMaxWidth().aspectRatio(controlsAspectRatio)) {
             RecorderControls(
                 isInteractionSuspended = model.isBusy,
                 isPlaying = model.isPlaying,
@@ -281,8 +287,10 @@ private fun RecordButton(
     isRecording: Boolean,
     onToggleRecording: () -> Unit,
 ) {
+    val useSmallSizes = isMobile && LocalScreenOrientation.current == ScreenOrientation.Landscape
+    val heightRatio = if (useSmallSizes) 0.7f else 0.55f
     Box(
-        modifier = Modifier.fillMaxHeight(0.55f)
+        modifier = Modifier.fillMaxHeight(heightRatio)
             .aspectRatio(1f, matchHeightConstraintsFirst = true)
             .plainClickable {
                 if (!isInteractionSuspended) {
@@ -316,8 +324,10 @@ private fun NavigateButton(
     imageVector: ImageVector,
     contentDescription: String,
 ) {
+    val useSmallSizes = isMobile && LocalScreenOrientation.current == ScreenOrientation.Landscape
+    val heightRatio = if (useSmallSizes) 0.55f else 0.4f
     IconButton(
-        modifier = Modifier.fillMaxHeight(0.4f)
+        modifier = Modifier.fillMaxHeight(heightRatio)
             .aspectRatio(1f, matchHeightConstraintsFirst = true),
         onClick = {
             if (!isInteractionSuspended) {

@@ -35,7 +35,10 @@ import ui.style.CustomColors
 private val itemHeight = 32.dp
 
 @Composable
-fun SentenceList(model: SessionScreenModel) {
+fun SentenceList(
+    model: SessionScreenModel,
+    isUpperLayer: Boolean,
+) {
     val lazyListState = rememberLazyListState()
     val density = LocalDensity.current
     val itemHeightPx = remember(density) { with(density) { itemHeight.toPx() } }
@@ -51,8 +54,13 @@ fun SentenceList(model: SessionScreenModel) {
             )
         }
     }
+    val backgroundColor = if (isUpperLayer) {
+        MaterialTheme.colors.surface
+    } else {
+        MaterialTheme.colors.background
+    }
     ScrollableLazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().background(color = backgroundColor),
         lazyListState = lazyListState,
     ) {
         itemsIndexed(
