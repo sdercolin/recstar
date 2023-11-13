@@ -5,20 +5,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.dp
@@ -31,6 +22,7 @@ import model.Action
 import model.Actions
 import model.Session
 import repository.LocalReclistRepository
+import ui.common.ActionMenu
 import ui.common.LocalAlertDialogController
 import ui.common.LocalProgressController
 import ui.common.LocalToastController
@@ -55,21 +47,8 @@ data class SessionScreen(val initialSession: Session) : Screen {
 
 @Composable
 private fun SessionScreen.ScreenActions() {
-    var showMenu by remember { mutableStateOf(false) }
     val model = rememberSessionScreenModel(initialSession)
-    IconButton(
-        enabled = model.isRecording.not() && model.isBusy.not(),
-        onClick = { showMenu = !showMenu },
-    ) {
-        Icon(
-            imageVector = Icons.Default.MoreVert,
-            contentDescription = string(Strings.CommonMore),
-        )
-    }
-    DropdownMenu(
-        expanded = showMenu,
-        onDismissRequest = { showMenu = false },
-    ) {
+    ActionMenu { closeMenu ->
         val fileInteractor = LocalFileInteractor.current
         val progressController = LocalProgressController.current
         val alertDialogController = LocalAlertDialogController.current
@@ -78,7 +57,7 @@ private fun SessionScreen.ScreenActions() {
         if (useOpenDirectory) {
             DropdownMenuItem(
                 onClick = {
-                    showMenu = false
+                    closeMenu()
                     Actions.openDirectory(fileInteractor, model.contentDirectory)
                 },
             ) {
@@ -88,7 +67,7 @@ private fun SessionScreen.ScreenActions() {
         if (useExport) {
             DropdownMenuItem(
                 onClick = {
-                    showMenu = false
+                    closeMenu()
                     val request = ExportDataRequest(
                         folder = model.contentDirectory,
                         allowedExtension = listOf("wav"),
@@ -105,7 +84,7 @@ private fun SessionScreen.ScreenActions() {
         }
         DropdownMenuItem(
             onClick = {
-                showMenu = false
+                closeMenu()
                 Actions.renameSession(alertDialogController, model)
             },
         ) {

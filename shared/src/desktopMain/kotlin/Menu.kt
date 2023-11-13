@@ -40,8 +40,8 @@ fun FrameWindowScope.Menu() {
                 shortcut = getShortcut(Key.R, ctrl = true),
             )
             ActionItem(
-                Action.EditSessionList,
-                string(Strings.MenuEditEditSessionList),
+                Action.EditList,
+                string(Strings.MenuEditEditList),
                 shortcut = getShortcut(Key.E, ctrl = true),
             )
         }

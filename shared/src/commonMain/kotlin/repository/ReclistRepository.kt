@@ -65,6 +65,17 @@ class ReclistRepository {
      * Gets the reclist with the given name.
      */
     fun get(name: String): Reclist = map[name] ?: parseReclist(folder.resolve("$name.txt")).getOrThrow()
+
+    /**
+     * Deletes the reclists with the given names.
+     */
+    fun delete(names: List<String>) {
+        names.forEach { name ->
+            val file = folder.resolve(name)
+            file.delete()
+        }
+        _items.value = _items.value.filterNot { it in names }
+    }
 }
 
 val LocalReclistRepository = staticCompositionLocalOf<ReclistRepository> { error("No ReclistRepository provided") }

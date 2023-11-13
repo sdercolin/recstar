@@ -19,7 +19,7 @@ enum class Action {
     OpenDirectory,
     Exit,
     RenameSession,
-    EditSessionList,
+    EditList,
     NextSentence,
     PreviousSentence,
     ToggleRecording,

@@ -7,51 +7,61 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.flow.StateFlow
+import repository.LocalReclistRepository
 import repository.LocalSessionRepository
+import repository.ReclistRepository
 import repository.SessionRepository
 import ui.common.AlertDialogController
 import ui.common.EditableListConfig
 import ui.common.EditableListScreenModel
 import ui.common.EditableListScreenModelImpl
 import ui.common.LocalAlertDialogController
+import ui.common.requestConfirm
 import ui.string.*
 import util.Log
 
-class MainScreenModel(
+class CreateSessionReclistScreenModel(
     private val sessionRepository: SessionRepository,
+    private val reclistRepository: ReclistRepository,
     private val navigator: Navigator,
     private val alertDialogController: AlertDialogController,
 ) : ScreenModel,
     EditableListScreenModel<String> by EditableListScreenModelImpl(
         alertDialogController,
         EditableListConfig(
-            deleteAlertTitle = { stringStatic(Strings.MainScreenDeleteItemsTitle) },
-            deleteAlertMessage = { count -> stringStatic(Strings.MainScreenDeleteItemsMessage, count) },
-            onDelete = { sessionRepository.delete(it) },
+            deleteAlertTitle = { stringStatic(Strings.CreateSessionReclistScreenDeleteItemsTitle) },
+            deleteAlertMessage = { count -> stringStatic(Strings.CreateSessionReclistScreenDeleteItemsMessage, count) },
+            onDelete = { reclistRepository.delete(it) },
         ),
     ) {
-    val sessions: StateFlow<List<String>> = sessionRepository.items
+    val reclists: StateFlow<List<String>> = reclistRepository.items
 
     init {
-        sessionRepository.fetch()
+        reclistRepository.fetch()
     }
 
-    fun openSession(name: String) {
-        val session = sessionRepository.get(name)
-            .getOrElse {
-                Log.e("Failed to get session $name", it)
-                return
+    fun select(name: String) {
+        val reclist = reclistRepository.get(name)
+        val session = sessionRepository.create(reclist)
+            .onFailure {
+                Log.e(it)
+                alertDialogController.requestConfirm(
+                    message = stringStatic(Strings.CreateSessionReclistScreenFailure),
+                )
             }
+            .getOrNull() ?: return
+        navigator.pop()
         navigator push SessionScreen(session)
     }
 }
 
 @Composable
-fun MainScreen.rememberMainScreenModel(): MainScreenModel {
+fun CreateSessionReclistScreen.rememberCreateSessionReclistScreenModel(): CreateSessionReclistScreenModel {
     val sessionRepository = LocalSessionRepository.current
+    val reclistRepository = LocalReclistRepository.current
     val navigator = LocalNavigator.currentOrThrow
     val alertDialogController = LocalAlertDialogController.current
     return rememberScreenModel {
-        MainScreenModel(sessionRepository, navigator, alertDialogController)
+        CreateSessionReclistScreenModel(sessionRepository, reclistRepository, navigator, alertDialogController)
     }
 }

@@ -29,7 +29,7 @@ class AppActionStore(private val scope: CoroutineScope) {
             Action.OpenDirectory -> currentScreen is SessionScreen
             Action.Exit -> currentScreen != MainScreen
             Action.RenameSession -> currentScreen is SessionScreen
-            Action.EditSessionList -> currentScreen == MainScreen
+            Action.EditList -> currentScreen !is SessionScreen
             Action.NextSentence -> currentScreen is SessionScreen
             Action.PreviousSentence -> currentScreen is SessionScreen
             Action.ToggleRecording -> currentScreen is SessionScreen
