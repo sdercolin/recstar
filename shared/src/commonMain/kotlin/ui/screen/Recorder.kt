@@ -167,7 +167,11 @@ private fun ColumnScope.RecorderWaveform(
             )
         }
         val data by flow.collectAsState(initial = emptyArray())
-        val color = if (isDarkMode) MaterialTheme.colors.primary else MaterialTheme.colors.onBackground
+        val color = if (isDarkMode) {
+            if (isRecording) MaterialTheme.colors.secondary else MaterialTheme.colors.primary
+        } else {
+            if (isRecording) MaterialTheme.colors.primaryVariant else MaterialTheme.colors.onBackground
+        }
         val playerCursorColor = if (isDarkMode) MaterialTheme.colors.secondary else MaterialTheme.colors.primaryVariant
         Canvas(modifier = Modifier.fillMaxSize()) {
             val width = size.width.toInt()
