@@ -2,9 +2,9 @@
 
 ## Download
 
-### Desktop
+See the [releases page](https://github.com/sdercolin/recstar/releases) for the latest version.
 
-See the [releases page](https://github.com/sdercolin/recstar/releases) for the latest desktop version.
+### Desktop
 
 - Windows: `~win64.zip`
 - macOS (Intel): `~mac-x64.dmg`
@@ -17,7 +17,7 @@ For other types of Linux os, please try building it by yourself.
 
 #### APK
 
-See the [releases page](https://github.com/sdercolin/recstar/releases) as well.
+Attached in the release page.
 
 #### Play Store
 
@@ -25,7 +25,7 @@ Preparing...
 
 ### iOS
 
-Preparing...
+Please access the url written in the release page with TestFlight installed.
 
 ## Getting started with development
 
