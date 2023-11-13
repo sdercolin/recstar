@@ -40,9 +40,9 @@ kotlin {
 
     if (includeIos) {
         listOf(
-            iosX64(),
-            iosArm64(),
-            iosSimulatorArm64(),
+            iosX64("iosX64"),
+            iosArm64("iosArm64"),
+            iosSimulatorArm64("iosSimulatorArm64"),
         ).forEach { iosTarget ->
             iosTarget.binaries.framework {
                 baseName = "shared"
@@ -147,12 +147,26 @@ buildkonfig {
     packageName = "com.sdercolin.recstar"
 
     defaultConfigs {
-        buildConfigField(FieldSpec.Type.BOOLEAN, "isDebug", "false")
+        buildConfigField(FieldSpec.Type.BOOLEAN, "isDebug", "true")
         buildConfigField(FieldSpec.Type.STRING, "version", findProperty("app.versionName").toString())
     }
 
-    defaultConfigs("debug") {
-        buildConfigField(FieldSpec.Type.BOOLEAN, "isDebug", "true")
+    defaultConfigs("release") {
+        buildConfigField(FieldSpec.Type.BOOLEAN, "isDebug", "false")
+    }
+
+    if (includeIos) {
+        targetConfigs {
+            create("iosX64") {
+                buildConfigField(FieldSpec.Type.BOOLEAN, "isDebug", "false")
+            }
+            create("iosArm64") {
+                buildConfigField(FieldSpec.Type.BOOLEAN, "isDebug", "false")
+            }
+            create("iosSimulatorArm64") {
+                buildConfigField(FieldSpec.Type.BOOLEAN, "isDebug", "true")
+            }
+        }
     }
 }
 
