@@ -1,3 +1,5 @@
+package repository
+
 import androidx.compose.runtime.staticCompositionLocalOf
 import io.Paths
 import io.appRecordFile
@@ -14,7 +16,10 @@ import util.Log
 import util.parseJson
 import util.stringifyJson
 
-class AppRecordStore(appRecord: AppRecord, private val scope: CoroutineScope) {
+/**
+ * A repository to manage the app record.
+ */
+class AppRecordRepository(appRecord: AppRecord, private val scope: CoroutineScope) {
     private val _stateFlow = MutableStateFlow(appRecord)
     val stateFlow: StateFlow<AppRecord> = _stateFlow
 
@@ -49,12 +54,12 @@ class AppRecordStore(appRecord: AppRecord, private val scope: CoroutineScope) {
     }
 }
 
-fun createAppRecordStore(scope: CoroutineScope): AppRecordStore {
+fun createAppRecordRepository(scope: CoroutineScope): AppRecordRepository {
     val recordText = Paths.appRecordFile.takeIf { it.exists() }?.readText()
     val appRecord = recordText?.parseJson() ?: AppRecord()
-    return AppRecordStore(appRecord, scope)
+    return AppRecordRepository(appRecord, scope)
 }
 
-val LocalAppRecordStore = staticCompositionLocalOf<AppRecordStore> {
-    error("No AppRecordStore provided")
+val LocalAppRecordRepository = staticCompositionLocalOf<AppRecordRepository> {
+    error("No AppRecordRepository provided")
 }

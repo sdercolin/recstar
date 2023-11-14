@@ -1,3 +1,5 @@
+package repository
+
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,6 +14,9 @@ import ui.screen.CreateSessionReclistScreen
 import ui.screen.MainScreen
 import ui.screen.SessionScreen
 
+/**
+ * A store to collect and dispatch app actions.
+ */
 class AppActionStore(private val scope: CoroutineScope) {
     private val _actions = MutableSharedFlow<Action>(replay = 0)
     val actions: Flow<Action> = _actions

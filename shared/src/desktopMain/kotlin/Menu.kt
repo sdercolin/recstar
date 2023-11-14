@@ -5,6 +5,7 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.MenuScope
 import model.Action
+import repository.LocalAppActionStore
 import ui.string.*
 import util.isMacOS
 

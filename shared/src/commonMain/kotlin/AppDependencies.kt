@@ -5,10 +5,15 @@ import io.FileInteractor
 import io.LocalFileInteractor
 import io.LocalPermissionChecker
 import io.PermissionChecker
+import repository.AppActionStore
+import repository.AppRecordRepository
+import repository.LocalAppActionStore
+import repository.LocalAppRecordRepository
 import repository.LocalReclistRepository
 import repository.LocalSessionRepository
 import repository.ReclistRepository
 import repository.SessionRepository
+import repository.createAppRecordRepository
 import ui.common.AlertDialogController
 import ui.common.LocalAlertDialogController
 import ui.common.LocalProgressController
@@ -28,7 +33,7 @@ import util.isDebug
 class AppDependencies(
     val context: AppContext,
     val language: Language = findBestMatchedLanguage(),
-    val appRecordStore: AppRecordStore = createAppRecordStore(context.coroutineScope),
+    val appRecordRepository: AppRecordRepository = createAppRecordRepository(context.coroutineScope),
     val appActionStore: AppActionStore = AppActionStore(context.coroutineScope),
     val toastController: ToastController = ToastController(context),
     val alertDialogController: AlertDialogController = AlertDialogController(context),
@@ -60,7 +65,7 @@ fun ProvideAppDependencies(
     CompositionLocalProvider(
         LocalAppContext provides dependencies.context,
         LocalLanguage provides dependencies.language,
-        LocalAppRecordStore provides dependencies.appRecordStore,
+        LocalAppRecordRepository provides dependencies.appRecordRepository,
         LocalAppActionStore provides dependencies.appActionStore,
         LocalToastController provides dependencies.toastController,
         LocalAlertDialogController provides dependencies.alertDialogController,

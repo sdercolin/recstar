@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import model.AppRecord
+import repository.AppRecordRepository
 import ui.model.DesktopContext
 import util.Log
 
@@ -28,14 +29,14 @@ fun main() =
         val coroutineScope = rememberCoroutineScope()
         val context = remember { DesktopContext(coroutineScope) }
         val dependencies = remember(context) { AppDependencies(context) }
-        val windowState = rememberResizableWindowState(dependencies.appRecordStore.stateFlow)
+        val windowState = rememberResizableWindowState(dependencies.appRecordRepository.stateFlow)
         ProvideAppDependencies(dependencies) {
             Window(
                 title = APP_NAME,
                 state = windowState,
                 onCloseRequest = ::exitApplication,
             ) {
-                LaunchSaveWindowSize(windowState, dependencies.appRecordStore)
+                LaunchSaveWindowSize(windowState, dependencies.appRecordRepository)
                 MainView()
                 Menu()
             }
@@ -45,11 +46,11 @@ fun main() =
 @Composable
 private fun LaunchSaveWindowSize(
     windowState: WindowState,
-    appRecordStore: AppRecordStore,
+    appRecordRepository: AppRecordRepository,
 ) {
     LaunchedEffect(windowState) {
         snapshotFlow { windowState.size }
-            .onEach(appRecordStore::saveWindowSize)
+            .onEach(appRecordRepository::saveWindowSize)
             .launchIn(this)
     }
 }
@@ -60,7 +61,7 @@ private fun rememberResizableWindowState(appRecord: StateFlow<AppRecord>): Windo
     return rememberWindowState(width = windowSize.first.dp, height = windowSize.second.dp)
 }
 
-private fun AppRecordStore.saveWindowSize(dpSize: DpSize) {
+private fun AppRecordRepository.saveWindowSize(dpSize: DpSize) {
     val size = dpSize.width.value to dpSize.height.value
     update { copy(windowSizeDp = size) }
 }
