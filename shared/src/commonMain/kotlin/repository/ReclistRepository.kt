@@ -71,7 +71,7 @@ class ReclistRepository {
      */
     fun delete(names: List<String>) {
         names.forEach { name ->
-            val file = folder.resolve(name)
+            val file = folder.resolve("$name.txt")
             file.delete()
         }
         _items.value = _items.value.filterNot { it in names }
