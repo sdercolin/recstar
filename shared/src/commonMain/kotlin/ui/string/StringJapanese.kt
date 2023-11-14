@@ -73,5 +73,9 @@ fun Strings.ja(): String? =
         MenuActionNextSentence -> "次へ"
         MenuActionPreviousSentence -> "前へ"
         MenuActionToggleRecording -> "録音/停止"
+        MenuHelp -> "ヘルプ"
+        MenuHelpOpenContentDirectory -> "コンテンツディレクトリを開く"
+        MenuHelpOpenAppDirectory -> "アプリディレクトリを開く"
+        MenuHelpAbout -> "$APP_NAME について"
         else -> null
     }

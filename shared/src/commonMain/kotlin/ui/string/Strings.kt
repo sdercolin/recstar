@@ -70,6 +70,10 @@ enum class Strings {
     MenuActionNextSentence,
     MenuActionPreviousSentence,
     MenuActionToggleRecording,
+    MenuHelp,
+    MenuHelpOpenContentDirectory,
+    MenuHelpOpenAppDirectory,
+    MenuHelpAbout,
     ;
 
     fun get(language: Language): String =

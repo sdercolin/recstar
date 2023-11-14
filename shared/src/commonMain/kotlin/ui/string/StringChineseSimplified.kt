@@ -73,5 +73,9 @@ fun Strings.zhHans(): String? =
         MenuActionNextSentence -> "下一句"
         MenuActionPreviousSentence -> "上一句"
         MenuActionToggleRecording -> "录制/停止"
+        MenuHelp -> "帮助"
+        MenuHelpOpenContentDirectory -> "打开内容目录"
+        MenuHelpOpenAppDirectory -> "打开应用目录"
+        MenuHelpAbout -> "关于"
         else -> null
     }

@@ -38,6 +38,9 @@ class AppActionStore(private val scope: CoroutineScope) {
             Action.NextSentence -> currentScreen is SessionScreen
             Action.PreviousSentence -> currentScreen is SessionScreen
             Action.ToggleRecording -> currentScreen is SessionScreen
+            Action.OpenAppDirectory -> true
+            Action.OpenContentDirectory -> true
+            Action.OpenAbout -> true
         }
 
     fun dispatch(action: Action) {

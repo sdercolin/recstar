@@ -10,11 +10,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
+import io.LocalFileInteractor
+import io.Paths
+import kotlinx.coroutines.flow.collectLatest
+import model.Action
 import repository.LocalAppActionStore
 import ui.common.LocalAlertDialogController
 import ui.common.LocalProgressController
 import ui.common.LocalToastController
 import ui.model.Screen
+import ui.screen.AboutScreen
 import ui.screen.MainScreen
 import ui.string.*
 import ui.style.AppTheme
@@ -38,8 +43,19 @@ fun App() {
 @Composable
 private fun MainScaffold(navigator: Navigator) {
     val appActionStore = LocalAppActionStore.current
+    val fileInteractor = LocalFileInteractor.current
     LaunchedEffect(navigator.lastItem) {
         appActionStore.onScreenChange(navigator.lastItem as Screen)
+    }
+    LaunchedEffect(appActionStore) {
+        appActionStore.actions.collectLatest {
+            when (it) {
+                Action.OpenContentDirectory -> fileInteractor.requestOpenFolder(Paths.contentRoot)
+                Action.OpenAppDirectory -> fileInteractor.requestOpenFolder(Paths.appRoot)
+                Action.OpenAbout -> navigator push AboutScreen
+                else -> Unit
+            }
+        }
     }
     Scaffold(
         topBar = {

@@ -23,6 +23,9 @@ enum class Action {
     NextSentence,
     PreviousSentence,
     ToggleRecording,
+    OpenAppDirectory,
+    OpenContentDirectory,
+    OpenAbout,
 }
 
 /**

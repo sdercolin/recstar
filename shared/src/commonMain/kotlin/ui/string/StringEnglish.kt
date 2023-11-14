@@ -74,4 +74,8 @@ fun Strings.en(): String =
         MenuActionNextSentence -> "Next Sentence"
         MenuActionPreviousSentence -> "Previous Sentence"
         MenuActionToggleRecording -> "Toggle Recording"
+        MenuHelp -> "Help"
+        MenuHelpOpenContentDirectory -> "Open Content Directory"
+        MenuHelpOpenAppDirectory -> "Open App Directory"
+        MenuHelpAbout -> "About"
     }

@@ -63,6 +63,20 @@ fun FrameWindowScope.Menu() {
                 shortcut = getShortcut(Key.Enter),
             )
         }
+        Menu(string(Strings.MenuHelp), mnemonic = 'H') {
+            ActionItem(
+                Action.OpenContentDirectory,
+                string(Strings.MenuHelpOpenContentDirectory),
+            )
+            ActionItem(
+                Action.OpenAppDirectory,
+                string(Strings.MenuHelpOpenAppDirectory),
+            )
+            ActionItem(
+                Action.OpenAbout,
+                string(Strings.MenuHelpAbout),
+            )
+        }
     }
 }
 
@@ -70,7 +84,7 @@ fun FrameWindowScope.Menu() {
 private fun MenuScope.ActionItem(
     action: Action,
     title: String,
-    shortcut: KeyShortcut?,
+    shortcut: KeyShortcut? = null,
 ) {
     val store = LocalAppActionStore.current
     Item(
