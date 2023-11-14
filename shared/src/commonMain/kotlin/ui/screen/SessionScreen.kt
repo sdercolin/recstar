@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.IosShare
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -24,6 +26,7 @@ import model.Actions
 import model.Session
 import repository.LocalReclistRepository
 import ui.common.ActionMenu
+import ui.common.ActionMenuItem
 import ui.common.LocalAlertDialogController
 import ui.common.LocalProgressController
 import ui.common.LocalToastController
@@ -56,17 +59,19 @@ private fun SessionScreen.ScreenActions() {
         val useOpenDirectory = isDesktop || isIos
         val useExport = isMobile
         if (useOpenDirectory) {
-            DropdownMenuItem(
+            ActionMenuItem(
+                text = string(Strings.SessionScreenActionOpenDirectory),
+                icon = Icons.Default.Folder,
                 onClick = {
                     closeMenu()
                     Actions.openDirectory(fileInteractor, model.contentDirectory)
                 },
-            ) {
-                Text(text = string(Strings.SessionScreenActionOpenDirectory))
-            }
+            )
         }
         if (useExport) {
-            DropdownMenuItem(
+            ActionMenuItem(
+                text = string(Strings.SessionScreenActionExport),
+                icon = Icons.Default.IosShare,
                 onClick = {
                     closeMenu()
                     val request = ExportDataRequest(
@@ -79,18 +84,16 @@ private fun SessionScreen.ScreenActions() {
                     )
                     fileInteractor.exportData(request)
                 },
-            ) {
-                Text(text = string(Strings.SessionScreenActionExport))
-            }
+            )
         }
-        DropdownMenuItem(
+        ActionMenuItem(
+            text = string(Strings.SessionScreenActionRenameSession),
+            icon = Icons.Default.Edit,
             onClick = {
                 closeMenu()
                 Actions.renameSession(alertDialogController, model)
             },
-        ) {
-            Text(text = string(Strings.SessionScreenActionRenameSession))
-        }
+        )
     }
 }
 

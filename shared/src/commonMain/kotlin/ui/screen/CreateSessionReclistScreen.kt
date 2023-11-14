@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -27,6 +29,7 @@ import model.Action
 import model.Actions
 import repository.LocalReclistRepository
 import ui.common.ActionMenu
+import ui.common.ActionMenuItem
 import ui.common.FloatingActionButtonWrapper
 import ui.common.LocalToastController
 import ui.common.ScrollableLazyColumn
@@ -52,22 +55,22 @@ private fun CreateSessionReclistScreen.ScreenActions() {
             val fileInteractor = LocalFileInteractor.current
             val repository = LocalReclistRepository.current
             val toastController = LocalToastController.current
-            DropdownMenuItem(
+            ActionMenuItem(
+                text = string(Strings.CommonImport),
+                icon = Icons.Default.Add,
                 onClick = {
                     closeMenu()
                     Actions.importReclist(fileInteractor, repository, toastController)
                 },
-            ) {
-                Text(text = string(Strings.CommonImport))
-            }
-            DropdownMenuItem(
+            )
+            ActionMenuItem(
+                text = string(Strings.CommonEdit),
+                icon = Icons.Default.Edit,
                 onClick = {
                     closeMenu()
                     model.startSelectingForDeletion()
                 },
-            ) {
-                Text(text = string(Strings.CommonEdit))
-            }
+            )
         }
     }
 }
