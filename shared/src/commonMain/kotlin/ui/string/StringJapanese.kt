@@ -1,5 +1,6 @@
 package ui.string
 
+import const.APP_NAME
 import ui.string.Strings.*
 
 @Suppress("REDUNDANT_ELSE_IN_WHEN")
@@ -46,6 +47,20 @@ fun Strings.ja(): String? =
         CreateSessionReclistScreenFailure -> "セッションの作成に失敗しました。"
         CreateSessionReclistScreenDeleteItemsTitle -> "録音リストを削除"
         CreateSessionReclistScreenDeleteItemsMessage -> "本当に {0} 件の録音リストを削除しますか？"
+        PreferenceScreenTitle -> "設定"
+        PreferenceGroupAppearance -> "外観"
+        PreferenceLanguage -> "言語"
+        PreferenceLanguageAuto -> "自動"
+        PreferenceTheme -> "テーマ"
+        PreferenceThemeSystem -> "システムに従う"
+        PreferenceThemeLight -> "ライト"
+        PreferenceThemeDark -> "ダーク"
+        PreferenceGroupMisc -> "その他"
+        AboutScreenPrivacyPolicy -> "プライバシーポリシー"
+        PreferenceAbout -> "$APP_NAME について"
+        AboutScreenCopyDeviceInfo -> "デバイス情報をコピー"
+        AboutScreenDeviceInfoCopied -> "コピーしました"
+        AboutScreenViewOnGithub -> "GitHub で表示"
         MenuFile -> "ファイル"
         MenuFileNewSession -> "新しいセッションを開始"
         MenuFileImportReclist -> "録音リストをインポート"

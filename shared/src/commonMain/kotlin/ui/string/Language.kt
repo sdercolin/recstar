@@ -1,12 +1,14 @@
 package ui.string
 
 import androidx.compose.runtime.compositionLocalOf
+import util.Locale
+import util.Log
 
 var currentLanguage: Language = Language.default
 
 val LocalLanguage = compositionLocalOf { Language.default }
 
-enum class Language(val code: String, private val displayName: String) {
+enum class Language(val code: String, val displayName: String) {
     English("en", "English"),
     ChineseSimplified("zh-Hans", "简体中文"),
     Japanese("ja", "日本語"),
@@ -29,4 +31,10 @@ enum class Language(val code: String, private val displayName: String) {
             return null
         }
     }
+}
+
+fun findBestMatchedLanguage(): Language {
+    val detected = Language.find(Locale)
+    Log.i("Locale: $Locale, Language: $detected")
+    return detected ?: Language.default
 }

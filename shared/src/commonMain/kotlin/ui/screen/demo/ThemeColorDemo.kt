@@ -2,7 +2,6 @@ package ui.screen.demo
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import ui.model.Screen
+import ui.style.LocalThemeIsDarkMode
 import ui.style.appDarkColors
 import ui.style.appLightColors
 
@@ -58,7 +58,7 @@ class ThemeColorDemoScreenModel : ScreenModel {
 @Composable
 private fun Screen.ThemeDemo() {
     val model = rememberScreenModel { ThemeColorDemoScreenModel() }
-    val isDarkMode = isSystemInDarkTheme()
+    val isDarkMode = LocalThemeIsDarkMode.current
     val colors = remember(model.theme) {
         when (model.theme) {
             ThemeColorDemoScreenModel.Theme.System -> if (isDarkMode) {

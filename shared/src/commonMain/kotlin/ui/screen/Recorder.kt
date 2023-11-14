@@ -4,7 +4,6 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,6 +52,7 @@ import ui.common.plainClickable
 import ui.model.LocalScreenOrientation
 import ui.model.ScreenOrientation
 import ui.string.*
+import ui.style.LocalThemeIsDarkMode
 import util.alpha
 import util.isMobile
 
@@ -79,7 +79,7 @@ fun Recorder(
                     }
                 },
         ) {
-            if (isSystemInDarkTheme().not()) {
+            if (LocalThemeIsDarkMode.current.not()) {
                 Divider(color = MaterialTheme.colors.surface)
             }
             RecorderWaveform(
@@ -90,7 +90,7 @@ fun Recorder(
                 isInteractionSuspended = model.isBusy,
                 onTogglePlaying = model::togglePlaying,
             )
-            if (isSystemInDarkTheme().not()) {
+            if (LocalThemeIsDarkMode.current.not()) {
                 Divider(color = MaterialTheme.colors.surface)
             }
         }
@@ -161,7 +161,7 @@ private fun ColumnScope.RecorderWaveform(
     isInteractionSuspended: Boolean,
     onTogglePlaying: () -> Unit,
 ) {
-    val isDarkMode = isSystemInDarkTheme()
+    val isDarkMode = LocalThemeIsDarkMode.current
     val paperColor = if (isDarkMode) Color.Black else Color.White
     Box(modifier = Modifier.weight(1f).fillMaxWidth().background(color = paperColor)) {
         if (!hasFile && !isRecording) {

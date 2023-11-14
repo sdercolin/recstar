@@ -1,4 +1,3 @@
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
@@ -19,13 +18,14 @@ import ui.model.Screen
 import ui.screen.MainScreen
 import ui.string.*
 import ui.style.AppTheme
+import ui.style.LocalThemeIsDarkMode
 
 @Composable
 fun App() {
     val toastController = LocalToastController.current
     val alertDialogController = LocalAlertDialogController.current
     val progressController = LocalProgressController.current
-    AppTheme(isSystemInDarkTheme()) {
+    AppTheme(isDarkMode = LocalThemeIsDarkMode.current) {
         Navigator(MainScreen) { navigator ->
             MainScaffold(navigator)
         }

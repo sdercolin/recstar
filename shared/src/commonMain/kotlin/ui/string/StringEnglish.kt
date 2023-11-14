@@ -1,5 +1,6 @@
 package ui.string
 
+import const.APP_NAME
 import ui.string.Strings.*
 
 fun Strings.en(): String =
@@ -47,6 +48,20 @@ fun Strings.en(): String =
         CreateSessionReclistScreenFailure -> "Failed to create session."
         CreateSessionReclistScreenDeleteItemsTitle -> "Delete Reclists"
         CreateSessionReclistScreenDeleteItemsMessage -> "Are you sure you want to delete {0} reclist(s)?"
+        PreferenceScreenTitle -> "Settings"
+        PreferenceGroupAppearance -> "Appearance"
+        PreferenceLanguage -> "Language"
+        PreferenceLanguageAuto -> "Auto"
+        PreferenceTheme -> "Theme"
+        PreferenceThemeSystem -> "Follow System"
+        PreferenceThemeLight -> "Light"
+        PreferenceThemeDark -> "Dark"
+        PreferenceGroupMisc -> "Misc"
+        PreferenceAbout -> "About $APP_NAME"
+        AboutScreenPrivacyPolicy -> "Privacy Policy"
+        AboutScreenCopyDeviceInfo -> "Copy Device Info"
+        AboutScreenDeviceInfoCopied -> "Device info copied to clipboard"
+        AboutScreenViewOnGithub -> "View on GitHub"
         MenuFile -> "File"
         MenuFileNewSession -> "Start New Session"
         MenuFileImportReclist -> "Import Reclist"

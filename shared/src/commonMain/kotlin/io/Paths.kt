@@ -19,6 +19,9 @@ val Paths.reclistsDirectory: File
 val Paths.appRecordFile: File
     get() = appRoot.resolve("record.json")
 
+val Paths.appPreferenceFile: File
+    get() = appRoot.resolve("preference.json")
+
 fun ensurePaths() {
     listOf(Paths.appRoot, Paths.contentRoot).forEach {
         Log.i("ensurePaths: ${it.absolutePath}")

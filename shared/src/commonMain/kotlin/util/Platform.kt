@@ -9,6 +9,14 @@ enum class PlatformTarget {
     Android,
     Desktop,
     Ios,
+    ;
+
+    override fun toString(): String =
+        when (this) {
+            Android -> "Android"
+            Desktop -> "Desktop"
+            Ios -> "iOS"
+        }
 }
 
 val isAndroid: Boolean = Platform.target == PlatformTarget.Android

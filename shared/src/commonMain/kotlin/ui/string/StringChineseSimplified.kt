@@ -1,5 +1,6 @@
 package ui.string
 
+import const.APP_NAME
 import ui.string.Strings.*
 
 @Suppress("REDUNDANT_ELSE_IN_WHEN")
@@ -46,6 +47,20 @@ fun Strings.zhHans(): String? =
         CreateSessionReclistScreenFailure -> "创建会话失败。"
         CreateSessionReclistScreenDeleteItemsTitle -> "删除录音表"
         CreateSessionReclistScreenDeleteItemsMessage -> "确定要删除 {0} 个录音表吗？"
+        PreferenceScreenTitle -> "设置"
+        PreferenceGroupAppearance -> "外观"
+        PreferenceLanguage -> "语言"
+        PreferenceLanguageAuto -> "自动"
+        PreferenceTheme -> "主题"
+        PreferenceThemeSystem -> "跟随系统"
+        PreferenceThemeLight -> "浅色"
+        PreferenceThemeDark -> "深色"
+        PreferenceGroupMisc -> "其他"
+        PreferenceAbout -> "关于 $APP_NAME"
+        AboutScreenPrivacyPolicy -> "隐私政策"
+        AboutScreenCopyDeviceInfo -> "复制设备信息"
+        AboutScreenDeviceInfoCopied -> "已将设备信息复制到剪贴板"
+        AboutScreenViewOnGithub -> "在 GitHub 上查看"
         MenuFile -> "文件"
         MenuFileNewSession -> "开始新会话"
         MenuFileImportReclist -> "导入录音表"

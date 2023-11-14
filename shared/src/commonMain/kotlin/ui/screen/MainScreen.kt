@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -79,6 +80,11 @@ private fun MainScreen.ScreenAction() {
                     closeMenu()
                     model.startSelectingForDeletion()
                 },
+            )
+            ActionMenuItem(
+                text = string(Strings.PreferenceScreenTitle),
+                icon = Icons.Default.Settings,
+                onClick = { navigator push PreferenceScreen },
             )
             ActionMenuItem(
                 text = "Dev Tools",
