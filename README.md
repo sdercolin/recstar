@@ -21,7 +21,7 @@ Attached in the release page.
 
 #### Play Store
 
-Preparing...
+Please access the url written in the release page with Play Store installed.
 
 ### iOS
 
