@@ -1,5 +1,11 @@
 # RecStar
 
+A UTAU style reclist recorder application for Desktop/iOS/Android.
+
+This project is currently on an early development stage.
+
+If you have any feedback, please join our [Discord Server](https://discord.gg/TyEcQ6P73y) and find the #recstar-prototype channel.
+
 ## Download
 
 See the [releases page](https://github.com/sdercolin/recstar/releases) for the latest version.
@@ -21,11 +27,12 @@ Attached in the release page.
 
 #### Play Store
 
-Please access the url written in the release page with Play Store installed.
+Get the latest version via Play Store with the following public test link:
+https://play.google.com/store/apps/details?id=com.sdercolin.recstar
 
 ### iOS
-
-Please access the url written in the release page with TestFlight installed.
+Get the latest version via TestFlight with the following link:
+https://testflight.apple.com/join/jBfhclHr
 
 ## Getting started with development
 
