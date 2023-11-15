@@ -83,7 +83,7 @@ private fun Group(
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)) {
         Text(
-            modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = 40.dp, vertical = 8.dp),
             text = title,
             style = MaterialTheme.typography.subtitle2,
             color = MaterialTheme.colors.primary,
@@ -150,8 +150,9 @@ private fun Item(
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
+            .padding(start = 24.dp)
             .runIfHave(onClick) { clickable(onClick = it) }
-            .padding(vertical = 16.dp, horizontal = 32.dp),
+            .padding(top = 16.dp, bottom = 16.dp, start = 16.dp, end = 40.dp),
     ) {
         Text(
             text = title,
