@@ -85,5 +85,5 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}
           packageName: com.sdercolin.recstar
           releaseFiles: ${{steps.sign_app.outputs.signedReleaseFile}}
-          track: production
+          track: beta
           status: completed
