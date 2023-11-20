@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.IosShare
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -24,12 +25,10 @@ import model.Action
 import model.Actions
 import model.Session
 import repository.LocalAppActionStore
-import repository.LocalReclistRepository
 import ui.common.ActionMenu
 import ui.common.ActionMenuItem
 import ui.common.LocalAlertDialogController
 import ui.common.LocalProgressController
-import ui.common.LocalToastController
 import ui.model.LocalScreenOrientation
 import ui.model.Screen
 import ui.model.ScreenOrientation
@@ -52,6 +51,7 @@ data class SessionScreen(val initialSession: Session) : Screen {
 @Composable
 private fun SessionScreen.ScreenActions() {
     val model = rememberSessionScreenModel(initialSession)
+    val navigator = LocalNavigator.currentOrThrow
     ActionMenu { closeMenu ->
         val fileInteractor = LocalFileInteractor.current
         val progressController = LocalProgressController.current
@@ -94,6 +94,14 @@ private fun SessionScreen.ScreenActions() {
                 Actions.renameSession(alertDialogController, model)
             },
         )
+        ActionMenuItem(
+            text = string(Strings.SessionScreenActionConfigureGuideAudio),
+            icon = Icons.Default.MusicNote,
+            onClick = {
+                closeMenu()
+                navigator push GuideAudioScreen(model.name)
+            },
+        )
     }
 }
 
@@ -104,8 +112,6 @@ private fun SessionScreen.ScreenContent() {
     val screenOrientation = LocalScreenOrientation.current
     val actionStore = LocalAppActionStore.current
     val fileInteractor = LocalFileInteractor.current
-    val reclistRepository = LocalReclistRepository.current
-    val toastController = LocalToastController.current
     val alertDialogController = LocalAlertDialogController.current
     LaunchedEffect(model, actionStore) {
         actionStore.actions.collectLatest { action ->
@@ -114,10 +120,10 @@ private fun SessionScreen.ScreenContent() {
                     navigator.popUntilRoot()
                     navigator push CreateSessionReclistScreen
                 }
-                Action.ImportReclist -> Actions.importReclist(fileInteractor, reclistRepository, toastController)
                 Action.OpenDirectory -> Actions.openDirectory(fileInteractor, model.contentDirectory)
                 Action.Exit -> navigator.pop()
                 Action.RenameSession -> Actions.renameSession(alertDialogController, model)
+                Action.ConfigureGuideAudio -> navigator push GuideAudioScreen(model.name)
                 Action.ToggleRecording -> model.toggleRecording()
                 Action.NextSentence -> model.next()
                 Action.PreviousSentence -> model.previous()

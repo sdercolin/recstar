@@ -11,9 +11,11 @@ import model.AppPreference
 import repository.AppActionStore
 import repository.AppPreferenceRepository
 import repository.AppRecordRepository
+import repository.GuideAudioRepository
 import repository.LocalAppActionStore
 import repository.LocalAppPreferenceRepository
 import repository.LocalAppRecordRepository
+import repository.LocalGuideAudioRepository
 import repository.LocalReclistRepository
 import repository.LocalSessionRepository
 import repository.ReclistRepository
@@ -45,7 +47,8 @@ class AppDependencies(
     val fileInteractor: FileInteractor = FileInteractor(context, toastController, alertDialogController),
     val permissionChecker: PermissionChecker = PermissionChecker(context),
     val reclistRepository: ReclistRepository = ReclistRepository(),
-    val sessionRepository: SessionRepository = SessionRepository(reclistRepository),
+    val guideAudioRepository: GuideAudioRepository = GuideAudioRepository(),
+    val sessionRepository: SessionRepository = SessionRepository(reclistRepository, guideAudioRepository),
 )
 
 @Composable
@@ -79,6 +82,7 @@ fun ProvideAppDependencies(
         LocalPermissionChecker provides dependencies.permissionChecker,
         LocalReclistRepository provides dependencies.reclistRepository,
         LocalSessionRepository provides dependencies.sessionRepository,
+        LocalGuideAudioRepository provides dependencies.guideAudioRepository,
     ) {
         content()
     }

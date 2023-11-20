@@ -1,6 +1,7 @@
 package io
 
 import android.app.Activity
+import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.activity.result.ActivityResultLauncher
@@ -21,10 +22,15 @@ class PickFileDelegate(activity: AppCompatActivity, private val alertDialogContr
         alertDialogController.requestConfirmError(message = stringStatic(Strings.ErrorReadFileFailedMessage))
     }
 
-    private val pickFileContract: ActivityResultLauncher<String> =
-        activity.registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+    private val pickFileContract: ActivityResultLauncher<Intent> =
+        activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val scopedActivity = activityRef.get() ?: return@registerForActivityResult
             val contentResolver = scopedActivity.contentResolver
+            if (result.resultCode != Activity.RESULT_OK) {
+                pickFileCallback?.invoke(null)
+                return@registerForActivityResult
+            }
+            val uri = result.data?.data
             if (uri == null) {
                 pickFileCallback?.invoke(null)
                 return@registerForActivityResult
@@ -41,7 +47,6 @@ class PickFileDelegate(activity: AppCompatActivity, private val alertDialogContr
                     }
                 }
                 pickFileCallback?.invoke(Paths.cacheRoot.resolve(fileName))
-                tempFile.delete()
             } catch (t: Throwable) {
                 onError(t)
             }
@@ -70,12 +75,20 @@ class PickFileDelegate(activity: AppCompatActivity, private val alertDialogContr
         onFinish: (File?) -> Unit,
     ) {
         pickFileCallback = onFinish
-        pickFileContract.launch(mapExtensionsToMimeType(allowedExtensions))
+        val (type, mimeTypes) = mapExtensionsToMimeType(allowedExtensions)
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+            this.type = type
+            action = Intent.ACTION_GET_CONTENT
+            mimeTypes?.let { putExtra(Intent.EXTRA_MIME_TYPES, it.toTypedArray()) }
+            putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false)
+        }
+        pickFileContract.launch(intent)
     }
 
-    private fun mapExtensionsToMimeType(allowedExtensions: List<String>): String =
+    private fun mapExtensionsToMimeType(allowedExtensions: List<String>): Pair<String, List<String>?> =
         when (allowedExtensions.firstOrNull()) {
-            "txt" -> "text/plain"
-            else -> "*/*"
+            "txt" -> "text/plain" to null
+            "wav" -> "audio/*" to listOf("audio/wav", "audio/x-wav")
+            else -> "*/*" to null
         }
 }

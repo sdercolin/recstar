@@ -23,8 +23,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import model.GuideAudio
 import model.Session
 import repository.LocalSessionRepository
 import repository.SessionRepository
@@ -58,12 +60,28 @@ class SessionScreenModel(
     val sentences: List<Sentence>
         get() = _sentences
 
+    var guideAudioConfig: GuideAudio? by mutableStateOf(session.guideAudioConfig)
+        private set
+
     private fun reload(session: Session) {
         name = session.name
         contentDirectory = session.directory
         _sentences.clear()
         _sentences.addAll(session.reclist.lines.map { Sentence(it, isFileExisting(it)) })
+        guideAudioConfig = session.guideAudioConfig
         currentIndex = currentIndex.coerceAtMost(sentences.size - 1)
+        Log.d("Reloading session: $name")
+        Log.d("guideAudioConfig: $guideAudioConfig")
+    }
+
+    init {
+        screenModelScope.launch {
+            sessionRepository.sessionUpdated.collectLatest { updatedName ->
+                if (updatedName == name) {
+                    reload(sessionRepository.get(updatedName).getOrThrow())
+                }
+            }
+        }
     }
 
     var currentIndex: Int by savedMutableStateOf(0) { waveformPainter.switch(currentFile) }
@@ -253,8 +271,7 @@ class SessionScreenModel(
     fun renameSession(newName: String) {
         screenModelScope.launch(Dispatchers.IO) {
             runCatching {
-                val newSession = sessionRepository.rename(name, newName).getOrThrow()
-                reload(newSession)
+                sessionRepository.rename(name, newName)
             }.onFailure {
                 withContext(Dispatchers.Main) {
                     Log.e("Failed to rename session", it)

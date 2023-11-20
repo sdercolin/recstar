@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -79,7 +80,7 @@ interface EditableListScreenModel<T : Any> {
     fun ItemRow(
         item: T,
         onClick: (T) -> Unit,
-        content: @Composable () -> Unit,
+        content: @Composable RowScope.(isSelectingForDeletion: Boolean) -> Unit,
     ) {
         Row(
             modifier = Modifier
@@ -109,7 +110,7 @@ interface EditableListScreenModel<T : Any> {
                     tint = tint,
                 )
             }
-            content()
+            content(isSelectingForDeletion)
         }
     }
 }

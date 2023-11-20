@@ -14,7 +14,10 @@ import io.LocalFileInteractor
 import io.Paths
 import kotlinx.coroutines.flow.collectLatest
 import model.Action
+import model.Actions
 import repository.LocalAppActionStore
+import repository.LocalGuideAudioRepository
+import repository.LocalReclistRepository
 import ui.common.LocalAlertDialogController
 import ui.common.LocalProgressController
 import ui.common.LocalToastController
@@ -44,12 +47,23 @@ fun App() {
 private fun MainScaffold(navigator: Navigator) {
     val appActionStore = LocalAppActionStore.current
     val fileInteractor = LocalFileInteractor.current
+    val reclistRepository = LocalReclistRepository.current
+    val guideAudioRepository = LocalGuideAudioRepository.current
+    val alertDialogController = LocalAlertDialogController.current
+    val toastController = LocalToastController.current
     LaunchedEffect(navigator.lastItem) {
         appActionStore.onScreenChange(navigator.lastItem as Screen)
     }
     LaunchedEffect(appActionStore) {
         appActionStore.actions.collectLatest {
             when (it) {
+                Action.ImportReclist -> Actions.importReclist(fileInteractor, reclistRepository, toastController)
+                Action.ImportGuideAudio -> Actions.importGuideAudio(
+                    fileInteractor,
+                    guideAudioRepository,
+                    alertDialogController,
+                    toastController,
+                )
                 Action.OpenContentDirectory -> fileInteractor.requestOpenFolder(Paths.contentRoot)
                 Action.OpenAppDirectory -> fileInteractor.requestOpenFolder(Paths.appRoot)
                 Action.OpenAbout -> navigator push AboutScreen

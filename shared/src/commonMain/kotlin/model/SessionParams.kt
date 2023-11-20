@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SessionParams(
     val reclistName: String,
+    val guideAudioName: String? = null,
 )
 
-fun Session.toParams(): SessionParams = SessionParams(reclist.name)
+fun Session.toParams(): SessionParams = SessionParams(reclist.name, guideAudioConfig?.name)

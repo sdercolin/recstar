@@ -79,16 +79,12 @@ private fun CreateSessionReclistScreen.ScreenActions() {
 private fun CreateSessionReclistScreen.ScreenContent() {
     val model = rememberCreateSessionReclistScreenModel()
     val reclists by model.reclists.collectAsState()
-    val reclistRepository = LocalReclistRepository.current
     val navigator = LocalNavigator.currentOrThrow
     val appActionStore = LocalAppActionStore.current
-    val fileInteractor = LocalFileInteractor.current
-    val toastController = LocalToastController.current
 
     LaunchedEffect(appActionStore) {
         appActionStore.actions.collectLatest {
             when (it) {
-                Action.ImportReclist -> Actions.importReclist(fileInteractor, reclistRepository, toastController)
                 Action.EditList -> model.startSelectingForDeletion()
                 Action.Exit -> navigator.pop()
                 else -> Unit
@@ -106,9 +102,9 @@ private fun CreateSessionReclistScreen.ScreenContent() {
             ItemDivider()
             Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
                 ScrollableLazyColumn {
-                    items(reclists, key = { it }) {
-                        model.ItemRow(it, model::select) {
-                            Text(it)
+                    items(reclists, key = { it }) { name ->
+                        model.ItemRow(name, model::select) {
+                            Text(name)
                         }
                         ItemDivider()
                     }

@@ -16,6 +16,9 @@ val Paths.sessionsDirectory: File
 val Paths.reclistsDirectory: File
     get() = contentRoot.resolve("reclists")
 
+val Paths.guideAudioDirectory: File
+    get() = contentRoot.resolve("bgms")
+
 val Paths.appRecordFile: File
     get() = appRoot.resolve("record.json")
 

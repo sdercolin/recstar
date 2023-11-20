@@ -24,6 +24,10 @@ fun FrameWindowScope.Menu() {
                 shortcut = getShortcut(Key.I, ctrl = true),
             )
             ActionItem(
+                Action.ImportGuideAudio,
+                string(Strings.MenuFileImportGuideAudio),
+            )
+            ActionItem(
                 Action.OpenDirectory,
                 string(Strings.MenuFileOpenDirectory),
                 shortcut = getShortcut(Key.O, ctrl = true),
@@ -39,6 +43,10 @@ fun FrameWindowScope.Menu() {
                 Action.RenameSession,
                 string(Strings.MenuEditRenameSession),
                 shortcut = getShortcut(Key.R, ctrl = true),
+            )
+            ActionItem(
+                Action.ConfigureGuideAudio,
+                string(Strings.MenuEditConfigureGuideAudio),
             )
             ActionItem(
                 Action.EditList,

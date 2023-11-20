@@ -1,5 +1,6 @@
 package io
 
+import platform.UniformTypeIdentifiers.UTTypeAudio
 import platform.UniformTypeIdentifiers.UTTypeData
 import platform.UniformTypeIdentifiers.UTTypeText
 
@@ -8,6 +9,7 @@ object Uti {
         return extensions.map { extension ->
             when (extension) {
                 "txt" -> UTTypeText
+                "wav" -> UTTypeAudio
                 else -> UTTypeData
             }
         }
