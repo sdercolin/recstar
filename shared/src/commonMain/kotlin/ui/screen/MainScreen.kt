@@ -37,6 +37,7 @@ import ui.common.ScrollableLazyColumn
 import ui.model.Screen
 import ui.screen.demo.DemoShowcaseScreen
 import ui.string.*
+import util.isDebug
 
 object MainScreen : Screen {
     @Composable
@@ -78,11 +79,13 @@ private fun MainScreen.ScreenAction() {
                 icon = Icons.Default.Settings,
                 onClick = { navigator push PreferenceScreen },
             )
-            ActionMenuItem(
-                text = "Dev Tools",
-                icon = Icons.Default.Code,
-                onClick = { navigator push DemoShowcaseScreen },
-            )
+            if (isDebug) {
+                ActionMenuItem(
+                    text = "Dev Tools",
+                    icon = Icons.Default.Code,
+                    onClick = { navigator push DemoShowcaseScreen },
+                )
+            }
         }
     }
 }
