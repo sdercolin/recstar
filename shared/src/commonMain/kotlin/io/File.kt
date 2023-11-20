@@ -62,9 +62,9 @@ expect class File(path: String) {
     fun delete(): Boolean
 
     /**
-     * Returns the last modified time of the file.
+     * The last modified time of the file.
      */
-    val lastModified: Long
+    var lastModified: Long
 
     /**
      * Reads the entire file as a String with the given [encoding].

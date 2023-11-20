@@ -3,6 +3,8 @@ package model
 import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.lifecycle.JavaSerializable
 import io.File
+import io.Paths
+import io.guideAudioDirectory
 import kotlinx.serialization.Serializable
 import model.GuideAudio.Node
 
@@ -10,7 +12,7 @@ import model.GuideAudio.Node
  * Model for a guide audio.
  *
  * @property name The name of the guide audio.
- * @property path The absolute path to the guide audio file.
+ * @property path The path to the guide audio file, relative to the guide audio directory.
  * @property nodes Control nodes of the guide audio. See [Node] for details.
  */
 @Immutable
@@ -20,7 +22,7 @@ data class GuideAudio(
     val path: String,
     val nodes: List<Node>,
 ) : JavaSerializable {
-    fun getFile(): File = File(path)
+    fun getFile(): File = Paths.guideAudioDirectory.resolve(path)
 
     /**
      * A control node of the guide audio.
@@ -48,7 +50,7 @@ data class GuideAudio(
 private fun createDefault(audioFile: File): GuideAudio {
     return GuideAudio(
         name = audioFile.nameWithoutExtension,
-        path = audioFile.absolutePath,
+        path = audioFile.name,
         nodes = listOf(
             Node(timeMs = 0, isRecordingStart = true),
             Node(timeMs = null, isRecordingEnd = true, isSwitching = true, repeatTargetNodeIndex = 0),
@@ -102,5 +104,5 @@ fun createGuideAudioConfig(
                 comment = comment,
             )
         }
-        GuideAudio(audioFile.nameWithoutExtension, audioFile.absolutePath, nodes)
+        GuideAudio(audioFile.nameWithoutExtension, audioFile.name, nodes)
     }

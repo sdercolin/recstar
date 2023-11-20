@@ -41,6 +41,9 @@ fun Strings.en(): String =
         SessionScreenActionRenameSession -> "Rename Session"
         SessionScreenActionConfigureGuideAudio -> "Configure Guide BGM"
         SessionScreenTogglePlaying -> "Toggle Playback"
+        SessionScreenNoGuideAudio -> "Not Set"
+        SessionScreenAlertGuideAudioNotFoundMessage ->
+            "The guide BGM file is not found. Please configure the guide BGM again."
         CreateSessionReclistScreenTitle -> "Select reclist to record"
         CreateSessionReclistScreenActionImport -> "Import Reclist"
         CreateSessionReclistScreenAllReclists -> "All Reclists"
@@ -52,8 +55,7 @@ fun Strings.en(): String =
         GuideAudioScreenTitle -> "Configure guide BGM"
         GuideAudioScreenActionImport -> "Import Guide BGM"
         GuideAudioScreenActionImportConfigAlertMessage ->
-            "Do you want to import the corresponding guide BGM config file (.txt)? " +
-                "If not imported, the whole guide BGM will be played and looped."
+            "Do you want to import the corresponding guide BGM config file (.txt)?"
         GuideAudioScreenAllGuideAudios -> "All Guide BGMs"
         GuideAudioScreenEmpty -> "Please import a guide BGM first."
         GuideAudioScreenItemSelectedLabel -> "Selected"

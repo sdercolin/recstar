@@ -25,6 +25,7 @@ import platform.Foundation.appendData
 import platform.Foundation.create
 import platform.Foundation.dataUsingEncoding
 import platform.Foundation.dataWithContentsOfURL
+import platform.Foundation.dateWithTimeIntervalSince1970
 import platform.Foundation.lastPathComponent
 import platform.Foundation.stringByAppendingPathComponent
 import platform.Foundation.stringByDeletingLastPathComponent
@@ -98,11 +99,19 @@ actual class File actual constructor(private val path: String) {
             return fileManager.removeItemAtPath(path, e)
         }
 
-    actual val lastModified: Long
+    actual var lastModified: Long
         get() = withNSError { e ->
-            val attributes = requireNotNull(fileManager.attributesOfItemAtPath(path, e))
+            val attributes = fileManager.attributesOfItemAtPath(path, e) ?: return@withNSError 0L
             val date = attributes[NSFileModificationDate] as NSDate
             date.timeIntervalSince1970.toLong()
+        }
+        set(value) {
+            withNSError { e ->
+                val attributes = fileManager.attributesOfItemAtPath(path, e)?.toMutableMap() ?: mutableMapOf()
+                val date = NSDate.dateWithTimeIntervalSince1970(value.toDouble())
+                attributes[NSFileModificationDate] = date
+                fileManager.setAttributes(attributes, ofItemAtPath = path, error = e)
+            }
         }
 
     actual fun writeText(text: String) =

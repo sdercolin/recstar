@@ -40,6 +40,8 @@ fun Strings.ja(): String? =
         SessionScreenActionRenameSession -> "セッション名を編集"
         SessionScreenActionConfigureGuideAudio -> "ガイド BGM を設定"
         SessionScreenTogglePlaying -> "再生/停止"
+        SessionScreenNoGuideAudio -> "未設定"
+        SessionScreenAlertGuideAudioNotFoundMessage -> "ガイド BGM ファイルが見つかりません。ガイド BGM を再設定してください。"
         CreateSessionReclistScreenTitle -> "録音リストを選択"
         CreateSessionReclistScreenActionImport -> "録音リストをインポート"
         CreateSessionReclistScreenAllReclists -> "すべての録音リスト"
@@ -50,9 +52,7 @@ fun Strings.ja(): String? =
         CreateSessionReclistScreenDeleteItemsMessage -> "本当に {0} 件の録音リストを削除しますか？"
         GuideAudioScreenTitle -> "ガイド BGM を設定"
         GuideAudioScreenActionImport -> "ガイド BGM をインポート"
-        GuideAudioScreenActionImportConfigAlertMessage ->
-            "続いてガイド BGM の設定ファイル（.txt）をインポートしますか？" +
-                "インポートしない場合、ガイド BGM は全体が再生され、ループされます。"
+        GuideAudioScreenActionImportConfigAlertMessage -> "続いてガイド BGM の設定ファイル（.txt）をインポートしますか？"
         GuideAudioScreenAllGuideAudios -> "すべてのガイド BGM"
         GuideAudioScreenEmpty -> "ガイド BGM をインポートしてください。"
         GuideAudioScreenItemSelectedLabel -> "選択済み"

@@ -40,6 +40,8 @@ fun Strings.zhHans(): String? =
         SessionScreenActionRenameSession -> "重命名会话"
         SessionScreenActionConfigureGuideAudio -> "设置 BGM"
         SessionScreenTogglePlaying -> "播放/停止"
+        SessionScreenNoGuideAudio -> "未设置"
+        SessionScreenAlertGuideAudioNotFoundMessage -> "找不到 BGM 文件。请重新设置 BGM。"
         CreateSessionReclistScreenTitle -> "选择录音表"
         CreateSessionReclistScreenActionImport -> "导入录音表"
         CreateSessionReclistScreenAllReclists -> "全部录音表"
@@ -50,8 +52,7 @@ fun Strings.zhHans(): String? =
         CreateSessionReclistScreenDeleteItemsMessage -> "确定要删除 {0} 个录音表吗？"
         GuideAudioScreenTitle -> "设置 BGM"
         GuideAudioScreenActionImport -> "导入 BGM"
-        GuideAudioScreenActionImportConfigAlertMessage ->
-            "是否要继续导入 BGM 配置文件（.txt）？如果不导入，整个 BGM 将被播放并循环。"
+        GuideAudioScreenActionImportConfigAlertMessage -> "是否要继续导入对应的 BGM 配置文件（.txt）？"
         GuideAudioScreenAllGuideAudios -> "全部 BGM"
         GuideAudioScreenEmpty -> "请先导入 BGM。"
         GuideAudioScreenItemSelectedLabel -> "已选"

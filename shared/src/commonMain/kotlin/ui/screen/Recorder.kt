@@ -27,6 +27,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.NavigateBefore
 import androidx.compose.material.icons.filled.NavigateNext
 import androidx.compose.material.icons.filled.PlayArrow
@@ -47,6 +48,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.flow.Flow
 import ui.common.plainClickable
 import ui.model.LocalScreenOrientation
@@ -62,6 +65,7 @@ fun Recorder(
     hasFixedHeight: Boolean,
     isUpperLayer: Boolean,
 ) {
+    val navigator = LocalNavigator.currentOrThrow
     val backgroundColor = if (isUpperLayer) {
         MaterialTheme.colors.surface
     } else {
@@ -89,6 +93,8 @@ fun Recorder(
                 playingProgress = model.playingProgress,
                 isInteractionSuspended = model.isBusy,
                 onTogglePlaying = model::togglePlaying,
+                guideAudioName = model.guideAudioConfig?.name,
+                onClickGuideAudioName = { navigator push GuideAudioScreen(model.name) },
             )
             if (LocalThemeIsDarkMode.current.not()) {
                 Divider(color = MaterialTheme.colors.surface)
@@ -160,18 +166,12 @@ private fun ColumnScope.RecorderWaveform(
     playingProgress: Float?,
     isInteractionSuspended: Boolean,
     onTogglePlaying: () -> Unit,
+    guideAudioName: String?,
+    onClickGuideAudioName: () -> Unit,
 ) {
     val isDarkMode = LocalThemeIsDarkMode.current
     val paperColor = if (isDarkMode) Color.Black else Color.White
     Box(modifier = Modifier.weight(1f).fillMaxWidth().background(color = paperColor)) {
-        if (!hasFile && !isRecording) {
-            Text(
-                text = string(Strings.SessionScreenNoData),
-                style = MaterialTheme.typography.caption,
-                color = MaterialTheme.colors.onBackground,
-                modifier = Modifier.align(Alignment.Center),
-            )
-        }
         val data by flow.collectAsState(initial = emptyArray())
         val color = if (isDarkMode) {
             if (isRecording) MaterialTheme.colors.secondary else MaterialTheme.colors.primary
@@ -179,7 +179,7 @@ private fun ColumnScope.RecorderWaveform(
             if (isRecording) MaterialTheme.colors.primaryVariant else MaterialTheme.colors.onBackground
         }
         val playerCursorColor = if (isDarkMode) MaterialTheme.colors.secondary else MaterialTheme.colors.primaryVariant
-        Canvas(modifier = Modifier.fillMaxSize()) {
+        Canvas(modifier = Modifier.fillMaxSize().padding(bottom = 8.dp)) {
             val width = size.width.toInt()
             val height = size.height.toInt()
             val halfHeight = height / 2
@@ -216,6 +216,12 @@ private fun ColumnScope.RecorderWaveform(
                 )
             }
         }
+        val iconTint = if (isDarkMode) {
+            MaterialTheme.colors.primary.alpha(0.7f)
+        } else {
+            MaterialTheme.colors.onBackground.alpha(0.7f)
+        }
+        val iconSize = if (isMobile) 18.dp else 24.dp
         if (hasFile && !isRecording) {
             Box(
                 modifier = Modifier.fillMaxSize()
@@ -223,20 +229,35 @@ private fun ColumnScope.RecorderWaveform(
                     .padding(if (isMobile) 12.dp else 24.dp),
             ) {
                 val icon = if (playingProgress != null) Icons.Default.Square else Icons.Default.PlayArrow
-                val size = if (isMobile) 20.dp else 24.dp
                 val padding = if (playingProgress != null) 3.dp else 0.dp
-                val tint = if (isDarkMode) {
-                    MaterialTheme.colors.primary.alpha(0.7f)
-                } else {
-                    MaterialTheme.colors.primaryVariant
-                }
                 Icon(
-                    modifier = Modifier.size(size).padding(padding),
+                    modifier = Modifier.size(iconSize).padding(padding),
                     imageVector = icon,
                     contentDescription = string(Strings.SessionScreenTogglePlaying),
-                    tint = tint,
+                    tint = iconTint,
                 )
             }
+        }
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .clickable(enabled = isRecording.not()) { onClickGuideAudioName() }
+                .padding(if (isMobile) 12.dp else 24.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = guideAudioName ?: string(Strings.SessionScreenNoGuideAudio),
+                style = MaterialTheme.typography.caption,
+                fontSize = if (isMobile) 10.sp else MaterialTheme.typography.caption.fontSize,
+                color = iconTint,
+            )
+            Spacer(modifier = Modifier.width(if (isMobile) 4.dp else 8.dp))
+            Icon(
+                modifier = Modifier.size(iconSize),
+                imageVector = Icons.Default.MusicNote,
+                contentDescription = string(Strings.SessionScreenActionConfigureGuideAudio),
+                tint = iconTint,
+            )
         }
     }
 }

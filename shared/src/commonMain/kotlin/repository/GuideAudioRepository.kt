@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import model.GuideAudio
 import model.createGuideAudioConfig
+import util.DateTime
 import util.Log
 import util.parseJson
 import util.stringifyJson
@@ -64,6 +65,7 @@ class GuideAudioRepository {
             .onSuccess {
                 val importedWav = folder.resolve("${it.name}.$GUIDE_AUDIO_FILE_EXTENSION")
                 audioFile.copyTo(importedWav, overwrite = true)
+                audioFile.lastModified = DateTime.getNow()
                 val importedConfig = it.copy(path = importedWav.absolutePath)
                 val importedConfigFile = folder.resolve("${it.name}.$GUIDE_AUDIO_CONFIG_FILE_NAME_SUFFIX")
                 importedConfigFile.writeText(importedConfig.stringifyJson())

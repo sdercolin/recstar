@@ -137,6 +137,21 @@ class SessionScreenModel(
             waveformPainter?.onStopRecording()
         }
     }
+
+    private val guidePlayerListener = object : AudioPlayer.Listener {
+        override fun onStarted() {
+            startRecording()
+        }
+
+        override fun onProgress(progress: Float) {
+            // No-op
+        }
+
+        override fun onStopped() {
+            // No-op
+        }
+    }
+
     private val player = AudioPlayerProvider(playerListener, context).get()
     private val recorder = AudioRecorderProvider(recorderListener, context).get()
     private val waveformPainter = WaveformPainter(recorder.waveDataFlow, screenModelScope).apply {
@@ -145,6 +160,8 @@ class SessionScreenModel(
     }
 
     val waveformFlow: Flow<Array<FloatArray>> = waveformPainter.flow
+
+    private val guidePlayer = AudioPlayerProvider(guidePlayerListener, context).get()
 
     private var isPermissionGranted = permissionChecker.checkAndRequestRecordingPermission()
 
@@ -178,13 +195,13 @@ class SessionScreenModel(
 
     fun toggleRecording() {
         if (isRecording) {
-            stopRecording()
+            requestStopRecording()
         } else {
-            startRecording()
+            requestStartRecording()
         }
     }
 
-    private fun startRecording() {
+    private fun requestStartRecording() {
         if (!isPermissionGranted) {
             // We have already checked/requested the permission when this screen is shown.
             // If the permission is not granted, we try to request it once again.
@@ -203,8 +220,26 @@ class SessionScreenModel(
                 return
             }
         }
+        val guideAudio = guideAudioConfig
+        if (guideAudio != null) {
+            if (guideAudio.getFile().exists().not()) {
+                Log.d("Guide audio file not found: ${guideAudio.getFile().absolutePath}")
+                alertDialogController.requestConfirm(
+                    message = stringStatic(Strings.SessionScreenAlertGuideAudioNotFoundMessage),
+                )
+                return
+            }
+        }
         isRequestedRecording = true
         prepareOutputFile()
+        if (guideAudio != null) {
+            guidePlayer.play(guideAudio.getFile())
+        } else {
+            startRecording()
+        }
+    }
+
+    private fun startRecording() {
         recorder.start(currentFile)
         waveformPainter.onStartRecording()
     }
@@ -217,9 +252,16 @@ class SessionScreenModel(
         }
     }
 
-    private fun stopRecording() {
+    private fun requestStopRecording() {
         isRequestedRecording = false
+        stopRecording()
+    }
+
+    private fun stopRecording() {
         recorder.stop()
+        if (guidePlayer.isPlaying()) {
+            guidePlayer.stop()
+        }
     }
 
     fun togglePlaying() {
@@ -244,7 +286,7 @@ class SessionScreenModel(
         if (index == currentIndex) return
         currentIndex = index
         if (isRecording || isRequestedRecording) {
-            stopRecording()
+            requestStopRecording()
         } else {
             updateCurrentSentence()
         }
