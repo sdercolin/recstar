@@ -40,7 +40,11 @@ class CreateSessionReclistScreenModel(
         reclistRepository.fetch()
     }
 
+    private var finished = false
+
     fun select(name: String) {
+        if (finished) return
+        finished = true
         val reclist = reclistRepository.get(name)
         val session = sessionRepository.create(reclist)
             .onFailure {
@@ -48,6 +52,7 @@ class CreateSessionReclistScreenModel(
                 alertDialogController.requestConfirm(
                     message = stringStatic(Strings.CreateSessionReclistScreenFailure),
                 )
+                finished = false
             }
             .getOrNull() ?: return
         navigator.pop()
