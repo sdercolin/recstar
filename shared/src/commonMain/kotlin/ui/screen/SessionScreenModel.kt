@@ -313,7 +313,8 @@ class SessionScreenModel(
     fun renameSession(newName: String) {
         screenModelScope.launch(Dispatchers.IO) {
             runCatching {
-                sessionRepository.rename(name, newName)
+                val newSession = sessionRepository.rename(name, newName).getOrThrow()
+                reload(newSession)
             }.onFailure {
                 withContext(Dispatchers.Main) {
                     Log.e("Failed to rename session", it)
