@@ -78,6 +78,11 @@ kotlin {
                 implementation(voyager("transitions"))
             }
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
         val sharedJvmMain by creating {
             dependsOn(commonMain)
             dependencies {
