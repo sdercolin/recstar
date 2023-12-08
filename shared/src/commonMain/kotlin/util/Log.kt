@@ -131,6 +131,9 @@ private fun nativePerformLog(
     if (priority >= LogLevel.ERROR) {
         writeLogToFile(Paths.logsDirectory.resolve("error.log"), priority, tag, throwable, message)
     }
+    if (priority >= LogLevel.INFO) {
+        writeLogToFile(Paths.logsDirectory.resolve("info.log"), priority, tag, throwable, message)
+    }
 }
 
 private fun printLog(
