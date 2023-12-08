@@ -66,10 +66,9 @@ class GuideAudioRepository {
                 val importedWav = folder.resolve("${it.name}.$GUIDE_AUDIO_FILE_EXTENSION")
                 audioFile.copyTo(importedWav, overwrite = true)
                 audioFile.lastModified = DateTime.getNow()
-                val importedConfig = it.copy(path = importedWav.absolutePath)
                 val importedConfigFile = folder.resolve("${it.name}.$GUIDE_AUDIO_CONFIG_FILE_NAME_SUFFIX")
-                importedConfigFile.writeText(importedConfig.stringifyJson())
-                Log.i("GuideAudioRepository.import: saved to ${importedConfig.path}")
+                importedConfigFile.writeText(it.stringifyJson())
+                Log.i("GuideAudioRepository.import: saved to ${importedWav.absolutePath}")
             }
             .onFailure { t ->
                 Log.e("GuideAudioRepository.import: failed to import ${audioFile.absolutePath}", t)

@@ -47,8 +47,8 @@ data class GuideAudio(
     ) : JavaSerializable
 }
 
-private fun createDefault(audioFile: File): GuideAudio {
-    return GuideAudio(
+private fun createDefault(audioFile: File) =
+    GuideAudio(
         name = audioFile.nameWithoutExtension,
         path = audioFile.name,
         nodes = listOf(
@@ -56,7 +56,6 @@ private fun createDefault(audioFile: File): GuideAudio {
             Node(timeMs = null, isRecordingEnd = true, isSwitching = true, repeatTargetNodeIndex = 0),
         ),
     )
-}
 
 /**
  * Creates a [GuideAudio] from the given audio file. If an OREMO guide BGM [rawConfigFile] exists, it will be imported.
