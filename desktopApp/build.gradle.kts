@@ -53,6 +53,8 @@ compose.desktop {
                             .let { appleID.set(it) }
                         properties.getOrDefault("compose.desktop.mac.notarization.password", "").toString()
                             .let { password.set(it) }
+                        properties.getOrDefault("compose.desktop.mac.notarization.teamID", "").toString()
+                            .let { teamID.set(it) }
                     }
                 }
 

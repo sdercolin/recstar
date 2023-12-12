@@ -36,7 +36,7 @@ jobs:
       - name: Set Flavor
         run: echo "buildkonfig.flavor=release" >> gradle.properties
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           java-version: '21'
@@ -44,8 +44,6 @@ jobs:
 
       - name: Prepare signing
         env:
-          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
-          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
           KEYCHAIN_NAME: build.keychain
           KEYCHAIN_PWD: ${{ secrets.KEYCHAIN_PWD }}
         run: |
@@ -63,7 +61,7 @@ jobs:
           
           # Configure the local.properties file with the necessary information for signing
           echo "compose.desktop.mac.sign=true" > local.properties
-          echo "compose.desktop.mac.signing.identity=${MACOS_CERTIFICATE_IDENTITY}" >> local.properties
+          echo "compose.desktop.mac.signing.identity=${{ secrets.MACOS_CERTIFICATE_IDENTITY }}" >> local.properties
           echo "compose.desktop.mac.notarization.appleID=${{ secrets.APPLE_ID }}" >> local.properties
           echo "compose.desktop.mac.notarization.password=${{ secrets.MACOS_APP_PWD }}" >> local.properties
           cat local.properties
