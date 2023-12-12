@@ -55,6 +55,11 @@ compose.desktop {
                             .let { password.set(it) }
                     }
                 }
+
+                infoPlist {
+                    extraKeysRawXml = "  <key>NSMicrophoneUsageDescription</key>\n" +
+                        "  <string>RecStar needs access to the microphone to be able to record audio.</string>"
+                }
             }
             windows {
                 iconFile.set(project.file("src/jvmMain/resources/icon.ico"))
