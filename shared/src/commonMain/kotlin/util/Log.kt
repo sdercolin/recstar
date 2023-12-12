@@ -154,6 +154,7 @@ private fun writeLogToFile(
     message: String?,
 ) {
     val log = buildLog(priority, tag, throwable, message)
+    if (file.parentFile?.isDirectory != true) return
     file.appendText("$log\n")
 }
 
