@@ -67,6 +67,7 @@ fun Strings.zhHans(): String? =
         PreferenceThemeLight -> "浅色"
         PreferenceThemeDark -> "深色"
         PreferenceGroupMisc -> "其他"
+        PreferenceContentRootLocation -> "内容目录所在位置"
         PreferenceAbout -> "关于 $APP_NAME"
         AboutScreenPrivacyPolicy -> "隐私政策"
         AboutScreenCopyDeviceInfo -> "复制设备信息"

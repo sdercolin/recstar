@@ -74,8 +74,8 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-io-core:0.3.0")
                 implementation("io.github.aakira:napier:2.6.1")
-                implementation(voyager("navigator"))
-                implementation(voyager("transitions"))
+                api(voyager("navigator"))
+                api(voyager("transitions"))
             }
         }
         val commonTest by getting {

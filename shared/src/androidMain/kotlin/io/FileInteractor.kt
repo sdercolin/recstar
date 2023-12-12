@@ -34,6 +34,7 @@ actual class FileInteractor actual constructor(
         title: String,
         allowedExtensions: List<String>,
         onFinish: (File?) -> Unit,
+        initialDirectory: File?,
     ) = pickFileDelegate.launch(allowedExtensions, onFinish)
 
     actual fun exportData(request: ExportDataRequest) = exportDataDelegate.launch(request)

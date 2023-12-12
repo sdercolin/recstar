@@ -5,6 +5,8 @@ import util.Log
 expect object Paths {
     val appRoot: File
     val contentRoot: File
+
+    fun moveContentRoot(newLocation: File)
 }
 
 val Paths.logsDirectory: File
@@ -26,13 +28,16 @@ val Paths.appPreferenceFile: File
     get() = appRoot.resolve("preference.json")
 
 fun ensurePaths() {
-    listOf(Paths.appRoot, Paths.contentRoot).forEach {
-        Log.i("ensurePaths: ${it.absolutePath}")
-        if (!it.exists()) {
-            Log.i("not exists, creating...")
-            val created = it.mkdirs()
-            Log.i("created: $created")
-        }
+    ensurePath(Paths.appRoot)
+    ensurePath(Paths.contentRoot)
+}
+
+fun ensurePath(path: File) {
+    Log.i("ensurePath: ${path.absolutePath}")
+    if (!path.exists()) {
+        Log.i("not exists, creating...")
+        val created = path.mkdirs()
+        Log.i("created: $created")
     }
 }
 

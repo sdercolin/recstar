@@ -16,6 +16,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -26,11 +27,17 @@ import androidx.compose.ui.window.DialogProperties
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import const.APP_NAME
+import io.LocalFileInteractor
+import io.Paths
 import model.AppPreference
 import repository.LocalAppPreferenceRepository
+import repository.LocalGuideAudioRepository
+import repository.LocalReclistRepository
+import repository.LocalSessionRepository
 import ui.common.ScrollableColumn
 import ui.model.Screen
 import ui.string.*
+import util.Log
 import util.appVersion
 import util.isDesktop
 import util.runIf
@@ -48,6 +55,7 @@ object PreferenceScreen : Screen {
 private fun ScreenContent() {
     val repository = LocalAppPreferenceRepository.current
     val navigator = LocalNavigator.currentOrThrow
+    val fileInteractor = LocalFileInteractor.current
     val value by repository.state
     ScrollableColumn(modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background)) {
         Group(title = string(Strings.PreferenceGroupAppearance)) {
@@ -67,6 +75,33 @@ private fun ScreenContent() {
             )
         }
         Group(title = string(Strings.PreferenceGroupMisc)) {
+            if (isDesktop) {
+                val guideAudioRepository = LocalGuideAudioRepository.current
+                val sessionRepository = LocalSessionRepository.current
+                val reclistRepository = LocalReclistRepository.current
+                key(value.customContentRootPath) {
+                    Item(
+                        title = string(Strings.PreferenceContentRootLocation),
+                        info = Paths.contentRoot.parentFile?.absolutePath ?: "",
+                        onClick = {
+                            fileInteractor.pickFile(
+                                title = stringStatic(Strings.PreferenceContentRootLocation),
+                                allowedExtensions = listOf(""),
+                                initialDirectory = Paths.contentRoot.parentFile,
+                                onFinish = { file ->
+                                    file ?: return@pickFile
+                                    Log.i("Setting custom content root: ${file.absolutePath}")
+                                    repository.update { copy(customContentRootPath = file.absolutePath) }
+                                    Paths.moveContentRoot(file)
+                                    guideAudioRepository.init()
+                                    sessionRepository.init()
+                                    reclistRepository.init()
+                                },
+                            )
+                        },
+                    )
+                }
+            }
             Item(
                 title = string(Strings.PreferenceAbout),
                 info = "$APP_NAME $appVersion",

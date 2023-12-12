@@ -17,11 +17,7 @@ import util.stringifyJson
  * A repository to manage guide audio files.
  */
 class GuideAudioRepository {
-    private val folder = Paths.guideAudioDirectory.also {
-        if (!it.exists()) {
-            it.mkdirs()
-        }
-    }
+    private lateinit var folder: File
 
     private val map = mutableMapOf<String, GuideAudio>()
     private val _items = MutableStateFlow(emptyList<String>())
@@ -30,6 +26,23 @@ class GuideAudioRepository {
      * The list of existing guide audio names.
      */
     val items: StateFlow<List<String>> = _items
+
+    init {
+        init()
+    }
+
+    /**
+     * Initializes the repository.
+     */
+    fun init() {
+        folder = Paths.guideAudioDirectory.also {
+            if (!it.exists()) {
+                it.mkdirs()
+            }
+        }
+        map.clear()
+        _items.value = emptyList()
+    }
 
     /**
      * Fetches the list of guide audio names.

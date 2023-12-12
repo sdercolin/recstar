@@ -26,12 +26,7 @@ class SessionRepository(
     private val reclistRepository: ReclistRepository,
     private val guideAudioRepository: GuideAudioRepository,
 ) {
-    private val folder = Paths.sessionsDirectory.also {
-        if (!it.exists()) {
-            it.mkdirs()
-        }
-    }
-
+    private lateinit var folder: File
     private val map = mutableMapOf<String, Session>()
     private val _items = MutableStateFlow(emptyList<String>())
 
@@ -46,6 +41,23 @@ class SessionRepository(
      * A flow of session names that have been updated.
      */
     val sessionUpdated: Flow<String> = _sessionUpdated
+
+    init {
+        init()
+    }
+
+    /**
+     * Initializes the repository.
+     */
+    fun init() {
+        folder = Paths.sessionsDirectory.also {
+            if (!it.exists()) {
+                it.mkdirs()
+            }
+        }
+        map.clear()
+        _items.value = emptyList()
+    }
 
     /**
      * Fetches the list of sessions.

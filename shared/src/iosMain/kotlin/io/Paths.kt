@@ -20,6 +20,10 @@ actual object Paths {
             return File(path)
         }
 
+    actual fun moveContentRoot(newLocation: File) {
+        // no-op on iOS
+    }
+
     fun initializeAppRootPath(path: String) {
         appRootPathRef.compareAndSet(null, path)
         println("appRootPath is set to $path")

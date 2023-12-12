@@ -14,13 +14,31 @@ import util.Log
  * A repository to manage reclist files.
  */
 class ReclistRepository {
-    private val folder = Paths.reclistsDirectory.also {
-        if (!it.exists()) {
-            it.mkdirs()
-        }
+    private lateinit var folder: File
+    private val map = mutableMapOf<String, Reclist>()
+    private val _items = MutableStateFlow(emptyList<String>())
+
+    /**
+     * The list of reclist names.
+     */
+    val items: StateFlow<List<String>> = _items
+
+    init {
+        init()
     }
 
-    private val map = mutableMapOf<String, Reclist>()
+    /**
+     * Initializes the repository.
+     */
+    fun init() {
+        folder = Paths.reclistsDirectory.also {
+            if (!it.exists()) {
+                it.mkdirs()
+            }
+        }
+        map.clear()
+        _items.value = emptyList()
+    }
 
     /**
      * Imports a reclist from the given file.
@@ -43,13 +61,6 @@ class ReclistRepository {
         _items.value = listOf(name) + _items.value.minus(name)
         return true
     }
-
-    private val _items = MutableStateFlow(emptyList<String>())
-
-    /**
-     * The list of reclist names.
-     */
-    val items: StateFlow<List<String>> = _items
 
     /**
      * Fetches the list of reclists.

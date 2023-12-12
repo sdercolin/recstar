@@ -7,6 +7,11 @@ import java.lang.ref.WeakReference
 actual object Paths {
     actual val appRoot: File get() = File(context.filesDir)
     actual val contentRoot: File get() = File(contentRootFile)
+
+    actual fun moveContentRoot(newLocation: File) {
+        // no-op on Android
+    }
+
     val cacheRoot: File get() = File(context.cacheDir)
 
     private lateinit var contentRootFile: JavaFile

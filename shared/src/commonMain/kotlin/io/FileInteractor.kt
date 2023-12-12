@@ -26,11 +26,13 @@ expect class FileInteractor(
      * @param allowedExtensions The allowed file extensions. If empty, all files are allowed.
      * @param onFinish The callback to be called when the dialog is dismissed. The parameter is the picked file, or null
      *     if the user cancelled the dialog.
+     * @param initialDirectory The initial directory to be opened in the file picker dialog.
      */
     fun pickFile(
         title: String,
         allowedExtensions: List<String>,
         onFinish: (File?) -> Unit,
+        initialDirectory: File? = null,
     )
 
     /**

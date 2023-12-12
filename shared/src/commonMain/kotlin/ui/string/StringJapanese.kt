@@ -67,6 +67,7 @@ fun Strings.ja(): String? =
         PreferenceThemeLight -> "ライト"
         PreferenceThemeDark -> "ダーク"
         PreferenceGroupMisc -> "その他"
+        PreferenceContentRootLocation -> "コンテンツディレクトリのローケーション"
         AboutScreenPrivacyPolicy -> "プライバシーポリシー"
         PreferenceAbout -> "$APP_NAME について"
         AboutScreenCopyDeviceInfo -> "デバイス情報をコピー"

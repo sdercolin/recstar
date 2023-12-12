@@ -10,7 +10,8 @@ import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import const.APP_NAME
-import io.ensurePaths
+import io.Paths
+import io.ensurePath
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -18,18 +19,21 @@ import model.AppRecord
 import repository.AppRecordRepository
 import ui.model.DesktopContext
 import util.Log
+import util.toJavaFile
 
 fun main() =
     application {
         remember {
-            ensurePaths()
+            ensurePath(Paths.appRoot)
             Log.initialize()
         }
 
         val coroutineScope = rememberCoroutineScope()
         val context = remember { DesktopContext(coroutineScope) }
         val dependencies = remember(context) { AppDependencies(context) }
+        ensureContentRoot(dependencies)
         val windowState = rememberResizableWindowState(dependencies.appRecordRepository.stateFlow)
+
         ProvideAppDependencies(dependencies) {
             Window(
                 title = APP_NAME,
@@ -65,3 +69,16 @@ private fun AppRecordRepository.saveWindowSize(dpSize: DpSize) {
     val size = dpSize.width.value to dpSize.height.value
     update { copy(windowSizeDp = size) }
 }
+
+@Composable
+private fun ensureContentRoot(dependencies: AppDependencies) =
+    remember {
+        val file = dependencies.appPreferenceRepository.value.customContentRootPath?.toJavaFile()
+        Paths.customContentRootLocation = file
+        ensurePath(Paths.contentRoot)
+        if (file != null) {
+            dependencies.reclistRepository.init()
+            dependencies.guideAudioRepository.init()
+            dependencies.sessionRepository.init()
+        }
+    }

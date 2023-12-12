@@ -14,6 +14,7 @@ private typealias StringLanguage = Language
 data class AppPreference(
     val language: Language = Language.Auto,
     val theme: Theme = if (isDesktop) Theme.Dark else Theme.System,
+    val customContentRootPath: String? = null,
 ) : JavaSerializable {
     enum class Language(private val language: StringLanguage?) : LocalizedTest {
         Auto(null),

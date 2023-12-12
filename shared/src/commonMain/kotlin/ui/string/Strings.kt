@@ -64,6 +64,7 @@ enum class Strings {
     PreferenceThemeLight,
     PreferenceThemeDark,
     PreferenceGroupMisc,
+    PreferenceContentRootLocation,
     PreferenceAbout,
     AboutScreenPrivacyPolicy,
     AboutScreenCopyDeviceInfo,

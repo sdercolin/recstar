@@ -29,10 +29,13 @@ actual class FileInteractor actual constructor(
         title: String,
         allowedExtensions: List<String>,
         onFinish: (File?) -> Unit,
+        initialDirectory: File?,
     ) {
         fileDialogRequest = OpenFileDialogRequest(
             title = title,
             extensions = allowedExtensions,
+            initialDirectory = initialDirectory?.absolutePath,
+            directoryMode = allowedExtensions.singleOrNull() == "",
             onCloseRequest = { parent, name ->
                 if (parent == null || name == null) {
                     fileDialogRequest = null

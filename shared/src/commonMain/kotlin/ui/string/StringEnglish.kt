@@ -70,6 +70,7 @@ fun Strings.en(): String =
         PreferenceThemeLight -> "Light"
         PreferenceThemeDark -> "Dark"
         PreferenceGroupMisc -> "Misc"
+        PreferenceContentRootLocation -> "Location of Content Directory"
         PreferenceAbout -> "About $APP_NAME"
         AboutScreenPrivacyPolicy -> "Privacy Policy"
         AboutScreenCopyDeviceInfo -> "Copy Device Info"

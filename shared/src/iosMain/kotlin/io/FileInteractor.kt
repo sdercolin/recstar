@@ -60,6 +60,7 @@ actual class FileInteractor actual constructor(
         title: String,
         allowedExtensions: List<String>,
         onFinish: (File?) -> Unit,
+        initialDirectory: File?,
     ) {
         documentPickerDelegateCallback = onFinish
         val types = Uti.mapExtensions(allowedExtensions)
