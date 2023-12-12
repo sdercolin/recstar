@@ -62,6 +62,8 @@ compose.desktop {
                     extraKeysRawXml = "  <key>NSMicrophoneUsageDescription</key>\n" +
                         "  <string>RecStar needs access to the microphone to be able to record audio.</string>"
                 }
+                entitlementsFile.set(project.file("entitlements.plist"))
+                runtimeEntitlementsFile.set(project.file("runtime-entitlements.plist"))
             }
             windows {
                 iconFile.set(project.file("src/jvmMain/resources/icon.ico"))

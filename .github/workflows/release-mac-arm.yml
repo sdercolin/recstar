@@ -43,41 +43,25 @@ jobs:
           distribution: 'corretto'
 
       - name: Prepare signing
-        env:
-          KEYCHAIN_NAME: build.keychain
-          KEYCHAIN_PWD: ${{ secrets.KEYCHAIN_PWD }}
         run: |
-          # Unlock the keychain
-          security unlock-keychain -p "$KEYCHAIN_PWD" "$KEYCHAIN_NAME"
-          
-          # Set keychain settings to prevent it from locking automatically
-          security set-keychain-settings "$KEYCHAIN_NAME"
-          
-          # Set the keychain to be searched by default, which is necessary for codesign to find the certificate
-          security list-keychains -s "$KEYCHAIN_NAME"
-          
-          # Verify that the certificate is available in the keychain
-          security find-identity -vp codesigning "$KEYCHAIN_NAME"
-          
           # Configure the local.properties file with the necessary information for signing
           echo "compose.desktop.mac.sign=true" > local.properties
           echo "compose.desktop.mac.signing.identity=${{ secrets.MACOS_CERTIFICATE_IDENTITY }}" >> local.properties
           echo "compose.desktop.mac.notarization.appleID=${{ secrets.APPLE_ID }}" >> local.properties
           echo "compose.desktop.mac.notarization.password=${{ secrets.MACOS_APP_PWD }}" >> local.properties
+          echo "compose.desktop.mac.notarization.teamID=${{ secrets.APPLE_TEAM_ID }}" >> local.properties
           cat local.properties
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: packageDmg
+          arguments: notarizeDmg
 
-      - name: Rename and notarize
+      - name: Rename
         run: |
           VERSION=${{ github.ref_name }}
           echo $VERSION
           mv ./desktopApp/build/compose/binaries/main/dmg/RecStar-1.0.0.dmg ./recstar-$VERSION-mac-arm64.dmg
-          xcrun notarytool submit recstar-$VERSION-mac-arm64.dmg --apple-id ${{ secrets.APPLE_ID }} --password ${{ secrets.MACOS_APP_PWD }} --team-id ${{ secrets.APPLE_TEAM_ID }} --wait
-          xcrun stapler staple recstar-$VERSION-mac-arm64.dmg
 
       - name: Release
         uses: softprops/action-gh-release@v1

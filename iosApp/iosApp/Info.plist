@@ -53,6 +53,6 @@
     <key>NSDocumentsDirectory</key>
     <string>Read/Write access to app’s shared documents directory</string>
     <key>NSMicrophoneUsageDescription</key>
-    <string>We need access to the microphone for recording purposes.</string>
+    <string>RecStar needs access to the microphone to be able to record audio.</string>
 </dict>
 </plist>

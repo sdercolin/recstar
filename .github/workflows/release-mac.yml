@@ -55,21 +55,23 @@ jobs:
           security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
           security find-identity -v
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $KEYCHAIN_PWD build.keychain
-          echo $'compose.desktop.mac.sign=true\ncompose.desktop.mac.signing.identity=${{ secrets.MACOS_CERTIFICATE_IDENTITY }}\ncompose.desktop.mac.notarization.appleID=${{ secrets.APPLE_ID }}\ncompose.desktop.mac.notarization.password=${{ secrets.MACOS_APP_PWD }}' >local.properties
+          echo "compose.desktop.mac.sign=true" > local.properties
+          echo "compose.desktop.mac.signing.identity=${{ secrets.MACOS_CERTIFICATE_IDENTITY }}" >> local.properties
+          echo "compose.desktop.mac.notarization.appleID=${{ secrets.APPLE_ID }}" >> local.properties
+          echo "compose.desktop.mac.notarization.password=${{ secrets.MACOS_APP_PWD }}" >> local.properties
+          echo "compose.desktop.mac.notarization.teamID=${{ secrets.APPLE_TEAM_ID }}" >> local.properties
           cat local.properties
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: packageDmg
+          arguments: notarizeDmg
 
-      - name: Rename and notarize
+      - name: Rename
         run: |
           VERSION=${{ github.ref_name }}
           echo $VERSION
           mv ./desktopApp/build/compose/binaries/main/dmg/RecStar-1.0.0.dmg ./recstar-$VERSION-mac-x64.dmg
-          xcrun notarytool submit recstar-$VERSION-mac-x64.dmg --apple-id ${{ secrets.APPLE_ID }} --password ${{ secrets.MACOS_APP_PWD }} --team-id ${{ secrets.APPLE_TEAM_ID }} --wait
-          xcrun stapler staple recstar-$VERSION-mac-x64.dmg
 
       - name: Release
         uses: softprops/action-gh-release@v1
