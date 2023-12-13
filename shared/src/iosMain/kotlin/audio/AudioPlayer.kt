@@ -10,6 +10,9 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import platform.AVFAudio.AVAudioPlayer
+import platform.AVFAudio.AVAudioSession
+import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
+import platform.AVFAudio.setActive
 import ui.model.AppContext
 import util.Log
 import util.withNSError
@@ -38,6 +41,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                 return
             }
             job = scope.launch(Dispatchers.IO) {
+                setupAudioSession()
                 val lastModified = file.lastModified
                 if (lastLoadedFile != file || lastLoadedFileModified != lastModified) {
                     val url = file.toNSURL()
@@ -107,6 +111,15 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
 
     private fun stopCounting() {
         countingJob?.cancel()
+    }
+
+    private fun setupAudioSession() {
+        withNSError { e ->
+            AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayAndRecord, error = e)
+        }
+        withNSError { e ->
+            AVAudioSession.sharedInstance().setActive(true, error = e)
+        }
     }
 }
 

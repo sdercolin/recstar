@@ -62,7 +62,7 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener, context: A
                     val input = engine.inputNode
                     val bus = 0L.toULong()
                     val format = input.inputFormatForBus(bus)
-                    input.installTapOnBus(bus, 1792.toUInt(), format) { buffer, _ ->
+                    input.installTapOnBus(bus, 2048.toUInt(), format) { buffer, _ ->
                         if (buffer != null) {
                             addWaveData(buffer)
                         }
