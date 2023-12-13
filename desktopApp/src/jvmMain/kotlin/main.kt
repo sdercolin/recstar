@@ -3,6 +3,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -37,6 +38,7 @@ fun main() =
         ProvideAppDependencies(dependencies) {
             Window(
                 title = APP_NAME,
+                icon = painterResource("icon.ico"),
                 state = windowState,
                 onCloseRequest = ::exitApplication,
             ) {
