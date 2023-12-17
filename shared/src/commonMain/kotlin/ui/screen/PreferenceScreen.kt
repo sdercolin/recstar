@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
@@ -88,6 +89,7 @@ private fun ScreenContent() {
         Group(title = string(Strings.PreferenceGroupReclist)) {
             SwitchItem(
                 title = string(Strings.PreferenceKanaNormalization),
+                info = string(Strings.PreferenceKanaNormalizationDescription),
                 value = value.normalizeKanaNfc,
                 onValueChanged = { repository.update { copy(normalizeKanaNfc = it) } },
             )
@@ -164,7 +166,7 @@ private fun <T : LocalizedTest> SelectionItem(
         AlertDialog(
             onDismissRequest = { isShowingDialog = false },
             title = {
-                Text(text = title)
+                Text(text = title, fontWeight = FontWeight.Bold)
             },
             text = {
                 Column {
@@ -178,7 +180,6 @@ private fun <T : LocalizedTest> SelectionItem(
                                     isShowingDialog = false
                                 }
                                 .padding(vertical = 12.dp),
-                            style = MaterialTheme.typography.body1,
                             color = MaterialTheme.colors.onSurface,
                             textAlign = TextAlign.Center,
                         )
@@ -198,11 +199,13 @@ private fun <T : LocalizedTest> SelectionItem(
 @Composable
 private fun SwitchItem(
     title: String,
+    info: String?,
     value: Boolean,
     onValueChanged: (Boolean) -> Unit,
 ) {
     Item(
         title = title,
+        info = info,
         subItem = {
             Switch(
                 modifier = Modifier.size(32.dp),
