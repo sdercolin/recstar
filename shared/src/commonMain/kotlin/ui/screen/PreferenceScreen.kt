@@ -86,6 +86,14 @@ private fun ScreenContent() {
                 },
             )
         }
+        Group(title = string(Strings.PreferenceGroupRecording)) {
+            SwitchItem(
+                title = string(Strings.PreferenceContinuousRecording),
+                info = string(Strings.PreferenceContinuousRecordingDescription),
+                value = value.recording.continuous,
+                onValueChanged = { repository.update { copy(recording = recording.copy(continuous = it)) } },
+            )
+        }
         Group(title = string(Strings.PreferenceGroupReclist)) {
             SwitchItem(
                 title = string(Strings.PreferenceKanaNormalization),
