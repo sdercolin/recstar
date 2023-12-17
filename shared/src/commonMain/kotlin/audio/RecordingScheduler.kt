@@ -72,11 +72,16 @@ class RecordingScheduler(
      * Called when the guide audio reaches the end before scheduled NEXT event.
      */
     fun onGuideAudioEnd() {
-        if (!settings.continuous || state != State.Recording) return
+        if (state != State.Recording) return
         Log.d("RecordingScheduler onReachAudioEnd")
         job = scope.launch {
-            state = State.Switching
-            emitEvent(Event.Next)
+            if (settings.continuous) {
+                state = State.Switching
+                emitEvent(Event.Next)
+            } else {
+                state = State.Stopping
+                emitEvent(Event.Stop)
+            }
         }
     }
 

@@ -108,7 +108,6 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                 }
                 delay(5)
             }
-            Log.d("AudioPlayerImpl.startCounting: stopped")
             stop()
         }
     }

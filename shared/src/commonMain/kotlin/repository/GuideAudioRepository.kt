@@ -70,7 +70,7 @@ class GuideAudioRepository {
         }
         val resolvedRawConfigFile = if (rawConfigFile == null && findConfig) {
             val configFileName = "${audioFile.nameWithoutExtension}.$GUIDE_AUDIO_RAW_CONFIG_FILE_EXTENSION"
-            audioFile.parentFile?.resolve(configFileName)
+            audioFile.parentFile?.resolve(configFileName)?.takeIf { it.exists() }
         } else {
             rawConfigFile
         }
