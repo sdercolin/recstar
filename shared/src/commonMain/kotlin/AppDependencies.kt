@@ -2,6 +2,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import io.FileInteractor
 import io.LocalFileInteractor
@@ -60,13 +61,14 @@ fun ProvideAppDependencies(
     dependencies: AppDependencies,
     content: @Composable () -> Unit,
 ) {
-    val language = derivedStateOf { dependencies.appPreferenceRepository.value.language.getLanguage() }
+    val preferenceState = dependencies.appPreferenceRepository.flow.collectAsState()
+    val language = derivedStateOf { preferenceState.value.language.getLanguage() }
     LaunchedEffect(language.value) {
         currentLanguage = language.value
     }
     val isSystemInDarkTheme = isSystemInDarkTheme()
     val isDarkMode = derivedStateOf {
-        when (dependencies.appPreferenceRepository.value.theme) {
+        when (preferenceState.value.theme) {
             AppPreference.Theme.System -> isSystemInDarkTheme
             AppPreference.Theme.Light -> false
             AppPreference.Theme.Dark -> true
