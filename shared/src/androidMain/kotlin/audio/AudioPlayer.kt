@@ -19,13 +19,18 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
     private var countingJob: Job? = null
     private var startTime: Long = 0
 
-    override fun play(file: File) {
+    override fun play(file: File) = play(file, 0)
+
+    private fun play(
+        file: File,
+        positionMs: Long,
+    ) {
         runCatching {
             if (file.absolutePath == lastLoadedFile &&
                 lastLoadedFileModified == file.lastModified &&
                 mediaPlayer != null
             ) {
-                mediaPlayer?.seekTo(0)
+                mediaPlayer?.seekTo(positionMs.toInt())
                 mediaPlayer?.start()
                 listener.onStarted()
                 startCounting()
@@ -36,6 +41,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                 setDataSource(file.absolutePath)
                 prepareAsync()
                 setOnPreparedListener {
+                    seekTo(positionMs.toInt())
                     start()
                     listener.onStarted()
                     startCounting()
@@ -55,6 +61,13 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
             Log.e(it)
             dispose()
         }
+    }
+
+    override fun seekAndPlay(positionMs: Long) {
+        if (isPlaying()) {
+            stop()
+        }
+        play(File(requireNotNull(lastLoadedFile)), positionMs)
     }
 
     override fun stop() {
