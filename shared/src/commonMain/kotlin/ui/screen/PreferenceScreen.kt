@@ -244,7 +244,7 @@ private fun Item(
         modifier = Modifier.fillMaxWidth()
             .padding(start = 24.dp)
             .runIfHave(onClick) { clickable(onClick = it) }
-            .padding(top = 16.dp, bottom = 16.dp, start = 16.dp, end = 40.dp),
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
