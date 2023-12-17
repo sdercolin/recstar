@@ -6,6 +6,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import cafe.adriel.voyager.navigator.Navigator
@@ -27,6 +28,7 @@ import ui.screen.MainScreen
 import ui.string.*
 import ui.style.AppTheme
 import ui.style.LocalThemeIsDarkMode
+import util.useIosStyle
 
 @Composable
 fun App() {
@@ -82,7 +84,11 @@ private fun MainScaffold(navigator: Navigator) {
                     @Composable {
                         IconButton(onClick = { navigator.pop() }) {
                             Icon(
-                                imageVector = Icons.Default.ArrowBack,
+                                imageVector = if (useIosStyle) {
+                                    Icons.Default.ArrowBackIosNew
+                                } else {
+                                    Icons.Default.ArrowBack
+                                },
                                 contentDescription = string(Strings.CommonBack),
                             )
                         }

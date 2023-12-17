@@ -13,11 +13,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -49,6 +52,7 @@ import util.appVersion
 import util.isDesktop
 import util.runIf
 import util.runIfHave
+import util.useIosStyle
 
 object PreferenceScreen : Screen {
     @Composable
@@ -222,7 +226,18 @@ private fun SwitchItem(
 private fun Item(
     title: String,
     info: String? = null,
-    subItem: @Composable (() -> Unit)? = null,
+    subItem: @Composable (() -> Unit)? = if (useIosStyle) {
+        {
+            Icon(
+                imageVector = Icons.Default.ArrowForwardIos,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
+            )
+        }
+    } else {
+        null
+    },
     onClick: (() -> Unit)? = null,
 ) {
     Row(

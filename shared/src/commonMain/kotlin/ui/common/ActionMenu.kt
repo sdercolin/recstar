@@ -9,6 +9,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import ui.string.*
+import util.useIosStyle
 
 @Composable
 fun ActionMenu(content: @Composable ColumnScope.(closeMenu: () -> Unit) -> Unit) {
@@ -27,7 +29,7 @@ fun ActionMenu(content: @Composable ColumnScope.(closeMenu: () -> Unit) -> Unit)
         onClick = { showMenu = !showMenu },
     ) {
         Icon(
-            imageVector = Icons.Default.MoreVert,
+            imageVector = if (useIosStyle) Icons.Default.MoreHoriz else Icons.Default.MoreVert,
             contentDescription = string(Strings.CommonMore),
         )
     }
