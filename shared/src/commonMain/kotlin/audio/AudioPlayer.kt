@@ -24,6 +24,11 @@ interface AudioPlayer {
     fun play(file: File)
 
     /**
+     * An asynchronous operation that seeks to the given [positionMs] and starts playing.
+     */
+    fun seekAndPlay(positionMs: Long)
+
+    /**
      * An asynchronous operation that stops the playback.
      */
     fun stop()

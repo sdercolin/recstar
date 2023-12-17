@@ -19,6 +19,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
     private var lastLoadedFile: File? = null
     private var lastLoadedFileModified: Long? = null
     private var job: Job? = null
+    private var seekingJob: Job? = null
     private var cleanupJob: Job? = null
     private var countingJob: Job? = null
     private var isPlaying = false
@@ -26,7 +27,12 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
         clip = AudioSystem.getClip()
     }
 
-    override fun play(file: File) {
+    override fun play(file: File) = play(file, 0)
+
+    private fun play(
+        file: File,
+        positionMs: Long,
+    ) {
         runCatching {
             if (job?.isActive == true) {
                 Log.w("AudioPlayerImpl.start: already started")
@@ -44,23 +50,29 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                         val audioInputStream = AudioSystem.getAudioInputStream(file.toJavaFile())
                         clip.open(audioInputStream)
                     }
-                    clip.framePosition = 0
+                    clip.microsecondPosition = positionMs
                     clip.start()
-                    countingJob = scope.launch {
-                        while (clip.isRunning) {
-                            val progress = clip.microsecondPosition.toFloat() / clip.microsecondLength.toFloat()
-                            withContext(Dispatchers.Main) {
-                                listener.onProgress(progress)
-                            }
-                            delay(5)
-                        }
-                        stop()
-                    }
+                    startCounting()
                     lastLoadedFile = file
                     lastLoadedFileModified = file.lastModified
                     listener.onStarted()
                     isPlaying = true
                 }
+            }
+        }.onFailure {
+            Log.e(it)
+            dispose()
+        }
+    }
+
+    override fun seekAndPlay(positionMs: Long) {
+        runCatching {
+            seekingJob = scope.launch {
+                if (isPlaying) {
+                    stop()
+                }
+                cleanupJob?.join()
+                play(requireNotNull(lastLoadedFile), positionMs)
             }
         }.onFailure {
             Log.e(it)
@@ -87,9 +99,24 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
 
     override fun isPlaying(): Boolean = isPlaying
 
+    private fun startCounting() {
+        countingJob = scope.launch {
+            while (clip.isRunning) {
+                val progress = clip.microsecondPosition.toFloat() / clip.microsecondLength.toFloat()
+                withContext(Dispatchers.Main) {
+                    listener.onProgress(progress)
+                }
+                delay(5)
+            }
+            Log.d("AudioPlayerImpl.startCounting: stopped")
+            stop()
+        }
+    }
+
     override fun dispose() {
         runCatching {
             job?.cancel()
+            seekingJob?.cancel()
             cleanupJob?.cancel()
             countingJob?.cancel()
             clip.close()

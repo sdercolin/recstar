@@ -10,6 +10,7 @@ import audio.AudioPlayer
 import audio.AudioPlayerProvider
 import audio.AudioRecorder
 import audio.AudioRecorderProvider
+import audio.RecordingScheduler
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
@@ -28,6 +29,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import model.GuideAudio
 import model.Session
+import repository.AppPreferenceRepository
+import repository.LocalAppPreferenceRepository
 import repository.LocalSessionRepository
 import repository.SessionRepository
 import ui.common.AlertDialogController
@@ -44,6 +47,7 @@ import util.savedMutableStateOf
 class SessionScreenModel(
     session: Session,
     context: AppContext,
+    private val appPreferenceRepository: AppPreferenceRepository,
     private val sessionRepository: SessionRepository,
     private val alertDialogController: AlertDialogController,
     private val permissionChecker: PermissionChecker,
@@ -63,6 +67,8 @@ class SessionScreenModel(
     var guideAudioConfig: GuideAudio? by mutableStateOf(session.guideAudioConfig)
         private set
 
+    private val scheduler = RecordingScheduler(appPreferenceRepository, screenModelScope)
+
     private fun reload(session: Session) {
         name = session.name
         contentDirectory = session.directory
@@ -79,6 +85,14 @@ class SessionScreenModel(
             sessionRepository.sessionUpdated.collectLatest { updatedName ->
                 if (updatedName == name) {
                     reload(sessionRepository.get(updatedName).getOrThrow())
+                }
+            }
+        }
+        screenModelScope.launch {
+            scheduler.eventFlow.collectLatest { event ->
+                when (event) {
+                    RecordingScheduler.Event.Next -> nextWithScheduler()
+                    RecordingScheduler.Event.Stop -> requestStopRecording()
                 }
             }
         }
@@ -133,14 +147,26 @@ class SessionScreenModel(
 
         override fun onStopped() {
             lastSentenceIndex?.let { updateSentence(it) }
-            isRecording = false
-            waveformPainter?.onStopRecording()
+            val isSwitching = scheduler.state == RecordingScheduler.State.Switching
+            waveformPainter?.onStopRecording(isSwitching)
+            if (isSwitching) {
+                switchScheduled()
+            } else {
+                isRecording = false
+            }
         }
     }
 
     private val guidePlayerListener = object : AudioPlayer.Listener {
         override fun onStarted() {
             startRecording()
+            if (scheduler.state == RecordingScheduler.State.Switching) {
+                guideAudioConfig?.let {
+                    scheduler.start(it)
+                } ?: run {
+                    Log.e("guideAudioConfig is null")
+                }
+            }
         }
 
         override fun onProgress(progress: Float) {
@@ -148,7 +174,9 @@ class SessionScreenModel(
         }
 
         override fun onStopped() {
-            // No-op
+            if (scheduler.state == RecordingScheduler.State.Recording) {
+                scheduler.onGuideAudioEnd()
+            }
         }
     }
 
@@ -240,6 +268,8 @@ class SessionScreenModel(
     }
 
     private fun startRecording() {
+        if (isRecording) return
+        guideAudioConfig?.let { scheduler.start(it) }
         recorder.start(currentFile)
         waveformPainter.onStartRecording()
     }
@@ -254,6 +284,7 @@ class SessionScreenModel(
 
     private fun requestStopRecording() {
         isRequestedRecording = false
+        scheduler.finish()
         stopRecording()
     }
 
@@ -282,16 +313,24 @@ class SessionScreenModel(
         player.stop()
     }
 
-    fun selectSentence(index: Int) {
+    fun selectSentence(
+        index: Int,
+        scheduled: Boolean = false,
+    ) {
         if (index == currentIndex) return
         currentIndex = index
-        if (isRecording || isRequestedRecording) {
-            requestStopRecording()
+        if (scheduled) {
+            // do no show stopped state on UI because it is scheduled and will continue soon
+            recorder.stop()
         } else {
-            updateCurrentSentence()
-        }
-        if (isPlaying || isRequestedPlaying) {
-            stopPlaying()
+            if (isRecording || isRequestedRecording) {
+                requestStopRecording()
+            } else {
+                updateCurrentSentence()
+            }
+            if (isPlaying || isRequestedPlaying) {
+                stopPlaying()
+            }
         }
         requestScrollToCurrentSentence()
     }
@@ -301,6 +340,30 @@ class SessionScreenModel(
     fun next() {
         if (!hasNext) return
         selectSentence(currentIndex + 1)
+    }
+
+    private fun nextWithScheduler() {
+        if (!hasNext) {
+            Log.d("SessionScreenModel nextWithScheduler: no next sentence")
+            scheduler.finish()
+            return
+        }
+        selectSentence(currentIndex + 1, scheduled = true)
+    }
+
+    private fun switchScheduled() {
+        // current index has been already updated
+        recorder.start(currentFile)
+        waveformPainter.onStartRecording()
+        val config = guideAudioConfig
+        if (config != null) {
+            config.repeatStartingNode?.timeMs?.let {
+                guidePlayer.seekAndPlay(it)
+                // expecting stopped -> started events from guidePlayerListener
+            }
+        } else {
+            Log.e("SessionScreenModel switchScheduled: guideAudioConfig is null")
+        }
     }
 
     val hasPrevious get() = currentIndex > 0
@@ -338,6 +401,7 @@ class SessionScreenModel(
     }
 
     override fun onDispose() {
+        scheduler.dispose()
         recorder.dispose()
         player.dispose()
         waveformPainter.dispose()
@@ -348,6 +412,7 @@ class SessionScreenModel(
 @Composable
 fun SessionScreen.rememberSessionScreenModel(session: Session): SessionScreenModel {
     val context = LocalAppContext.current
+    val appPreferenceRepository = LocalAppPreferenceRepository.current
     val alertDialogController = LocalAlertDialogController.current
     val permissionChecker = LocalPermissionChecker.current
     val sessionRepository = LocalSessionRepository.current
@@ -355,6 +420,7 @@ fun SessionScreen.rememberSessionScreenModel(session: Session): SessionScreenMod
         SessionScreenModel(
             session = session,
             context = context,
+            appPreferenceRepository = appPreferenceRepository,
             sessionRepository = sessionRepository,
             alertDialogController = alertDialogController,
             permissionChecker = permissionChecker,

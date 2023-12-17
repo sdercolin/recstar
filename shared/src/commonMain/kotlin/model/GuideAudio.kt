@@ -45,6 +45,12 @@ data class GuideAudio(
         val repeatTargetNodeIndex: Int? = null,
         val comment: String? = null,
     ) : JavaSerializable
+
+    val switchingNode get() = nodes.firstOrNull { it.isSwitching }
+    val repeatStartingNode
+        get() = nodes.firstOrNull { it.repeatTargetNodeIndex != null }?.repeatTargetNodeIndex?.let {
+            nodes[it]
+        }
 }
 
 private fun createDefault(audioFile: File) =

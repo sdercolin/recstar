@@ -74,11 +74,13 @@ class WaveformPainter(
         return sampledData
     }
 
-    fun onStopRecording() {
+    fun onStopRecording(isSwitchingScheduled: Boolean) {
         coroutineScope.launch {
             job?.cancelAndJoin()
             job = null
-            consumePendingFile()
+            if (!isSwitchingScheduled) {
+                consumePendingFile()
+            }
         }
     }
 
