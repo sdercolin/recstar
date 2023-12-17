@@ -1,10 +1,10 @@
 package repository
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import io.Paths
 import io.appPreferenceFile
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import model.AppPreference
 import util.parseJson
 import util.stringifyJson
@@ -13,13 +13,13 @@ import util.stringifyJson
  * A repository to manage the app preference.
  */
 class AppPreferenceRepository(appPreference: AppPreference) {
-    private val _state = mutableStateOf(appPreference)
-    val state: State<AppPreference> get() = _state
-    val value: AppPreference get() = _state.value
+    private val _flow = MutableStateFlow(appPreference)
+    val flow: StateFlow<AppPreference> get() = _flow
+    val value: AppPreference get() = _flow.value
 
     fun update(updater: AppPreference.() -> AppPreference) {
         val newValue = updater(value)
-        _state.value = newValue
+        _flow.value = newValue
         Paths.appPreferenceFile.writeText(newValue.stringifyJson())
     }
 }

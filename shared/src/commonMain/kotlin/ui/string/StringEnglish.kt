@@ -69,6 +69,8 @@ fun Strings.en(): String =
         PreferenceThemeSystem -> "Follow System"
         PreferenceThemeLight -> "Light"
         PreferenceThemeDark -> "Dark"
+        PreferenceGroupReclist -> "Reclist"
+        PreferenceKanaNormalization -> "Normalize Kana to NFC"
         PreferenceGroupMisc -> "Misc"
         PreferenceContentRootLocation -> "Location of Content Directory"
         PreferenceAbout -> "About $APP_NAME"

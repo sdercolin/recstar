@@ -46,9 +46,13 @@ class AppDependencies(
     val progressController: ProgressController = ProgressController(),
     val fileInteractor: FileInteractor = FileInteractor(context, toastController, alertDialogController),
     val permissionChecker: PermissionChecker = PermissionChecker(context),
-    val reclistRepository: ReclistRepository = ReclistRepository(),
+    val reclistRepository: ReclistRepository = ReclistRepository(appPreferenceRepository),
     val guideAudioRepository: GuideAudioRepository = GuideAudioRepository(),
-    val sessionRepository: SessionRepository = SessionRepository(reclistRepository, guideAudioRepository),
+    val sessionRepository: SessionRepository = SessionRepository(
+        appPreferenceRepository,
+        reclistRepository,
+        guideAudioRepository,
+    ),
 )
 
 @Composable

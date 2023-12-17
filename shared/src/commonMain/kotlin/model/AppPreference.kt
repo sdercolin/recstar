@@ -15,6 +15,7 @@ data class AppPreference(
     val language: Language = Language.Auto,
     val theme: Theme = if (isDesktop) Theme.Dark else Theme.System,
     val customContentRootPath: String? = null,
+    val normalizeKanaNfc: Boolean = true,
 ) : JavaSerializable {
     enum class Language(private val language: StringLanguage?) : LocalizedTest {
         Auto(null),

@@ -66,6 +66,8 @@ fun Strings.ja(): String? =
         PreferenceThemeSystem -> "システムに従う"
         PreferenceThemeLight -> "ライト"
         PreferenceThemeDark -> "ダーク"
+        PreferenceGroupReclist -> "録音リスト"
+        PreferenceKanaNormalization -> "仮名の正規化（NFC）"
         PreferenceGroupMisc -> "その他"
         PreferenceContentRootLocation -> "コンテンツディレクトリのローケーション"
         AboutScreenPrivacyPolicy -> "プライバシーポリシー"

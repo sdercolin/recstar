@@ -66,6 +66,8 @@ fun Strings.zhHans(): String? =
         PreferenceThemeSystem -> "跟随系统"
         PreferenceThemeLight -> "浅色"
         PreferenceThemeDark -> "深色"
+        PreferenceGroupReclist -> "录音表"
+        PreferenceKanaNormalization -> "假名规范化（NFC）"
         PreferenceGroupMisc -> "其他"
         PreferenceContentRootLocation -> "内容目录所在位置"
         PreferenceAbout -> "关于 $APP_NAME"

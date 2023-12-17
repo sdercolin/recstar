@@ -63,6 +63,8 @@ enum class Strings {
     PreferenceThemeSystem,
     PreferenceThemeLight,
     PreferenceThemeDark,
+    PreferenceGroupReclist,
+    PreferenceKanaNormalization,
     PreferenceGroupMisc,
     PreferenceContentRootLocation,
     PreferenceAbout,

@@ -4,22 +4,28 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Switch
+import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -34,6 +40,7 @@ import repository.LocalAppPreferenceRepository
 import repository.LocalGuideAudioRepository
 import repository.LocalReclistRepository
 import repository.LocalSessionRepository
+import ui.common.DisabledMutableInteractionSource
 import ui.common.ScrollableColumn
 import ui.model.Screen
 import ui.string.*
@@ -56,7 +63,7 @@ private fun ScreenContent() {
     val repository = LocalAppPreferenceRepository.current
     val navigator = LocalNavigator.currentOrThrow
     val fileInteractor = LocalFileInteractor.current
-    val value by repository.state
+    val value by repository.flow.collectAsState()
     ScrollableColumn(modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background)) {
         Group(title = string(Strings.PreferenceGroupAppearance)) {
             SelectionItem(
@@ -72,6 +79,13 @@ private fun ScreenContent() {
                 options = AppPreference.Theme.values().toList().runIf(isDesktop) {
                     minus(AppPreference.Theme.System)
                 },
+            )
+        }
+        Group(title = string(Strings.PreferenceGroupReclist)) {
+            SwitchItem(
+                title = string(Strings.PreferenceKanaNormalization),
+                value = value.normalizeKanaNfc,
+                onValueChanged = { repository.update { copy(normalizeKanaNfc = it) } },
             )
         }
         Group(title = string(Strings.PreferenceGroupMisc)) {
@@ -118,7 +132,7 @@ private fun Group(
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)) {
         Text(
-            modifier = Modifier.padding(horizontal = 40.dp, vertical = 8.dp),
+            modifier = Modifier.padding(start = 40.dp, end = 40.dp, top = 8.dp, bottom = 16.dp),
             text = title,
             style = MaterialTheme.typography.subtitle2,
             color = MaterialTheme.colors.primary,
@@ -178,27 +192,65 @@ private fun <T : LocalizedTest> SelectionItem(
 }
 
 @Composable
+private fun SwitchItem(
+    title: String,
+    value: Boolean,
+    onValueChanged: (Boolean) -> Unit,
+) {
+    Item(
+        title = title,
+        subItem = {
+            Switch(
+                modifier = Modifier.size(32.dp),
+                checked = value,
+                onCheckedChange = null,
+                colors = MaterialTheme.colors.run {
+                    SwitchDefaults.colors(
+                        checkedThumbColor = primary,
+                        checkedTrackColor = primary,
+                    )
+                },
+                // disable interaction
+                interactionSource = remember { DisabledMutableInteractionSource() },
+            )
+        },
+        onClick = { onValueChanged(!value) },
+    )
+}
+
+@Composable
 private fun Item(
     title: String,
-    info: String,
+    info: String? = null,
+    subItem: @Composable (() -> Unit)? = null,
     onClick: (() -> Unit)? = null,
 ) {
-    Column(
+    Row(
         modifier = Modifier.fillMaxWidth()
             .padding(start = 24.dp)
             .runIfHave(onClick) { clickable(onClick = it) }
             .padding(top = 16.dp, bottom = 16.dp, start = 16.dp, end = 40.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.body1,
-            maxLines = 1,
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = info,
-            style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)),
-            maxLines = 1,
-        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.body1,
+                maxLines = 1,
+            )
+            info?.let {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = info,
+                    style = MaterialTheme.typography.caption.copy(
+                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
+                    ),
+                    maxLines = 1,
+                )
+            }
+        }
+        subItem?.let {
+            it()
+        }
     }
 }
