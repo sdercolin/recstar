@@ -70,13 +70,13 @@ private fun ScreenContent() {
                 title = string(Strings.PreferenceLanguage),
                 value = value.language,
                 onValueChanged = { repository.update { copy(language = it) } },
-                options = AppPreference.Language.values().toList(),
+                options = AppPreference.Language.entries.toList(),
             )
             SelectionItem(
                 title = string(Strings.PreferenceTheme),
                 value = value.theme,
                 onValueChanged = { repository.update { copy(theme = it) } },
-                options = AppPreference.Theme.values().toList().runIf(isDesktop) {
+                options = AppPreference.Theme.entries.toList().runIf(isDesktop) {
                     minus(AppPreference.Theme.System)
                 },
             )

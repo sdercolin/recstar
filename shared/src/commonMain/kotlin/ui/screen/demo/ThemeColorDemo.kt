@@ -149,7 +149,7 @@ private fun ThemeDemoContent(
                         Modifier.fillMaxHeight().width(IntrinsicSize.Max),
                         verticalArrangement = Arrangement.Center,
                     ) {
-                        ThemeColorDemoScreenModel.Theme.values().forEach {
+                        ThemeColorDemoScreenModel.Theme.entries.forEach {
                             Button(
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = ButtonDefaults.buttonColors(
