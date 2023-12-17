@@ -23,6 +23,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
     private var audioPlayer: AVAudioPlayer? = null
     private var fileDuration: Double = 0.0
     private var job: Job? = null
+    private var seekingJob: Job? = null
     private var cleanupJob: Job? = null
     private var countingJob: Job? = null
     private var lastLoadedFile: File? = null
@@ -34,7 +35,12 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
         }
     }
 
-    override fun play(file: File) {
+    override fun play(file: File) = play(file, 0)
+
+    private fun play(
+        file: File,
+        positionMs: Long,
+    ) {
         runCatching {
             if (job?.isActive == true) {
                 Log.w("AudioRecorderImpl.start: already started")
@@ -49,12 +55,13 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                         audioPlayer = AVAudioPlayer(contentsOfURL = url, error = e).apply {
                             delegate = this@AudioPlayerImpl.delegate
                             prepareToPlay()
+                            setCurrentTime(positionMs / 1000.0)
                             play()
                             fileDuration = duration
                         }
                     }
                 } else {
-                    audioPlayer?.setCurrentTime(0.0)
+                    audioPlayer?.setCurrentTime(positionMs / 1000.0)
                     audioPlayer?.play()
                 }
                 lastLoadedFile = file
@@ -63,6 +70,21 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                     listener.onStarted()
                 }
                 startCounting()
+            }
+        }.onFailure {
+            Log.e(it)
+            dispose()
+        }
+    }
+
+    override fun seekAndPlay(positionMs: Long) {
+        runCatching {
+            seekingJob = scope.launch(Dispatchers.IO) {
+                if (isPlaying()) {
+                    stop()
+                }
+                cleanupJob?.join()
+                play(requireNotNull(lastLoadedFile), positionMs)
             }
         }.onFailure {
             Log.e(it)
@@ -92,6 +114,10 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
             stopCounting()
             audioPlayer?.takeIf { it.isPlaying() }?.stop()
             audioPlayer = null
+            job?.cancel()
+            job = null
+            seekingJob?.cancel()
+            seekingJob = null
             lastLoadedFile = null
             lastLoadedFileModified = null
         }.onFailure { Log.e(it) }
