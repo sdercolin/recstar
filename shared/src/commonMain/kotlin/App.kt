@@ -22,12 +22,15 @@ import repository.LocalReclistRepository
 import ui.common.LocalAlertDialogController
 import ui.common.LocalProgressController
 import ui.common.LocalToastController
+import ui.common.requestYesNo
 import ui.model.Screen
 import ui.screen.AboutScreen
 import ui.screen.MainScreen
+import ui.screen.PreferenceScreen
 import ui.string.*
 import ui.style.AppTheme
 import ui.style.LocalThemeIsDarkMode
+import util.quitApp
 import util.useIosStyle
 
 @Composable
@@ -69,6 +72,19 @@ private fun MainScaffold(navigator: Navigator) {
                 Action.OpenContentDirectory -> fileInteractor.requestOpenFolder(Paths.contentRoot)
                 Action.OpenAppDirectory -> fileInteractor.requestOpenFolder(Paths.appRoot)
                 Action.OpenAbout -> navigator push AboutScreen
+                Action.OpenSettings -> {
+                    navigator.popUntilRoot()
+                    navigator push PreferenceScreen
+                }
+                Action.ClearSettings -> {
+                    alertDialogController.requestYesNo(
+                        message = stringStatic(Strings.MenuSettingsClearSettingsAlertMessage),
+                        onConfirm = {
+                            Paths.appRoot.delete()
+                            quitApp()
+                        },
+                    )
+                }
                 else -> Unit
             }
         }

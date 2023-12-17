@@ -71,6 +71,16 @@ fun FrameWindowScope.Menu() {
                 shortcut = getShortcut(Key.Enter),
             )
         }
+        Menu(string(Strings.MenuSettings), mnemonic = 'S') {
+            ActionItem(
+                Action.OpenSettings,
+                string(Strings.MenuSettingsOpenSettings),
+            )
+            ActionItem(
+                Action.ClearSettings,
+                string(Strings.MenuSettingsClearSettings),
+            )
+        }
         Menu(string(Strings.MenuHelp), mnemonic = 'H') {
             ActionItem(
                 Action.OpenContentDirectory,

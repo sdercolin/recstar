@@ -28,6 +28,8 @@ enum class Action {
     NextSentence,
     PreviousSentence,
     ToggleRecording,
+    OpenSettings,
+    ClearSettings,
     OpenAppDirectory,
     OpenContentDirectory,
     OpenAbout,

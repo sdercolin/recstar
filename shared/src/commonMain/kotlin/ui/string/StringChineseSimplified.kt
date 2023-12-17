@@ -89,6 +89,11 @@ fun Strings.zhHans(): String? =
         MenuActionNextSentence -> "下一句"
         MenuActionPreviousSentence -> "上一句"
         MenuActionToggleRecording -> "录制/停止"
+        MenuSettings -> "设置"
+        MenuSettingsOpenSettings -> "打开设置"
+        MenuSettingsClearSettings -> "清除设置"
+        MenuSettingsClearSettingsAlertMessage ->
+            "确定要清除所有设置吗？您的会话数据和已导入的资源文件（如录音表和 BGM）将不会被删除。应用将在该操作后关闭。"
         MenuHelp -> "帮助"
         MenuHelpOpenContentDirectory -> "打开内容目录"
         MenuHelpOpenAppDirectory -> "打开应用目录"

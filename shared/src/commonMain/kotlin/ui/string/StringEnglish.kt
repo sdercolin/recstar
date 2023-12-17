@@ -92,6 +92,12 @@ fun Strings.en(): String =
         MenuActionNextSentence -> "Next Sentence"
         MenuActionPreviousSentence -> "Previous Sentence"
         MenuActionToggleRecording -> "Toggle Recording"
+        MenuSettings -> "Settings"
+        MenuSettingsOpenSettings -> "Open Settings"
+        MenuSettingsClearSettings -> "Clear Settings"
+        MenuSettingsClearSettingsAlertMessage ->
+            "Are you sure you want to clear all settings? This will not delete your sessions and imported resources. " +
+                "The App will be closed after clearing."
         MenuHelp -> "Help"
         MenuHelpOpenContentDirectory -> "Open Content Directory"
         MenuHelpOpenAppDirectory -> "Open App Directory"

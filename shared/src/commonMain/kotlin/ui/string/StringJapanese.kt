@@ -89,6 +89,12 @@ fun Strings.ja(): String? =
         MenuActionNextSentence -> "次へ"
         MenuActionPreviousSentence -> "前へ"
         MenuActionToggleRecording -> "録音/停止"
+        MenuSettings -> "設定"
+        MenuSettingsOpenSettings -> "設定を開く"
+        MenuSettingsClearSettings -> "設定をクリア"
+        MenuSettingsClearSettingsAlertMessage ->
+            "すべての設定をクリアしますか？セッションデータやインポートしたリソースファイル（録音リストやガイド BGM など）は削除されません。" +
+                "アプリはこの操作後に終了します。"
         MenuHelp -> "ヘルプ"
         MenuHelpOpenContentDirectory -> "コンテンツディレクトリを開く"
         MenuHelpOpenAppDirectory -> "アプリディレクトリを開く"
