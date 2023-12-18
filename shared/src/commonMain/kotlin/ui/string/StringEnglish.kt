@@ -23,6 +23,10 @@ fun Strings.en(): String =
         ExceptionRenameSessionExisting -> "Session named {0} already exists."
         ExceptionRenameSessionInvalid -> "Invalid session name: {0}"
         ExceptionRenameSessionUnexpected -> "Failed to rename session."
+        AlertExportTips ->
+            "Files recorded on iOS and macOS may have file names with special characters. " +
+                "Before using them on Windows with other software, please normalize the file names to NFC form. " +
+                "You can use the \"File Name Normalizer\" tool in the \"Tools\" menu of \"vLabeler\" app to do this."
         ToastExportDataSuccess -> "Exported successfully"
         ToastExportDataCancel -> "Export cancelled"
         ToastImportReclistSuccess -> "Imported successfully"

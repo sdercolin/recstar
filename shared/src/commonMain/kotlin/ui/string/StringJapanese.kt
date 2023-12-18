@@ -23,6 +23,10 @@ fun Strings.ja(): String? =
         ExceptionRenameSessionExisting -> "名前が {0} のセッションが既に存在します。"
         ExceptionRenameSessionInvalid -> "無効なセッション名：{0}"
         ExceptionRenameSessionUnexpected -> "セッション名の編集に失敗しました。"
+        AlertExportTips ->
+            "iOS や macOS で録音したファイルには、ファイル名が特殊文字を含む場合があります。" +
+                "Windows 上の他のソフトウェアでこれらのファイルを使用する前に、ファイル名を NFC 形式に正規化してください。" +
+                "これは、`vLabeler` アプリの「ツール」メニューの「ファイル名を正規化」ツールで実行できます。"
         ToastExportDataSuccess -> "成功しました"
         ToastExportDataCancel -> "キャンセルされました"
         ToastImportReclistSuccess -> "インポートに成功しました"

@@ -23,6 +23,10 @@ fun Strings.zhHans(): String? =
         ExceptionRenameSessionExisting -> "已存在名为 {0} 的会话。"
         ExceptionRenameSessionInvalid -> "无效的会话名：{0}"
         ExceptionRenameSessionUnexpected -> "重命名会话失败。"
+        AlertExportTips ->
+            "在 iOS 和 macOS 上录制的文件可能具有带有特殊字符的文件名。" +
+                "在 Windows 上使用其他软件读取这些文件之前，请将文件名规范化为 NFC 格式。" +
+                "您可以使用 `vLabeler` 应用程序的「工具」菜单中的「文件名规范化」工具来执行此操作。"
         ToastExportDataSuccess -> "导出成功"
         ToastExportDataCancel -> "导出已被取消"
         ToastImportReclistSuccess -> "导入成功"

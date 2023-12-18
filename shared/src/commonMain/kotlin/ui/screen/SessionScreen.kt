@@ -25,10 +25,12 @@ import model.Action
 import model.Actions
 import model.Session
 import repository.LocalAppActionStore
+import repository.LocalAppRecordRepository
 import ui.common.ActionMenu
 import ui.common.ActionMenuItem
 import ui.common.LocalAlertDialogController
 import ui.common.LocalProgressController
+import ui.common.requestConfirm
 import ui.model.LocalScreenOrientation
 import ui.model.Screen
 import ui.model.ScreenOrientation
@@ -69,20 +71,34 @@ private fun SessionScreen.ScreenActions() {
             )
         }
         if (useExport) {
+            val appRecordRepository = LocalAppRecordRepository.current
             ActionMenuItem(
                 text = string(Strings.SessionScreenActionExport),
                 icon = Icons.Default.IosShare,
                 onClick = {
                     closeMenu()
-                    val request = ExportDataRequest(
-                        folder = model.contentDirectory,
-                        allowedExtension = listOf("wav"),
-                        onStart = { progressController.show() },
-                        onSuccess = { progressController.hide() },
-                        onCancel = { progressController.hide() },
-                        onError = { progressController.hide() },
-                    )
-                    fileInteractor.exportData(request)
+
+                    fun export() {
+                        val request = ExportDataRequest(
+                            folder = model.contentDirectory,
+                            allowedExtension = listOf("wav"),
+                            onStart = { progressController.show() },
+                            onSuccess = { progressController.hide() },
+                            onCancel = { progressController.hide() },
+                            onError = { progressController.hide() },
+                        )
+                        fileInteractor.exportData(request)
+                    }
+                    if (appRecordRepository.value.hasShownExportTips.not()) {
+                        alertDialogController.requestConfirm(
+                            message = stringStatic(Strings.AlertExportTips),
+                        ) {
+                            appRecordRepository.update { copy(hasShownExportTips = true) }
+                            export()
+                        }
+                    } else {
+                        export()
+                    }
                 },
             )
         }
