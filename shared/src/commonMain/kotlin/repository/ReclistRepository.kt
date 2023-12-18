@@ -4,12 +4,8 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import io.File
 import io.Paths
 import io.reclistsDirectory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import model.Reclist
 import model.parseReclist
 import util.Log
@@ -17,14 +13,10 @@ import util.Log
 /**
  * A repository to manage reclist files.
  */
-class ReclistRepository(private val appPreferenceRepository: AppPreferenceRepository) {
+class ReclistRepository {
     private lateinit var folder: File
     private val map = mutableMapOf<String, Reclist>()
     private val _items = MutableStateFlow(emptyList<String>())
-    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-
-    private val normalizeKanaNfc: Boolean
-        get() = appPreferenceRepository.value.normalizeKanaNfc
 
     /**
      * The list of reclist names.
@@ -33,11 +25,6 @@ class ReclistRepository(private val appPreferenceRepository: AppPreferenceReposi
 
     init {
         init()
-        coroutineScope.launch {
-            appPreferenceRepository.flow.collect {
-                map.clear()
-            }
-        }
     }
 
     /**
@@ -60,7 +47,7 @@ class ReclistRepository(private val appPreferenceRepository: AppPreferenceReposi
      */
     fun import(file: File): Boolean {
         Log.i("ReclistRepository.import: ${file.absolutePath}")
-        val reclist = parseReclist(file, normalizeKanaNfc)
+        val reclist = parseReclist(file)
             .onFailure {
                 Log.e("ReclistRepository.import: failed to parse ${file.absolutePath}", it)
             }
@@ -88,8 +75,7 @@ class ReclistRepository(private val appPreferenceRepository: AppPreferenceReposi
     /**
      * Gets the reclist with the given name.
      */
-    fun get(name: String): Reclist =
-        map[name] ?: parseReclist(folder.resolve("$name.txt"), normalizeKanaNfc).getOrThrow()
+    fun get(name: String): Reclist = map[name] ?: parseReclist(folder.resolve("$name.txt")).getOrThrow()
 
     /**
      * Deletes the reclists with the given names.

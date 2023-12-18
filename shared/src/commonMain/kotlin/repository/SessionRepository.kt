@@ -6,14 +6,10 @@ import exception.SessionRenameInvalidException
 import io.File
 import io.Paths
 import io.sessionsDirectory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import model.Reclist
 import model.Session
 import model.SessionParams
@@ -27,14 +23,12 @@ import util.stringifyJson
  * A repository to manage sessions.
  */
 class SessionRepository(
-    private val appPreferenceRepository: AppPreferenceRepository,
     private val reclistRepository: ReclistRepository,
     private val guideAudioRepository: GuideAudioRepository,
 ) {
     private lateinit var folder: File
     private val map = mutableMapOf<String, Session>()
     private val _items = MutableStateFlow(emptyList<String>())
-    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     /**
      * The list of existing session names.
@@ -50,11 +44,6 @@ class SessionRepository(
 
     init {
         init()
-        coroutineScope.launch {
-            appPreferenceRepository.flow.collect {
-                map.clear()
-            }
-        }
     }
 
     /**

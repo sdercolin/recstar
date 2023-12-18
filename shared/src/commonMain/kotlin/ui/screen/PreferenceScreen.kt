@@ -100,14 +100,6 @@ private fun ScreenContent() {
                 onValueChanged = { repository.update { copy(recording = recording.copy(trim = it)) } },
             )
         }
-        Group(title = string(Strings.PreferenceGroupReclist)) {
-            SwitchItem(
-                title = string(Strings.PreferenceKanaNormalization),
-                info = string(Strings.PreferenceKanaNormalizationDescription),
-                value = value.normalizeKanaNfc,
-                onValueChanged = { repository.update { copy(normalizeKanaNfc = it) } },
-            )
-        }
         Group(title = string(Strings.PreferenceGroupMisc)) {
             if (isDesktop) {
                 val guideAudioRepository = LocalGuideAudioRepository.current

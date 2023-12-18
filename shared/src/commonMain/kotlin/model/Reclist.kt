@@ -4,9 +4,7 @@ import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.lifecycle.JavaSerializable
 import io.File
 import kotlinx.serialization.Serializable
-import util.KanaCharacterNormalizer
 import util.isValidFileName
-import util.runIf
 
 /**
  * Model for a reclist.
@@ -23,13 +21,9 @@ data class Reclist(
     val lines: List<String>,
 ) : JavaSerializable
 
-fun parseReclist(
-    file: File,
-    normalizeKanaNfc: Boolean,
-): Result<Reclist> =
+fun parseReclist(file: File): Result<Reclist> =
     runCatching {
         val lines = file.readTextDetectEncoding().split(*separators).filter { it.isValidFileName() }
-            .runIf(normalizeKanaNfc) { map { KanaCharacterNormalizer.convert(it) } }
         Reclist(file.nameWithoutExtension, file.absolutePath, lines)
     }
 
