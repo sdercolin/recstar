@@ -207,4 +207,6 @@ actual class File actual constructor(private val path: String) {
     fun toNSURL() = NSURL.fileURLWithPath(this.absolutePath)
 
     override fun equals(other: Any?): Boolean = absolutePath == (other as? File)?.absolutePath
+
+    override fun hashCode(): Int = absolutePath.hashCode()
 }
