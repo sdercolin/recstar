@@ -69,6 +69,8 @@ fun Strings.zhHans(): String? =
         PreferenceGroupRecording -> "录音"
         PreferenceContinuousRecording -> "连续录音"
         PreferenceContinuousRecordingDescription -> "基于 BGM 设置"
+        PreferenceTrimRecording -> "裁剪录音"
+        PreferenceTrimRecordingDescription -> "基于 BGM 设置"
         PreferenceGroupReclist -> "录音表"
         PreferenceKanaNormalization -> "假名规范化"
         PreferenceKanaNormalizationDescription -> "在音频文件名中使用 NFC 假名"

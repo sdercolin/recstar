@@ -69,6 +69,8 @@ fun Strings.ja(): String? =
         PreferenceGroupRecording -> "録音"
         PreferenceContinuousRecording -> "連続録音"
         PreferenceContinuousRecordingDescription -> "ガイド BGM に基づく"
+        PreferenceTrimRecording -> "録音をトリミング"
+        PreferenceTrimRecordingDescription -> "ガイド BGM に基づく"
         PreferenceGroupReclist -> "録音リスト"
         PreferenceKanaNormalization -> "仮名を正規化"
         PreferenceKanaNormalizationDescription -> "音声ファイル名を NFC 形式に正規化する"

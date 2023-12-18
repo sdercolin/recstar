@@ -47,7 +47,7 @@ import util.savedMutableStateOf
 class SessionScreenModel(
     session: Session,
     context: AppContext,
-    private val appPreferenceRepository: AppPreferenceRepository,
+    appPreferenceRepository: AppPreferenceRepository,
     private val sessionRepository: SessionRepository,
     private val alertDialogController: AlertDialogController,
     private val permissionChecker: PermissionChecker,
@@ -93,6 +93,8 @@ class SessionScreenModel(
                 when (event) {
                     RecordingScheduler.Event.Next -> nextWithScheduler()
                     RecordingScheduler.Event.Stop -> requestStopRecording()
+                    RecordingScheduler.Event.StartRecording -> startRecording()
+                    RecordingScheduler.Event.StopRecording -> stopRecording()
                 }
             }
         }
@@ -146,26 +148,30 @@ class SessionScreenModel(
         }
 
         override fun onStopped() {
-            lastSentenceIndex?.let { updateSentence(it) }
-            val isSwitching = scheduler.state == RecordingScheduler.State.Switching
-            waveformPainter?.onStopRecording(isSwitching)
+            val state = scheduler.state
+            Log.d("AudioRecorderListener onStopped, state: $state")
+            val isSwitching = state == RecordingScheduler.State.Switching
+            if (state != RecordingScheduler.State.RecordingStandby) {
+                waveformPainter?.onStopRecording(isSwitching)
+            }
             if (isSwitching) {
                 switchScheduled()
-            } else {
+            } else if (state == RecordingScheduler.State.Stopping || isRequestedRecording.not()) {
                 isRecording = false
+            }
+            if (state != RecordingScheduler.State.RecordingStandby) {
+                // delay update until switching or stopping
+                lastSentenceIndex?.let { updateSentence(it) }
             }
         }
     }
 
     private val guidePlayerListener = object : AudioPlayer.Listener {
         override fun onStarted() {
-            startRecording()
-            if (scheduler.state == RecordingScheduler.State.Switching) {
-                guideAudioConfig?.let {
-                    scheduler.start(it)
-                } ?: run {
-                    Log.e("guideAudioConfig is null")
-                }
+            if (scheduler.state == RecordingScheduler.State.Switching || !isRecording) {
+                startRecordingSchedule()
+                waveformPainter.clear()
+                isRecording = true
             }
         }
 
@@ -263,13 +269,19 @@ class SessionScreenModel(
         if (guideAudio != null) {
             guidePlayer.play(guideAudio.getFile())
         } else {
-            startRecording()
+            startRecordingSchedule()
         }
     }
 
+    private fun startRecordingSchedule() {
+        scheduler.start(guideAudioConfig)
+    }
+
     private fun startRecording() {
-        if (isRecording) return
-        guideAudioConfig?.let { scheduler.start(it) }
+        if (recorder.isRecording()) {
+            Log.w("AudioRecorder is already recording")
+            return
+        }
         recorder.start(currentFile)
         waveformPainter.onStartRecording()
     }
@@ -285,14 +297,23 @@ class SessionScreenModel(
     private fun requestStopRecording() {
         isRequestedRecording = false
         scheduler.finish()
-        stopRecording()
-    }
-
-    private fun stopRecording() {
-        recorder.stop()
+        if (recorder.isRecording()) {
+            stopRecording()
+        } else {
+            updateCurrentSentence()
+            isRecording = false
+        }
         if (guidePlayer.isPlaying()) {
             guidePlayer.stop()
         }
+    }
+
+    private fun stopRecording() {
+        if (!recorder.isRecording()) {
+            Log.w("AudioRecorder is not recording")
+            return
+        }
+        recorder.stop()
     }
 
     fun togglePlaying() {
@@ -321,7 +342,11 @@ class SessionScreenModel(
         currentIndex = index
         if (scheduled) {
             // do no show stopped state on UI because it is scheduled and will continue soon
-            recorder.stop()
+            if (recorder.isRecording()) {
+                stopRecording()
+            } else {
+                switchScheduled()
+            }
         } else {
             if (isRecording || isRequestedRecording) {
                 requestStopRecording()
@@ -352,9 +377,6 @@ class SessionScreenModel(
     }
 
     private fun switchScheduled() {
-        // current index has been already updated
-        recorder.start(currentFile)
-        waveformPainter.onStartRecording()
         val config = guideAudioConfig
         if (config != null) {
             config.repeatStartingNode?.timeMs?.let {

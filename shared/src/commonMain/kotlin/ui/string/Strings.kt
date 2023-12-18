@@ -66,6 +66,8 @@ enum class Strings {
     PreferenceGroupRecording,
     PreferenceContinuousRecording,
     PreferenceContinuousRecordingDescription,
+    PreferenceTrimRecording,
+    PreferenceTrimRecordingDescription,
     PreferenceGroupReclist,
     PreferenceKanaNormalization,
     PreferenceKanaNormalizationDescription,

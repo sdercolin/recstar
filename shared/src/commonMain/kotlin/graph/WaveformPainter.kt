@@ -56,6 +56,12 @@ class WaveformPainter(
         }
     }
 
+    fun clear() {
+        job?.cancel()
+        job = null
+        _flow.value = emptyArray()
+    }
+
     private fun getSampledData(data: FloatArray): Array<FloatArray> {
         val sampledData = Array(data.size / pointPerPixel) { FloatArray(2) }
         for (i in sampledData.indices) {

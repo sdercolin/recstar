@@ -72,6 +72,8 @@ fun Strings.en(): String =
         PreferenceGroupRecording -> "Recording"
         PreferenceContinuousRecording -> "Continuous recording"
         PreferenceContinuousRecordingDescription -> "Based on the guide BGM"
+        PreferenceTrimRecording -> "Trim recording"
+        PreferenceTrimRecordingDescription -> "Based on the guide BGM"
         PreferenceGroupReclist -> "Reclist"
         PreferenceKanaNormalization -> "Normalize Kana"
         PreferenceKanaNormalizationDescription -> "Use NFC kana for the saved audio"

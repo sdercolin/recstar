@@ -23,6 +23,8 @@ class RecordingScheduler(
     private var job: Job? = null
 
     enum class Event {
+        StartRecording,
+        StopRecording,
         Next,
         Stop,
     }
@@ -32,6 +34,7 @@ class RecordingScheduler(
 
     enum class State {
         Idle,
+        RecordingStandby,
         Recording,
         Switching,
         Stopping,
@@ -43,27 +46,40 @@ class RecordingScheduler(
     /**
      * Enter recording state with the given guide audio [config].
      */
-    fun start(config: GuideAudio) {
-        val switchingNode = config.switchingNode ?: return
-        Log.d("RecordingScheduler start: switchingNode=$switchingNode")
-        if (settings.continuous) {
-            val repeatStartingNode = config.repeatStartingNode
-            if (repeatStartingNode == null) {
-                Log.w("Cannot find repeat starting node but switching node exists")
-                return
-            }
+    fun start(config: GuideAudio?) {
+        if (state != State.Idle && state != State.Switching) {
+            Log.e("RecordingScheduler start: illegal state $state")
+            return
         }
         job?.cancel()
         job = scope.launch {
+            Log.d("RecordingScheduler start: $config")
+            var time = 0L
+            state = State.RecordingStandby
+            val startDelay = config?.recordingStartNode?.timeMs
+            if (startDelay != null && settings.trim) {
+                delay(startDelay)
+                time = startDelay
+            }
             state = State.Recording
-            val delayMs = switchingNode.timeMs ?: return@launch
-            delay(delayMs)
-            if (settings.continuous) {
-                state = State.Switching
-                emitEvent(Event.Next)
-            } else {
-                state = State.Stopping
-                emitEvent(Event.Stop)
+            emitEvent(Event.StartRecording)
+            val endDelay = config?.recordingEndNode?.timeMs
+            if (endDelay != null && settings.trim) {
+                delay(endDelay - time)
+                time = endDelay
+                state = State.RecordingStandby
+                emitEvent(Event.StopRecording)
+            }
+            val switchDelay = config?.switchingNode?.timeMs
+            if (switchDelay != null) {
+                delay(switchDelay - time)
+                if (settings.continuous) {
+                    state = State.Switching
+                    emitEvent(Event.Next)
+                } else {
+                    state = State.Stopping
+                    emitEvent(Event.Stop)
+                }
             }
         }
     }

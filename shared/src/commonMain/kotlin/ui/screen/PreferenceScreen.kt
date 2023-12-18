@@ -93,6 +93,12 @@ private fun ScreenContent() {
                 value = value.recording.continuous,
                 onValueChanged = { repository.update { copy(recording = recording.copy(continuous = it)) } },
             )
+            SwitchItem(
+                title = string(Strings.PreferenceTrimRecording),
+                info = string(Strings.PreferenceTrimRecordingDescription),
+                value = value.recording.trim,
+                onValueChanged = { repository.update { copy(recording = recording.copy(trim = it)) } },
+            )
         }
         Group(title = string(Strings.PreferenceGroupReclist)) {
             SwitchItem(
