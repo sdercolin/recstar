@@ -90,11 +90,6 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener, context: A
                 job?.cancelAndJoin()
                 engine?.stop()
                 engine = null
-                withNSErrorCatching { e ->
-                    AVAudioSession.sharedInstance().setActive(false, e)
-                }.onFailure {
-                    Log.e("Failed to free AVAudioSession", it)
-                }
                 Log.i("AudioRecorderImpl.stop: stopped")
                 withContext(Dispatchers.Main) {
                     listener.onStopped()
@@ -116,6 +111,11 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener, context: A
             recorder = null
             engine?.takeIf { it.running }?.stop()
             engine = null
+            withNSErrorCatching { e ->
+                AVAudioSession.sharedInstance().setActive(false, e)
+            }.onFailure {
+                Log.e("Failed to free AVAudioSession", it)
+            }
         }.onFailure { Log.e(it) }
     }
 

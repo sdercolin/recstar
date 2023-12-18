@@ -339,6 +339,7 @@ class SessionScreenModel(
         scheduled: Boolean = false,
     ) {
         if (index == currentIndex) return
+        updateSentence(currentIndex)
         currentIndex = index
         if (scheduled) {
             // do no show stopped state on UI because it is scheduled and will continue soon
