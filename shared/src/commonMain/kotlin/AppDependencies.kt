@@ -13,10 +13,12 @@ import repository.AppActionStore
 import repository.AppPreferenceRepository
 import repository.AppRecordRepository
 import repository.GuideAudioRepository
+import repository.KeyEventStore
 import repository.LocalAppActionStore
 import repository.LocalAppPreferenceRepository
 import repository.LocalAppRecordRepository
 import repository.LocalGuideAudioRepository
+import repository.LocalKeyEventStore
 import repository.LocalReclistRepository
 import repository.LocalSessionRepository
 import repository.ReclistRepository
@@ -41,7 +43,8 @@ class AppDependencies(
     val context: AppContext,
     val appRecordRepository: AppRecordRepository = createAppRecordRepository(context.coroutineScope),
     val appPreferenceRepository: AppPreferenceRepository = createAppPreferenceRepository(),
-    val appActionStore: AppActionStore = AppActionStore(context.coroutineScope),
+    val appActionStore: AppActionStore = AppActionStore(context.coroutineScope, appPreferenceRepository),
+    val keyEventStore: KeyEventStore = KeyEventStore(context.coroutineScope, appPreferenceRepository),
     val toastController: ToastController = ToastController(context),
     val alertDialogController: AlertDialogController = AlertDialogController(context),
     val progressController: ProgressController = ProgressController(),
@@ -77,6 +80,7 @@ fun ProvideAppDependencies(
         LocalAppRecordRepository provides dependencies.appRecordRepository,
         LocalAppPreferenceRepository provides dependencies.appPreferenceRepository,
         LocalAppActionStore provides dependencies.appActionStore,
+        LocalKeyEventStore provides dependencies.keyEventStore,
         LocalToastController provides dependencies.toastController,
         LocalAlertDialogController provides dependencies.alertDialogController,
         LocalProgressController provides dependencies.progressController,

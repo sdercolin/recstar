@@ -40,6 +40,7 @@ fun main() =
                 title = APP_NAME,
                 icon = painterResource("icon.ico"),
                 state = windowState,
+                onKeyEvent = { dependencies.keyEventStore.dispatch(it) },
                 onCloseRequest = ::exitApplication,
             ) {
                 LaunchSaveWindowSize(windowState, dependencies.appRecordRepository)

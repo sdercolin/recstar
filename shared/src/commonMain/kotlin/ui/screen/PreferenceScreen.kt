@@ -99,6 +99,20 @@ private fun ScreenContent() {
                 value = value.recording.trim,
                 onValueChanged = { repository.update { copy(recording = recording.copy(trim = it)) } },
             )
+            SwitchItem(
+                title = string(Strings.PreferenceRecordWhileHolding),
+                info = null,
+                value = value.recording.recordWhileHolding,
+                onValueChanged = { repository.update { copy(recording = recording.copy(recordWhileHolding = it)) } },
+            )
+            if (isDesktop) {
+                SelectionItem(
+                    title = string(Strings.PreferenceRecordingShortKey),
+                    value = value.recording.recordingShortKey,
+                    onValueChanged = { repository.update { copy(recording = recording.copy(recordingShortKey = it)) } },
+                    options = AppPreference.RecordingShortKey.entries.toList(),
+                )
+            }
         }
         Group(title = string(Strings.PreferenceGroupMisc)) {
             if (isDesktop) {

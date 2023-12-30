@@ -34,23 +34,33 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Square
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import repository.LocalAppPreferenceRepository
+import repository.LocalKeyEventStore
 import ui.common.plainClickable
 import ui.model.LocalScreenOrientation
 import ui.model.ScreenOrientation
@@ -58,6 +68,7 @@ import ui.string.*
 import ui.style.LocalThemeIsDarkMode
 import util.alpha
 import util.isMobile
+import util.runIf
 
 @Composable
 fun Recorder(
@@ -71,6 +82,7 @@ fun Recorder(
     } else {
         MaterialTheme.colors.background
     }
+    LaunchRecordingKeyPress(model)
     Column(modifier = Modifier.fillMaxWidth().background(color = backgroundColor)) {
         RecorderTitleBar(model)
         Column(
@@ -302,6 +314,7 @@ private fun RecorderControls(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun RecordButton(
     isInteractionSuspended: Boolean,
@@ -309,12 +322,27 @@ private fun RecordButton(
     onToggleRecording: () -> Unit,
 ) {
     val useSmallSizes = isMobile && LocalScreenOrientation.current == ScreenOrientation.Landscape
+    val holdingMode = LocalAppPreferenceRepository.current.flow.collectAsState().value.recording.recordWhileHolding
     val heightRatio = if (useSmallSizes) 0.7f else 0.55f
+    var holding by remember { mutableStateOf(false) }
     Box(
         modifier = Modifier.fillMaxHeight(heightRatio)
             .aspectRatio(1f, matchHeightConstraintsFirst = true)
-            .plainClickable {
-                if (!isInteractionSuspended) {
+            .runIf(holdingMode.not()) {
+                plainClickable {
+                    if (!isInteractionSuspended) {
+                        onToggleRecording()
+                    }
+                }
+            }
+            .runIf(holdingMode) {
+                onPointerEvent(PointerEventType.Press) {
+                    if (isInteractionSuspended || holding) return@onPointerEvent
+                    holding = true
+                    onToggleRecording()
+                }.onPointerEvent(PointerEventType.Release) {
+                    if (isInteractionSuspended || !holding) return@onPointerEvent
+                    holding = false
                     onToggleRecording()
                 }
             },
@@ -365,6 +393,36 @@ private fun NavigateButton(
                 imageVector = imageVector,
                 contentDescription = contentDescription,
             )
+        }
+    }
+}
+
+@Composable
+private fun LaunchRecordingKeyPress(model: SessionScreenModel) {
+    val keyEventFlow = LocalKeyEventStore.current.flow
+    var holding by remember { mutableStateOf(false) }
+    val appPreference = LocalAppPreferenceRepository.current.flow.collectAsState()
+    val recordingKey = appPreference.value.recording.recordingShortKey.getKey()
+    val isHoldingMode = appPreference.value.recording.recordWhileHolding
+    LaunchedEffect(keyEventFlow, isHoldingMode) {
+        if (isHoldingMode.not()) return@LaunchedEffect
+        keyEventFlow.collectLatest { ev ->
+            if (ev.key != recordingKey) return@collectLatest
+            val isRecording = model.isRecording
+            val isBusy = model.isBusy
+            when (ev.type) {
+                KeyEventType.KeyDown -> {
+                    if (isRecording || isBusy || holding) return@collectLatest
+                    holding = true
+                    model.toggleRecording()
+                }
+                KeyEventType.KeyUp -> {
+                    if (!isRecording || isBusy || !holding) return@collectLatest
+                    holding = false
+                    model.toggleRecording()
+                }
+                else -> return@collectLatest
+            }
         }
     }
 }

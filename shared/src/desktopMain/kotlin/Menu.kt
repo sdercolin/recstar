@@ -1,4 +1,6 @@
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.window.FrameWindowScope
@@ -6,6 +8,7 @@ import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.MenuScope
 import model.Action
 import repository.LocalAppActionStore
+import repository.LocalAppPreferenceRepository
 import ui.string.*
 import util.isMacOS
 
@@ -65,10 +68,15 @@ fun FrameWindowScope.Menu() {
                 string(Strings.MenuActionPreviousSentence),
                 shortcut = getShortcut(Key.DirectionLeft),
             )
+            val appPreference by LocalAppPreferenceRepository.current.flow.collectAsState()
             ActionItem(
                 Action.ToggleRecording,
-                string(Strings.MenuActionToggleRecording),
-                shortcut = getShortcut(Key.Enter),
+                if (appPreference.recording.recordWhileHolding) {
+                    string(Strings.MenuActionToggleRecordingHoldingMode)
+                } else {
+                    string(Strings.MenuActionToggleRecording)
+                },
+                shortcut = getShortcut(appPreference.recording.recordingShortKey.getKey()),
             )
         }
         Menu(string(Strings.MenuSettings), mnemonic = 'S') {

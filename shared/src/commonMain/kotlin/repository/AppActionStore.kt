@@ -17,7 +17,10 @@ import ui.screen.SessionScreen
 /**
  * A store to collect and dispatch app actions.
  */
-class AppActionStore(private val scope: CoroutineScope) {
+class AppActionStore(
+    private val scope: CoroutineScope,
+    private val appPreferenceRepository: AppPreferenceRepository,
+) {
     private val _actions = MutableSharedFlow<Action>(replay = 0)
     val actions: Flow<Action> = _actions
 
@@ -39,7 +42,10 @@ class AppActionStore(private val scope: CoroutineScope) {
             Action.EditList -> currentScreen !is SessionScreen
             Action.NextSentence -> currentScreen is SessionScreen
             Action.PreviousSentence -> currentScreen is SessionScreen
-            Action.ToggleRecording -> currentScreen is SessionScreen
+            Action.ToggleRecording -> {
+                val holdingMode = appPreferenceRepository.value.recording.recordWhileHolding
+                currentScreen is SessionScreen && !holdingMode
+            }
             Action.OpenSettings -> true
             Action.ClearSettings -> true
             Action.OpenAppDirectory -> true

@@ -2,6 +2,7 @@ package model
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.input.key.Key
 import cafe.adriel.voyager.core.lifecycle.JavaSerializable
 import kotlinx.serialization.Serializable
 import ui.string.*
@@ -46,7 +47,8 @@ data class AppPreference(
      * @param continuous Whether to continue to record the next sentence based on the guide audio config.
      * @param trim Whether to trim the recorded audio based on the guide audio config.
      * @param autoListenBack Whether to automatically listen back to the recorded audio after recording.
-     * @param recordWhilePressing Whether to record only while pressing the record button.
+     * @param recordWhileHolding Whether to record while holding the record button.
+     * @param recordingShortKey The short key to start/stop recording.
      */
     @Immutable
     @Serializable
@@ -54,6 +56,22 @@ data class AppPreference(
         val continuous: Boolean = false,
         val trim: Boolean = true,
         val autoListenBack: Boolean = false,
-        val recordWhilePressing: Boolean = false,
+        val recordWhileHolding: Boolean = false,
+        val recordingShortKey: RecordingShortKey = RecordingShortKey.Enter,
     ) : JavaSerializable
+
+    enum class RecordingShortKey(private val textKey: Strings) : LocalizedTest {
+        Enter(Strings.PreferenceRecordingShortKeyEnter),
+        R(Strings.PreferenceRecordingShortKeyR),
+        ;
+
+        fun getKey(): Key =
+            when (this) {
+                Enter -> Key.Enter
+                R -> Key.R
+            }
+
+        @Composable
+        override fun getText(): String = string(textKey)
+    }
 }
