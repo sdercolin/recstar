@@ -4,6 +4,8 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,7 +43,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
@@ -50,8 +51,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -314,7 +313,6 @@ private fun RecorderControls(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun RecordButton(
     isInteractionSuspended: Boolean,
@@ -325,6 +323,22 @@ private fun RecordButton(
     val holdingMode = LocalAppPreferenceRepository.current.flow.collectAsState().value.recording.recordWhileHolding
     val heightRatio = if (useSmallSizes) 0.7f else 0.55f
     var holding by remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    LaunchedEffect(isPressed) {
+        if (isInteractionSuspended) return@LaunchedEffect
+        if (isPressed) {
+            if (!holding && !isRecording) {
+                holding = true
+                onToggleRecording()
+            }
+        } else {
+            if (holding && isRecording) {
+                holding = false
+                onToggleRecording()
+            }
+        }
+    }
     Box(
         modifier = Modifier.fillMaxHeight(heightRatio)
             .aspectRatio(1f, matchHeightConstraintsFirst = true)
@@ -336,14 +350,11 @@ private fun RecordButton(
                 }
             }
             .runIf(holdingMode) {
-                onPointerEvent(PointerEventType.Press) {
-                    if (isInteractionSuspended || holding) return@onPointerEvent
-                    holding = true
-                    onToggleRecording()
-                }.onPointerEvent(PointerEventType.Release) {
-                    if (isInteractionSuspended || !holding) return@onPointerEvent
-                    holding = false
-                    onToggleRecording()
+                clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                ) {
+                    // handled with interactionSource
                 }
             },
     ) {
