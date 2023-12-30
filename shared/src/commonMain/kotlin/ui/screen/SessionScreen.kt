@@ -28,6 +28,7 @@ import repository.LocalAppActionStore
 import repository.LocalAppRecordRepository
 import ui.common.ActionMenu
 import ui.common.ActionMenuItem
+import ui.common.ActionMenuToggleItem
 import ui.common.LocalAlertDialogController
 import ui.common.LocalProgressController
 import ui.common.requestConfirm
@@ -117,6 +118,11 @@ private fun SessionScreen.ScreenActions() {
                 closeMenu()
                 navigator push GuideAudioScreen(model.name)
             },
+        )
+        ActionMenuToggleItem(
+            text = string(Strings.SessionScreenActionSkipFinishedSentence),
+            checked = model.skipFinishedSentences,
+            onCheckedChange = { model.skipFinishedSentences = it },
         )
     }
 }

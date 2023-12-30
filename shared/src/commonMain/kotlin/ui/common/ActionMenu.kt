@@ -9,6 +9,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
@@ -55,6 +57,27 @@ fun ActionMenuItem(
             )
             Spacer(modifier = Modifier.width(12.dp))
         }
+        Text(text = text)
+    }
+}
+
+@Composable
+fun ActionMenuToggleItem(
+    text: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    DropdownMenuItem(onClick = { onCheckedChange(!checked) }) {
+        val icon = if (checked) {
+            Icons.Default.CheckBox
+        } else {
+            Icons.Default.CheckBoxOutlineBlank
+        }
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+        )
+        Spacer(modifier = Modifier.width(12.dp))
         Text(text = text)
     }
 }

@@ -71,6 +71,7 @@ fun SentenceList(
                 index = index,
                 sentence = sentence,
                 isCurrent = model.currentIndex == index,
+                hideFinished = model.skipFinishedSentences,
                 onClickItem = model::selectSentence,
             )
         }
@@ -82,6 +83,7 @@ private fun SentenceItem(
     index: Int,
     sentence: Sentence,
     isCurrent: Boolean,
+    hideFinished: Boolean,
     onClickItem: (index: Int) -> Unit,
 ) {
     ReversedRow(
@@ -94,19 +96,29 @@ private fun SentenceItem(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (sentence.isFinished) {
+            val tint = when {
+                isCurrent -> MaterialTheme.colors.onPrimary
+                hideFinished -> CustomColors.DarkGreen.copy(alpha = 0.5f)
+                else -> CustomColors.DarkGreen
+            }
             Icon(
                 modifier = Modifier.size(16.dp),
                 imageVector = Icons.Filled.CheckCircle,
                 contentDescription = null,
-                tint = if (isCurrent) MaterialTheme.colors.onPrimary else CustomColors.DarkGreen,
+                tint = tint,
             )
             Spacer(modifier = Modifier.width(4.dp))
+        }
+        val textColor = when {
+            isCurrent -> MaterialTheme.colors.onPrimary
+            hideFinished && sentence.isFinished -> MaterialTheme.colors.onBackground.copy(alpha = 0.5f)
+            else -> MaterialTheme.colors.onBackground
         }
         Text(
             modifier = Modifier.weight(1f),
             text = sentence.text,
             style = MaterialTheme.typography.body2,
-            color = if (isCurrent) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onBackground,
+            color = textColor,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
         )

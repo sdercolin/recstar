@@ -43,6 +43,7 @@ fun Strings.zhHans(): String? =
         SessionScreenActionExport -> "导出"
         SessionScreenActionRenameSession -> "重命名会话"
         SessionScreenActionConfigureGuideAudio -> "设置 BGM"
+        SessionScreenActionSkipFinishedSentence -> "跳过已录制的句子"
         SessionScreenTogglePlaying -> "播放/停止"
         SessionScreenNoGuideAudio -> "未设置"
         SessionScreenAlertGuideAudioNotFoundMessage -> "找不到 BGM 文件。请重新设置 BGM。"

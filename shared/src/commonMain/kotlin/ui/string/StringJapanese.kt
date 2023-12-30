@@ -43,6 +43,7 @@ fun Strings.ja(): String? =
         SessionScreenActionExport -> "エクスポート"
         SessionScreenActionRenameSession -> "セッション名を編集"
         SessionScreenActionConfigureGuideAudio -> "ガイド BGM を設定"
+        SessionScreenActionSkipFinishedSentence -> "録音済みの行をスキップ"
         SessionScreenTogglePlaying -> "再生/停止"
         SessionScreenNoGuideAudio -> "未設定"
         SessionScreenAlertGuideAudioNotFoundMessage -> "ガイド BGM ファイルが見つかりません。ガイド BGM を再設定してください。"

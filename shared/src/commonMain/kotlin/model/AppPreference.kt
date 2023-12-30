@@ -45,7 +45,6 @@ data class AppPreference(
      *
      * @param continuous Whether to continue to record the next sentence based on the guide audio config.
      * @param trim Whether to trim the recorded audio based on the guide audio config.
-     * @param skipFinished Whether to skip the sentence that has been recorded during continuous recording.
      * @param autoListenBack Whether to automatically listen back to the recorded audio after recording.
      * @param recordWhilePressing Whether to record only while pressing the record button.
      */
@@ -54,7 +53,6 @@ data class AppPreference(
     data class Recording(
         val continuous: Boolean = false,
         val trim: Boolean = true,
-        val skipFinished: Boolean = true,
         val autoListenBack: Boolean = false,
         val recordWhilePressing: Boolean = false,
     ) : JavaSerializable

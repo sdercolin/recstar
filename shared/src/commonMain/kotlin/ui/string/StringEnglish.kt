@@ -44,6 +44,7 @@ fun Strings.en(): String =
         SessionScreenActionExport -> "Export"
         SessionScreenActionRenameSession -> "Rename Session"
         SessionScreenActionConfigureGuideAudio -> "Configure Guide BGM"
+        SessionScreenActionSkipFinishedSentence -> "Skip Recorded Sentences"
         SessionScreenTogglePlaying -> "Toggle Playback"
         SessionScreenNoGuideAudio -> "Not Set"
         SessionScreenAlertGuideAudioNotFoundMessage ->

@@ -61,13 +61,18 @@ class SessionScreenModel(
     private val _sentences: SnapshotStateList<Sentence> = session.reclist.lines
         .map { Sentence(it, isFileExisting(it)) }.toMutableStateList()
 
-    val sentences: List<Sentence>
-        get() = _sentences
+    val sentences: List<Sentence> get() = _sentences
 
     var guideAudioConfig: GuideAudio? by mutableStateOf(session.guideAudioConfig)
         private set
 
     private val scheduler = RecordingScheduler(appPreferenceRepository, screenModelScope)
+
+    var skipFinishedSentences: Boolean by savedMutableStateOf(session.skipFinishedSentence) {
+        screenModelScope.launch {
+            sessionRepository.update(sessionRepository.get(name).getOrThrow().copy(skipFinishedSentence = it))
+        }
+    }
 
     private fun reload(session: Session) {
         name = session.name
@@ -75,7 +80,7 @@ class SessionScreenModel(
         _sentences.clear()
         _sentences.addAll(session.reclist.lines.map { Sentence(it, isFileExisting(it)) })
         guideAudioConfig = session.guideAudioConfig
-        currentIndex = currentIndex.coerceAtMost(sentences.size - 1)
+        currentIndex = currentIndex.coerceAtMost(_sentences.size - 1)
         Log.d("Reloading session: $name")
         Log.d("guideAudioConfig: $guideAudioConfig")
     }
@@ -120,7 +125,7 @@ class SessionScreenModel(
         get() = isRequestedRecording != isRecording || isRequestedPlaying != isPlaying
 
     val currentSentence: Sentence
-        get() = sentences[currentIndex]
+        get() = _sentences[currentIndex]
 
     private val playerListener = object : AudioPlayer.Listener {
         override fun onStarted() {
@@ -224,7 +229,7 @@ class SessionScreenModel(
     }
 
     private fun updateSentence(index: Int) {
-        _sentences[index] = sentences[index].copy(isFinished = isFileExisting(sentences[index].text))
+        _sentences[index] = _sentences[index].copy(isFinished = isFileExisting(_sentences[index].text))
     }
 
     fun toggleRecording() {
@@ -361,20 +366,31 @@ class SessionScreenModel(
         requestScrollToCurrentSentence()
     }
 
-    val hasNext get() = currentIndex < sentences.size - 1
+    private fun getNextSentenceIndex(): Int? {
+        val isLast = currentIndex == _sentences.size - 1
+        if (isLast) return null
+        if (!skipFinishedSentences) return currentIndex + 1
+        _sentences.drop(currentIndex + 1).indexOfFirst { it.isFinished.not() }.let {
+            if (it == -1) return null
+            return currentIndex + 1 + it
+        }
+    }
+
+    val hasNext: Boolean get() = getNextSentenceIndex() != null
 
     fun next() {
-        if (!hasNext) return
-        selectSentence(currentIndex + 1)
+        val index = getNextSentenceIndex() ?: return
+        selectSentence(index)
     }
 
     private fun nextWithScheduler() {
-        if (!hasNext) {
+        val index = getNextSentenceIndex()
+        if (index == null) {
             Log.d("SessionScreenModel nextWithScheduler: no next sentence")
             scheduler.finish()
             return
         }
-        selectSentence(currentIndex + 1, scheduled = true)
+        selectSentence(index, scheduled = true)
     }
 
     private fun switchScheduled() {
@@ -389,11 +405,18 @@ class SessionScreenModel(
         }
     }
 
-    val hasPrevious get() = currentIndex > 0
+    private fun getPreviousSentenceIndex(): Int? {
+        val isFirst = currentIndex == 0
+        if (isFirst) return null
+        if (!skipFinishedSentences) return currentIndex - 1
+        return _sentences.take(currentIndex).indexOfLast { it.isFinished.not() }.takeIf { it != -1 }
+    }
+
+    val hasPrevious get() = getPreviousSentenceIndex() != null
 
     fun previous() {
-        if (!hasPrevious) return
-        selectSentence(currentIndex - 1)
+        val index = getPreviousSentenceIndex() ?: return
+        selectSentence(index)
     }
 
     fun renameSession(newName: String) {

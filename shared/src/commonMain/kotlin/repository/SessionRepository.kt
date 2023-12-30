@@ -106,6 +106,7 @@ class SessionRepository(
             reclist = reclist,
             locationPath = directory.absolutePath,
             guideAudioConfig = guideAudioConfig,
+            skipFinishedSentence = params.skipFinishedSentence,
         )
     }
 
