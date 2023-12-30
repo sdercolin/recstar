@@ -450,6 +450,7 @@ class SessionScreenModel(
         scheduler.dispose()
         recorder.dispose()
         player.dispose()
+        guidePlayer.dispose()
         waveformPainter.dispose()
         super.onDispose()
     }
