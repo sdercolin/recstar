@@ -272,7 +272,7 @@ class SessionScreenModel(
         isRequestedRecording = true
         prepareOutputFile()
         if (guideAudio != null) {
-            guidePlayer.play(guideAudio.getFile())
+            guidePlayer.play(guideAudio.getFile(), guideAudio.startNode?.timeMs ?: 0)
         } else {
             startRecordingSchedule()
         }

@@ -21,7 +21,10 @@ interface AudioPlayer {
     /**
      * An asynchronous operation that starts playing the given [file].
      */
-    fun play(file: File)
+    fun play(
+        file: File,
+        positionMs: Long = 0,
+    )
 
     /**
      * An asynchronous operation that seeks to the given [positionMs] and starts playing.

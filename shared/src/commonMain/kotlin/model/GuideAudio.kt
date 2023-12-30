@@ -46,6 +46,8 @@ data class GuideAudio(
         val comment: String? = null,
     ) : JavaSerializable
 
+    val startNode get() = nodes.firstOrNull()
+
     val recordingStartNode get() = nodes.firstOrNull { it.isRecordingStart }
     val recordingEndNode get() = nodes.firstOrNull { it.isRecordingEnd }
 

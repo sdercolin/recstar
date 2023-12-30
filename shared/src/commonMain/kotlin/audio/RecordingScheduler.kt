@@ -54,25 +54,25 @@ class RecordingScheduler(
         job?.cancel()
         job = scope.launch {
             Log.d("RecordingScheduler start: $config")
-            var time = 0L
+            var time = config?.startNode?.timeMs ?: 0
             state = State.RecordingStandby
-            val startDelay = config?.recordingStartNode?.timeMs
-            if (startDelay != null && settings.trim) {
-                delay(startDelay)
-                time = startDelay
+            val startRecodingTime = config?.recordingStartNode?.timeMs
+            if (startRecodingTime != null && settings.trim) {
+                delay(startRecodingTime - time)
+                time = startRecodingTime
             }
             state = State.Recording
             emitEvent(Event.StartRecording)
-            val endDelay = config?.recordingEndNode?.timeMs
-            if (endDelay != null && settings.trim) {
-                delay(endDelay - time)
-                time = endDelay
+            val endRecordingTime = config?.recordingEndNode?.timeMs
+            if (endRecordingTime != null && settings.trim) {
+                delay(endRecordingTime - time)
+                time = endRecordingTime
                 state = State.RecordingStandby
                 emitEvent(Event.StopRecording)
             }
-            val switchDelay = config?.switchingNode?.timeMs
-            if (switchDelay != null) {
-                delay(switchDelay - time)
+            val switchTime = config?.switchingNode?.timeMs
+            if (switchTime != null) {
+                delay(switchTime - time)
                 if (settings.continuous) {
                     state = State.Switching
                     emitEvent(Event.Next)

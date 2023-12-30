@@ -27,9 +27,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
         clip = AudioSystem.getClip()
     }
 
-    override fun play(file: File) = play(file, 0)
-
-    private fun play(
+    override fun play(
         file: File,
         positionMs: Long,
     ) {

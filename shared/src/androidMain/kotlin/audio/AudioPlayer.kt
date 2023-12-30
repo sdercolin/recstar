@@ -19,9 +19,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
     private var countingJob: Job? = null
     private var startTime: Long = 0
 
-    override fun play(file: File) = play(file, 0)
-
-    private fun play(
+    override fun play(
         file: File,
         positionMs: Long,
     ) {
