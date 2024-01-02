@@ -113,6 +113,18 @@ private fun ScreenContent() {
                     options = AppPreference.RecordingShortKey.entries.toList(),
                 )
             }
+            SwitchItem(
+                title = string(Strings.PreferenceAutoListenBack),
+                info = string(Strings.PreferenceAutoListenBackDescription),
+                value = value.recording.autoListenBack,
+                onValueChanged = { repository.update { copy(recording = recording.copy(autoListenBack = it)) } },
+            )
+            SwitchItem(
+                title = string(Strings.PreferenceAutoNext),
+                info = string(Strings.PreferenceAutoNextDescription),
+                value = value.recording.autoNext,
+                onValueChanged = { repository.update { copy(recording = recording.copy(autoNext = it)) } },
+            )
         }
         Group(title = string(Strings.PreferenceGroupMisc)) {
             if (isDesktop) {

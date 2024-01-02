@@ -46,7 +46,9 @@ data class AppPreference(
      *
      * @param continuous Whether to continue to record the next sentence based on the guide audio config.
      * @param trim Whether to trim the recorded audio based on the guide audio config.
-     * @param autoListenBack Whether to automatically listen back to the recorded audio after recording.
+     * @param autoListenBack Whether to automatically listen back to the recorded audio after stopping recording
+     *     manually.
+     * @param autoNext Whether to automatically switch to the next sentence after stopping recording manually.
      * @param recordWhileHolding Whether to record while holding the record button.
      * @param recordingShortKey The short key to start/stop recording.
      */
@@ -56,6 +58,7 @@ data class AppPreference(
         val continuous: Boolean = false,
         val trim: Boolean = true,
         val autoListenBack: Boolean = false,
+        val autoNext: Boolean = false,
         val recordWhileHolding: Boolean = false,
         val recordingShortKey: RecordingShortKey = RecordingShortKey.Enter,
     ) : JavaSerializable

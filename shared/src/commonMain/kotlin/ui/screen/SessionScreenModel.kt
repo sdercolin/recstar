@@ -10,6 +10,7 @@ import audio.AudioPlayer
 import audio.AudioPlayerProvider
 import audio.AudioRecorder
 import audio.AudioRecorderProvider
+import audio.PostRecordingScheduler
 import audio.RecordingScheduler
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
@@ -67,6 +68,7 @@ class SessionScreenModel(
         private set
 
     private val scheduler = RecordingScheduler(appPreferenceRepository, screenModelScope)
+    private val postScheduler = PostRecordingScheduler(appPreferenceRepository, screenModelScope)
 
     var skipFinishedSentences: Boolean by savedMutableStateOf(session.skipFinishedSentence) {
         screenModelScope.launch {
@@ -100,6 +102,16 @@ class SessionScreenModel(
                     RecordingScheduler.Event.Stop -> requestStopRecording()
                     RecordingScheduler.Event.StartRecording -> startRecording()
                     RecordingScheduler.Event.StopRecording -> stopRecording()
+                }
+            }
+        }
+        screenModelScope.launch {
+            postScheduler.eventFlow.collectLatest { event ->
+                when (event) {
+                    PostRecordingScheduler.Event.Playback -> if (!isPlaying) {
+                        startPlaying()
+                    }
+                    PostRecordingScheduler.Event.Next -> next()
                 }
             }
         }
@@ -140,6 +152,7 @@ class SessionScreenModel(
             playingProgress = null
             // this can be called without user's request
             isRequestedPlaying = false
+            postScheduler.onFinishPlayback(guideAudioConfig)
         }
     }
 
@@ -163,9 +176,10 @@ class SessionScreenModel(
                 switchScheduled()
             } else if (state == RecordingScheduler.State.Stopping || isRequestedRecording.not()) {
                 isRecording = false
+                postScheduler.onFinishRecording(guideAudioConfig)
             }
             if (state != RecordingScheduler.State.RecordingStandby) {
-                // delay update until switching or stopping
+                // if state is RecordingStandby, delay update until switching or stopping
                 lastSentenceIndex?.let { updateSentence(it) }
             }
         }
@@ -307,6 +321,8 @@ class SessionScreenModel(
         } else {
             updateCurrentSentence()
             isRecording = false
+            waveformPainter.onStopRecording(false)
+            postScheduler.onFinishRecording(guideAudioConfig)
         }
         if (guidePlayer.isPlaying()) {
             guidePlayer.stop()
@@ -330,6 +346,11 @@ class SessionScreenModel(
     }
 
     private fun startPlaying() {
+        if (!currentFile.exists()) {
+            // Not recorded yet. Consider as finished.
+            postScheduler.onFinishPlayback(guideAudioConfig)
+            return
+        }
         isRequestedPlaying = true
         player.play(currentFile)
     }
