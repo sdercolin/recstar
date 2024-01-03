@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
+import model.AppPreference
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSOperationQueue
 import platform.UIKit.UIDevice
@@ -78,3 +79,12 @@ private fun observeOrientationChanges(onChange: (ScreenOrientation) -> Unit): ()
         notificationCenter.removeObserver(observer)
     }
 }
+
+var requestedScreenOrientation: AppPreference.ScreenOrientation = AppPreference.ScreenOrientation.Auto
+
+fun getRequestedOrientation(): Int =
+    when (requestedScreenOrientation) {
+        AppPreference.ScreenOrientation.Auto -> -1
+        AppPreference.ScreenOrientation.Portrait -> 0
+        AppPreference.ScreenOrientation.Landscape -> 1
+    }

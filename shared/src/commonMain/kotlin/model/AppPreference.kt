@@ -15,10 +15,11 @@ private typealias StringLanguage = Language
 data class AppPreference(
     val language: Language = Language.Auto,
     val theme: Theme = if (isDesktop) Theme.Dark else Theme.System,
+    val orientation: ScreenOrientation = if (isDesktop) ScreenOrientation.Landscape else ScreenOrientation.Auto,
     val customContentRootPath: String? = null,
     val recording: Recording = Recording(),
 ) : JavaSerializable {
-    enum class Language(private val language: StringLanguage?) : LocalizedTest {
+    enum class Language(private val language: StringLanguage?) : LocalizedText {
         Auto(null),
         English(StringLanguage.English),
         SimplifiedChinese(StringLanguage.ChineseSimplified),
@@ -27,18 +28,22 @@ data class AppPreference(
 
         fun getLanguage(): StringLanguage = language ?: findBestMatchedLanguage()
 
+        override val textKey: Strings get() = error("Not accessible")
+
         @Composable
         override fun getText(): String = language?.displayName ?: string(Strings.PreferenceLanguageAuto)
     }
 
-    enum class Theme(private val textKey: Strings) : LocalizedTest {
+    enum class Theme(override val textKey: Strings) : LocalizedText {
         System(Strings.PreferenceThemeSystem),
         Light(Strings.PreferenceThemeLight),
         Dark(Strings.PreferenceThemeDark),
-        ;
+    }
 
-        @Composable
-        override fun getText(): String = string(textKey)
+    enum class ScreenOrientation(override val textKey: Strings) : LocalizedText {
+        Auto(Strings.PreferenceOrientationAuto),
+        Portrait(Strings.PreferenceOrientationPortrait),
+        Landscape(Strings.PreferenceOrientationLandscape),
     }
 
     /**
@@ -63,7 +68,7 @@ data class AppPreference(
         val recordingShortKey: RecordingShortKey = RecordingShortKey.Enter,
     ) : JavaSerializable
 
-    enum class RecordingShortKey(private val textKey: Strings) : LocalizedTest {
+    enum class RecordingShortKey(override val textKey: Strings) : LocalizedText {
         Enter(Strings.PreferenceRecordingShortKeyEnter),
         R(Strings.PreferenceRecordingShortKeyR),
         ;
@@ -73,8 +78,5 @@ data class AppPreference(
                 Enter -> Key.Enter
                 R -> Key.R
             }
-
-        @Composable
-        override fun getText(): String = string(textKey)
     }
 }

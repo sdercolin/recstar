@@ -85,6 +85,14 @@ private fun ScreenContent() {
                     minus(AppPreference.Theme.System)
                 },
             )
+            SelectionItem(
+                title = string(Strings.PreferenceOrientation),
+                value = value.orientation,
+                onValueChanged = { repository.update { copy(orientation = it) } },
+                options = AppPreference.ScreenOrientation.entries.toList().runIf(isDesktop) {
+                    minus(AppPreference.ScreenOrientation.Auto)
+                },
+            )
         }
         Group(title = string(Strings.PreferenceGroupRecording)) {
             SwitchItem(
@@ -182,7 +190,7 @@ private fun Group(
 }
 
 @Composable
-private fun <T : LocalizedTest> SelectionItem(
+private fun <T : LocalizedText> SelectionItem(
     title: String,
     value: T,
     onValueChanged: (T) -> Unit,

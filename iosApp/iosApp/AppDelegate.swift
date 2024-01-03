@@ -3,6 +3,7 @@ import UIKit
 import shared
 
 class AppDelegate: NSObject, UIApplicationDelegate {
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         let appRootPath = self.getAppRootPath()
         let contentRootPath = self.getContentRootPath()
@@ -50,5 +51,17 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         }
 
         return appFolderPath
+    }
+
+    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+        let orientation = ProvideScreenOrientationKt.getRequestedOrientation()
+        switch orientation {
+            case 0:
+                return .portrait
+            case 1:
+                return .landscape
+            default:
+                return .all
+        }
     }
 }
