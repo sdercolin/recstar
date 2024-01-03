@@ -72,10 +72,7 @@ private fun MainScaffold(navigator: Navigator) {
                 Action.OpenContentDirectory -> fileInteractor.requestOpenFolder(Paths.contentRoot)
                 Action.OpenAppDirectory -> fileInteractor.requestOpenFolder(Paths.appRoot)
                 Action.OpenAbout -> navigator push AboutScreen
-                Action.OpenSettings -> {
-                    navigator.popUntilRoot()
-                    navigator push PreferenceScreen
-                }
+                Action.OpenSettings -> navigator push PreferenceScreen
                 Action.ClearSettings -> {
                     alertDialogController.requestYesNo(
                         message = stringStatic(Strings.MenuSettingsClearSettingsAlertMessage),

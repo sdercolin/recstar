@@ -46,7 +46,7 @@ class AppActionStore(
                 val holdingMode = appPreferenceRepository.value.recording.recordWhileHolding
                 currentScreen is SessionScreen && !holdingMode
             }
-            Action.OpenSettings -> true
+            Action.OpenSettings -> currentScreen is MainScreen || currentScreen is SessionScreen
             Action.ClearSettings -> true
             Action.OpenAppDirectory -> true
             Action.OpenContentDirectory -> true

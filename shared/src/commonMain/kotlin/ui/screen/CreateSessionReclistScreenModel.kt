@@ -55,8 +55,7 @@ class CreateSessionReclistScreenModel(
                 finished = false
             }
             .getOrNull() ?: return
-        navigator.pop()
-        navigator push SessionScreen(session)
+        navigator.replace(SessionScreen(session))
     }
 }
 

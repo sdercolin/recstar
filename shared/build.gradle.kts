@@ -29,7 +29,7 @@ val localProperties =
 val isMac = System.getProperty("os.name").lowercase().contains("mac")
 val includeIos = isMac && localProperties.getProperty("ios.disabled", "false").toBoolean().not()
 
-val voyagerVersion = "1.0.0-rc10"
+val voyagerVersion = "1.0.0"
 
 fun voyager(module: String) = "cafe.adriel.voyager:voyager-$module:$voyagerVersion"
 
@@ -76,6 +76,7 @@ kotlin {
                 implementation("io.github.aakira:napier:2.6.1")
                 api(voyager("navigator"))
                 api(voyager("transitions"))
+                api(voyager("screenmodel"))
             }
         }
         val commonTest by getting {

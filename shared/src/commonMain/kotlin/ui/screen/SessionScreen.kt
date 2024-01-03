@@ -138,10 +138,7 @@ private fun SessionScreen.ScreenContent() {
     LaunchedEffect(model, actionStore) {
         actionStore.actions.collectLatest { action ->
             when (action) {
-                Action.NewSession -> {
-                    navigator.popUntilRoot()
-                    navigator push CreateSessionReclistScreen
-                }
+                Action.NewSession -> navigator.replace(CreateSessionReclistScreen)
                 Action.OpenDirectory -> Actions.openDirectory(fileInteractor, model.contentDirectory)
                 Action.Exit -> navigator.pop()
                 Action.RenameSession -> Actions.renameSession(alertDialogController, model)
