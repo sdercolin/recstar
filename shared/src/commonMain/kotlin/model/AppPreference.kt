@@ -15,7 +15,7 @@ private typealias StringLanguage = Language
 data class AppPreference(
     val language: Language = Language.Auto,
     val theme: Theme = if (isDesktop) Theme.Dark else Theme.System,
-    val orientation: ScreenOrientation = if (isDesktop) ScreenOrientation.Landscape else ScreenOrientation.Auto,
+    val orientation: ScreenOrientation = ScreenOrientation.Auto,
     val customContentRootPath: String? = null,
     val recording: Recording = Recording(),
 ) : JavaSerializable {

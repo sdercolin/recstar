@@ -89,9 +89,7 @@ private fun ScreenContent() {
                 title = string(Strings.PreferenceOrientation),
                 value = value.orientation,
                 onValueChanged = { repository.update { copy(orientation = it) } },
-                options = AppPreference.ScreenOrientation.entries.toList().runIf(isDesktop) {
-                    minus(AppPreference.ScreenOrientation.Auto)
-                },
+                options = AppPreference.ScreenOrientation.entries.toList(),
             )
         }
         Group(title = string(Strings.PreferenceGroupRecording)) {

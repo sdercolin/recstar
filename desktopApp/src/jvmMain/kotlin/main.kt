@@ -1,5 +1,8 @@
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
@@ -16,9 +19,11 @@ import io.ensurePath
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import model.AppPreference
 import model.AppRecord
 import repository.AppRecordRepository
 import ui.model.DesktopContext
+import ui.model.ScreenOrientation
 import util.Log
 import util.toJavaFile
 
@@ -35,6 +40,20 @@ fun main() =
         ensureContentRoot(dependencies)
         val windowState = rememberResizableWindowState(dependencies.appRecordRepository.stateFlow)
 
+        val appPreference by dependencies.appPreferenceRepository.flow.collectAsState()
+        val orientation by derivedStateOf {
+            when (appPreference.orientation) {
+                AppPreference.ScreenOrientation.Portrait -> ScreenOrientation.Portrait
+                AppPreference.ScreenOrientation.Landscape -> ScreenOrientation.Landscape
+                AppPreference.ScreenOrientation.Auto -> windowState.size.let { size ->
+                    if (size.width < size.height) {
+                        ScreenOrientation.Portrait
+                    } else {
+                        ScreenOrientation.Landscape
+                    }
+                }
+            }
+        }
         ProvideAppDependencies(dependencies) {
             Window(
                 title = APP_NAME,
@@ -43,15 +62,15 @@ fun main() =
                 onKeyEvent = { dependencies.keyEventStore.dispatch(it) },
                 onCloseRequest = ::exitApplication,
             ) {
-                LaunchSaveWindowSize(windowState, dependencies.appRecordRepository)
-                MainView()
+                LaunchObserveWindowSize(windowState, dependencies.appRecordRepository)
+                MainView(orientation)
                 Menu()
             }
         }
     }
 
 @Composable
-private fun LaunchSaveWindowSize(
+private fun LaunchObserveWindowSize(
     windowState: WindowState,
     appRecordRepository: AppRecordRepository,
 ) {
