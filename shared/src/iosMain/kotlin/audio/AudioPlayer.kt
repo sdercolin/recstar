@@ -13,13 +13,18 @@ import platform.AVFAudio.AVAudioPlayer
 import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
 import platform.AVFAudio.setActive
+import ui.common.UnexpectedErrorNotifier
 import ui.model.AppContext
 import util.Log
 import util.runCatchingCancellable
 import util.withNSError
 
 @OptIn(ExperimentalForeignApi::class)
-class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppContext) : AudioPlayer {
+class AudioPlayerImpl(
+    private val listener: AudioPlayer.Listener,
+    context: AppContext,
+    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+) : AudioPlayer {
     private val scope = context.coroutineScope
     private var audioPlayer: AVAudioPlayer? = null
     private var fileDuration: Double = 0.0
@@ -70,7 +75,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                 }
                 startCounting()
             }.onFailure {
-                Log.e(it)
+                unexpectedErrorNotifier.notify(it)
                 dispose()
             }
         }
@@ -85,7 +90,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                 cleanupJob?.join()
                 play(requireNotNull(lastLoadedFile), positionMs)
             }.onFailure {
-                Log.e(it)
+                unexpectedErrorNotifier.notify(it)
                 dispose()
             }
         }
@@ -100,7 +105,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                     listener.onStopped()
                 }
             }.onFailure {
-                Log.e(it)
+                unexpectedErrorNotifier.notify(it)
                 dispose()
             }
         }
@@ -119,7 +124,9 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
             seekingJob = null
             lastLoadedFile = null
             lastLoadedFileModified = null
-        }.onFailure { Log.e(it) }
+        }.onFailure {
+            unexpectedErrorNotifier.notify(it)
+        }
     }
 
     private fun startCounting() {
@@ -151,6 +158,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
 actual class AudioPlayerProvider actual constructor(
     private val listener: AudioPlayer.Listener,
     private val context: AppContext,
+    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
 ) {
-    actual fun get(): AudioPlayer = AudioPlayerImpl(listener, context)
+    actual fun get(): AudioPlayer = AudioPlayerImpl(listener, context, unexpectedErrorNotifier)
 }

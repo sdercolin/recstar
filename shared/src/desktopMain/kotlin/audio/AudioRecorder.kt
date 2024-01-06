@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import ui.common.UnexpectedErrorNotifier
 import ui.model.AppContext
 import util.Log
 import util.runCatchingCancellable
@@ -22,7 +23,10 @@ import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.TargetDataLine
 
 @Stable
-class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRecorder {
+class AudioRecorderImpl(
+    private val listener: AudioRecorder.Listener,
+    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+) : AudioRecorder {
     private var line: TargetDataLine? = null
     private var job: Job? = null
     private var cleanupJob: Job? = null
@@ -65,7 +69,7 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
                     )
                 }
             }.onFailure {
-                Log.e(it)
+                unexpectedErrorNotifier.notify(it)
                 dispose()
             }
         }
@@ -86,7 +90,7 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
                     listener.onStopped()
                 }
             }.onFailure {
-                Log.e(it)
+                unexpectedErrorNotifier.notify(it)
                 dispose()
             }
         }
@@ -103,7 +107,7 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
             line?.close()
             line = null
         }.onFailure {
-            Log.e(it)
+            unexpectedErrorNotifier.notify(it)
         }
     }
 
@@ -111,8 +115,15 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
     override val waveDataFlow: Flow<FloatArray> = _waveDataFlow
 }
 
-actual class AudioRecorderProvider(private val listener: AudioRecorder.Listener) {
-    actual constructor(listener: AudioRecorder.Listener, context: AppContext) : this(listener)
+actual class AudioRecorderProvider(
+    private val listener: AudioRecorder.Listener,
+    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+) {
+    actual constructor(
+        listener: AudioRecorder.Listener,
+        context: AppContext,
+        unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    ) : this(listener, unexpectedErrorNotifier)
 
-    actual fun get(): AudioRecorder = AudioRecorderImpl(listener)
+    actual fun get(): AudioRecorder = AudioRecorderImpl(listener, unexpectedErrorNotifier)
 }

@@ -7,6 +7,7 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import ui.common.UnexpectedErrorNotifier
 import ui.model.AppContext
 import util.Log
 import util.runCatchingCancellable
@@ -14,7 +15,11 @@ import util.toJavaFile
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.Clip
 
-class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppContext) : AudioPlayer {
+class AudioPlayerImpl(
+    private val listener: AudioPlayer.Listener,
+    context: AppContext,
+    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+) : AudioPlayer {
     private val scope = context.coroutineScope
     private lateinit var clip: Clip
     private var lastLoadedFile: File? = null
@@ -58,7 +63,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                     isPlaying = true
                 }
             }.onFailure {
-                Log.e(it)
+                unexpectedErrorNotifier.notify(it)
                 dispose()
             }
         }
@@ -73,7 +78,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                 cleanupJob?.join()
                 play(requireNotNull(lastLoadedFile), positionMs)
             }.onFailure {
-                Log.e(it)
+                unexpectedErrorNotifier.notify(it)
                 dispose()
             }
         }
@@ -90,7 +95,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                     flush()
                 }
             }.onFailure {
-                Log.e(it)
+                unexpectedErrorNotifier.notify(it)
                 dispose()
             }
         }
@@ -121,7 +126,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
             lastLoadedFile = null
             lastLoadedFileModified = null
         }.onFailure {
-            Log.e(it)
+            unexpectedErrorNotifier.notify(it)
         }
     }
 }
@@ -129,6 +134,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
 actual class AudioPlayerProvider actual constructor(
     private val listener: AudioPlayer.Listener,
     private val context: AppContext,
+    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
 ) {
-    actual fun get(): AudioPlayer = AudioPlayerImpl(listener, context)
+    actual fun get(): AudioPlayer = AudioPlayerImpl(listener, context, unexpectedErrorNotifier)
 }

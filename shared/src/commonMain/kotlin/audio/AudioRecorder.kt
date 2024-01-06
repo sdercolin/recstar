@@ -2,6 +2,7 @@ package audio
 
 import io.File
 import kotlinx.coroutines.flow.Flow
+import ui.common.UnexpectedErrorNotifier
 import ui.model.AppContext
 
 /**
@@ -43,6 +44,10 @@ interface AudioRecorder {
     val waveDataFlow: Flow<FloatArray>
 }
 
-expect class AudioRecorderProvider(listener: AudioRecorder.Listener, context: AppContext) {
+expect class AudioRecorderProvider(
+    listener: AudioRecorder.Listener,
+    context: AppContext,
+    unexpectedErrorNotifier: UnexpectedErrorNotifier,
+) {
     fun get(): AudioRecorder
 }

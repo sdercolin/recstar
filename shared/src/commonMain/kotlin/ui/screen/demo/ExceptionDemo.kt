@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import io.LocalFileInteractor
@@ -15,7 +16,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import ui.common.LocalAlertDialogController
 import ui.common.LocalToastController
+import ui.common.UnexpectedErrorNotifier
 import ui.common.show
 import ui.model.LocalAppContext
 import ui.model.Screen
@@ -35,6 +38,14 @@ private fun ExceptionDemo() {
     val context = LocalAppContext.current
     val fileInteractor = LocalFileInteractor.current
     val toastController = LocalToastController.current
+    val alertDialogController = LocalAlertDialogController.current
+    val unexpectedErrorNotifier = remember(context, alertDialogController, fileInteractor) {
+        UnexpectedErrorNotifier(
+            context = context,
+            alertDialogController = alertDialogController,
+            fileInteractor = fileInteractor,
+        )
+    }
     Column(
         Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -71,8 +82,7 @@ private fun ExceptionDemo() {
                     runCatching {
                         throw Exception("Caught exception tested in IO coroutine scope")
                     }.onFailure {
-                        toastController.show(it.message ?: "")
-                        Log.e(it)
+                        unexpectedErrorNotifier.notify(it)
                     }
                 }
             },

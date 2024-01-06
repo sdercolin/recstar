@@ -22,6 +22,7 @@ import platform.AVFAudio.AVNumberOfChannelsKey
 import platform.AVFAudio.AVSampleRateKey
 import platform.AVFAudio.setActive
 import platform.CoreAudioTypes.kAudioFormatLinearPCM
+import ui.common.UnexpectedErrorNotifier
 import ui.model.AppContext
 import util.Log
 import util.runCatchingCancellable
@@ -29,7 +30,11 @@ import util.withNSError
 import util.withNSErrorCatching
 
 @OptIn(ExperimentalForeignApi::class)
-class AudioRecorderImpl(private val listener: AudioRecorder.Listener, context: AppContext) : AudioRecorder {
+class AudioRecorderImpl(
+    private val listener: AudioRecorder.Listener,
+    context: AppContext,
+    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+) : AudioRecorder {
     private var recorder: AVAudioRecorder? = null
     private var engine: AVAudioEngine? = null
     private var job: Job? = null
@@ -77,7 +82,7 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener, context: A
                     }
                 }
             }.onFailure {
-                Log.e(it)
+                unexpectedErrorNotifier.notify(it)
                 dispose()
             }
         }
@@ -96,7 +101,7 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener, context: A
                     listener.onStopped()
                 }
             }.onFailure {
-                Log.e(it)
+                unexpectedErrorNotifier.notify(it)
                 dispose()
             }
         }
@@ -117,7 +122,9 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener, context: A
             }.onFailure {
                 Log.e("Failed to free AVAudioSession", it)
             }
-        }.onFailure { Log.e(it) }
+        }.onFailure {
+            unexpectedErrorNotifier.notify(it)
+        }
     }
 
     private fun addWaveData(buffer: AVAudioPCMBuffer) {
@@ -137,6 +144,7 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener, context: A
 actual class AudioRecorderProvider actual constructor(
     private val listener: AudioRecorder.Listener,
     private val context: AppContext,
+    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
 ) {
-    actual fun get(): AudioRecorder = AudioRecorderImpl(listener, context)
+    actual fun get(): AudioRecorder = AudioRecorderImpl(listener, context, unexpectedErrorNotifier)
 }

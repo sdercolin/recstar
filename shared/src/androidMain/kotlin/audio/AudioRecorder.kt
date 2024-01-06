@@ -18,6 +18,7 @@ import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 import kotlinx.io.writeIntLe
 import kotlinx.io.writeShortLe
+import ui.common.UnexpectedErrorNotifier
 import ui.model.AppContext
 import util.Log
 import util.runCatchingCancellable
@@ -27,6 +28,7 @@ import util.writeRawString
 class AudioRecorderImpl(
     private val listener: AudioRecorder.Listener,
     context: AppContext,
+    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
 ) : AudioRecorder {
     private val coroutineScope = context.coroutineScope
     private var job: Job? = null
@@ -111,7 +113,7 @@ class AudioRecorderImpl(
                     Thread.sleep(100)
                 }
             }.onFailure {
-                Log.e(it)
+                unexpectedErrorNotifier.notify(it)
                 dispose()
             }
         }
@@ -130,7 +132,7 @@ class AudioRecorderImpl(
                     listener.onStopped()
                 }
             }.onFailure {
-                Log.e(it)
+                unexpectedErrorNotifier.notify(it)
                 dispose()
             }
         }
@@ -147,7 +149,9 @@ class AudioRecorderImpl(
                 job = null
                 audioRecord = null
                 cleanupJob = null
-            }.onFailure { Log.e(it) }
+            }.onFailure {
+                unexpectedErrorNotifier.notify(it)
+            }
         }
     }
 
@@ -166,6 +170,7 @@ class AudioRecorderImpl(
 actual class AudioRecorderProvider actual constructor(
     private val listener: AudioRecorder.Listener,
     private val context: AppContext,
+    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
 ) {
-    actual fun get(): AudioRecorder = AudioRecorderImpl(listener, context)
+    actual fun get(): AudioRecorder = AudioRecorderImpl(listener, context, unexpectedErrorNotifier)
 }

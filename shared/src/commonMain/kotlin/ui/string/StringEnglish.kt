@@ -31,6 +31,11 @@ fun Strings.en(): String =
         ToastExportDataCancel -> "Export cancelled"
         ToastImportReclistSuccess -> "Imported successfully"
         ToastImportReclistFailure -> "Failed to import"
+        AlertUnexpectedErrorOpenLog -> "An error occurred. Please report to the developer with the error log file."
+        AlertUnexpectedErrorOpenLogButton -> "Open Log Folder"
+        AlertUnexpectedErrorCopyLogToClipboard ->
+            "An error occurred. Please report to the developer with the error info."
+        AlertUnexpectedErrorCopyLogToClipboardButton -> "Copy Error Info"
         MainScreenAllSessions -> "All Sessions"
         MainScreenItemSelecting -> "Selecting {0} items"
         MainScreenNewSession -> "Start New Session"

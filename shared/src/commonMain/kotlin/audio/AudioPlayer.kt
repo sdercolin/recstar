@@ -1,6 +1,7 @@
 package audio
 
 import io.File
+import ui.common.UnexpectedErrorNotifier
 import ui.model.AppContext
 
 /**
@@ -47,6 +48,10 @@ interface AudioPlayer {
     fun dispose()
 }
 
-expect class AudioPlayerProvider(listener: AudioPlayer.Listener, context: AppContext) {
+expect class AudioPlayerProvider(
+    listener: AudioPlayer.Listener,
+    context: AppContext,
+    unexpectedErrorNotifier: UnexpectedErrorNotifier,
+) {
     fun get(): AudioPlayer
 }

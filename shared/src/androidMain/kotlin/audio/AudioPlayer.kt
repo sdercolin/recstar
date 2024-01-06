@@ -9,11 +9,16 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import ui.common.UnexpectedErrorNotifier
 import ui.model.AppContext
 import util.Log
 import util.runCatchingCancellable
 
-class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppContext) : AudioPlayer {
+class AudioPlayerImpl(
+    private val listener: AudioPlayer.Listener,
+    private val context: AppContext,
+    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+) : AudioPlayer {
     private val scope = context.coroutineScope
     private var mediaPlayer: MediaPlayer? = null
     private var lastLoadedFile: String? = null
@@ -64,7 +69,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                 lastLoadedFile = file.absolutePath
                 lastLoadedFileModified = file.lastModified
             }.onFailure {
-                Log.e(it)
+                unexpectedErrorNotifier.notify(it)
                 dispose()
             }
         }
@@ -85,7 +90,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                 listener.onStopped()
                 stopCounting()
             }.onFailure {
-                Log.e(it)
+                unexpectedErrorNotifier.notify(it)
                 dispose()
             }
         }
@@ -101,7 +106,9 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
             mediaPlayer = null
             lastLoadedFile = null
             lastLoadedFileModified = null
-        }.onFailure { Log.e(it) }
+        }.onFailure {
+            unexpectedErrorNotifier.notify(it)
+        }
     }
 
     private fun startCounting() {
@@ -128,6 +135,7 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
 actual class AudioPlayerProvider actual constructor(
     private val listener: AudioPlayer.Listener,
     private val context: AppContext,
+    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
 ) {
-    actual fun get(): AudioPlayer = AudioPlayerImpl(listener, context)
+    actual fun get(): AudioPlayer = AudioPlayerImpl(listener, context, unexpectedErrorNotifier)
 }

@@ -19,6 +19,8 @@ import exception.SessionRenameExistingException
 import exception.SessionRenameInvalidException
 import graph.WaveformPainter
 import io.File
+import io.FileInteractor
+import io.LocalFileInteractor
 import io.LocalPermissionChecker
 import io.PermissionChecker
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +38,7 @@ import repository.LocalSessionRepository
 import repository.SessionRepository
 import ui.common.AlertDialogController
 import ui.common.LocalAlertDialogController
+import ui.common.UnexpectedErrorNotifier
 import ui.common.requestConfirm
 import ui.common.requestConfirmError
 import ui.model.AppContext
@@ -53,6 +56,7 @@ class SessionScreenModel(
     private val sessionRepository: SessionRepository,
     private val alertDialogController: AlertDialogController,
     private val permissionChecker: PermissionChecker,
+    fileInteractor: FileInteractor,
 ) : ScreenModel {
     var name: String by mutableStateOf(session.name)
         private set
@@ -206,16 +210,21 @@ class SessionScreenModel(
         }
     }
 
-    private val player = AudioPlayerProvider(playerListener, context).get()
-    private val recorder = AudioRecorderProvider(recorderListener, context).get()
-    private val waveformPainter = WaveformPainter(recorder.waveDataFlow, screenModelScope).apply {
+    private val unexpectedErrorNotifier = UnexpectedErrorNotifier(alertDialogController, context, fileInteractor)
+    private val player = AudioPlayerProvider(playerListener, context, unexpectedErrorNotifier).get()
+    private val recorder = AudioRecorderProvider(recorderListener, context, unexpectedErrorNotifier).get()
+    private val waveformPainter = WaveformPainter(
+        recorder.waveDataFlow,
+        screenModelScope,
+        unexpectedErrorNotifier,
+    ).apply {
         switch(currentFile)
         recorderListener.waveformPainter = this
     }
 
     val waveformFlow: Flow<Array<FloatArray>> = waveformPainter.flow
 
-    private val guidePlayer = AudioPlayerProvider(guidePlayerListener, context).get()
+    private val guidePlayer = AudioPlayerProvider(guidePlayerListener, context, unexpectedErrorNotifier).get()
 
     private var isPermissionGranted = permissionChecker.checkAndRequestRecordingPermission()
 
@@ -485,6 +494,7 @@ fun SessionScreen.rememberSessionScreenModel(session: Session): SessionScreenMod
     val alertDialogController = LocalAlertDialogController.current
     val permissionChecker = LocalPermissionChecker.current
     val sessionRepository = LocalSessionRepository.current
+    val fileInteractor = LocalFileInteractor.current
     return rememberScreenModel {
         SessionScreenModel(
             session = session,
@@ -493,6 +503,7 @@ fun SessionScreen.rememberSessionScreenModel(session: Session): SessionScreenMod
             sessionRepository = sessionRepository,
             alertDialogController = alertDialogController,
             permissionChecker = permissionChecker,
+            fileInteractor = fileInteractor,
         )
     }
 }
