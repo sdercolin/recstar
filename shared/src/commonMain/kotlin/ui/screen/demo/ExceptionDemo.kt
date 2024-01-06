@@ -13,9 +13,14 @@ import io.Paths
 import io.logsDirectory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import ui.common.LocalToastController
+import ui.common.show
 import ui.model.LocalAppContext
 import ui.model.Screen
+import util.Log
+import util.runCatchingCancellable
 
 object ExceptionDemoScreen : Screen {
     @Composable
@@ -29,6 +34,7 @@ object ExceptionDemoScreen : Screen {
 private fun ExceptionDemo() {
     val context = LocalAppContext.current
     val fileInteractor = LocalFileInteractor.current
+    val toastController = LocalToastController.current
     Column(
         Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -58,6 +64,56 @@ private fun ExceptionDemo() {
             },
         ) {
             Text(text = "Throw Exception on IO Coroutine Scope")
+        }
+        Button(
+            onClick = {
+                context.coroutineScope.launch(Dispatchers.IO) {
+                    runCatching {
+                        throw Exception("Caught exception tested in IO coroutine scope")
+                    }.onFailure {
+                        toastController.show(it.message ?: "")
+                        Log.e(it)
+                    }
+                }
+            },
+        ) {
+            Text(text = "Catch Exception on IO Coroutine Scope")
+        }
+        Button(
+            onClick = {
+                context.coroutineScope.launch {
+                    val job = launch {
+                        runCatchingCancellable {
+                            delay(1000)
+                        }.onFailure {
+                            toastController.show(it.message ?: "")
+                            Log.e(it)
+                        }
+                    }
+                    delay(500)
+                    job.cancel()
+                }
+            },
+        ) {
+            Text(text = "Ignore CancellationException Coroutine Scope")
+        }
+        Button(
+            onClick = {
+                context.coroutineScope.launch {
+                    val job = launch {
+                        runCatching {
+                            delay(1000)
+                        }.onFailure {
+                            toastController.show(it.message ?: "")
+                            Log.e(it)
+                        }
+                    }
+                    delay(500)
+                    job.cancel()
+                }
+            },
+        ) {
+            Text(text = "Catch CancellationException Coroutine Scope")
         }
         Button(
             onClick = {

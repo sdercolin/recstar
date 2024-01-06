@@ -4,18 +4,21 @@ import android.media.MediaPlayer
 import io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ui.model.AppContext
 import util.Log
+import util.runCatchingCancellable
 
 class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppContext) : AudioPlayer {
     private val scope = context.coroutineScope
     private var mediaPlayer: MediaPlayer? = null
     private var lastLoadedFile: String? = null
     private var lastLoadedFileModified: Long? = null
+    private var job: Job? = null
     private var countingJob: Job? = null
     private var startTime: Long = 0
 
@@ -23,41 +26,47 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
         file: File,
         positionMs: Long,
     ) {
-        runCatching {
-            if (file.absolutePath == lastLoadedFile &&
-                lastLoadedFileModified == file.lastModified &&
-                mediaPlayer != null
-            ) {
-                mediaPlayer?.seekTo(positionMs.toInt())
-                mediaPlayer?.start()
-                listener.onStarted()
-                startCounting()
-                return
-            }
-            dispose()
-            mediaPlayer = MediaPlayer().apply {
-                setDataSource(file.absolutePath)
-                prepareAsync()
-                setOnPreparedListener {
-                    seekTo(positionMs.toInt())
-                    start()
+        if (job?.isActive == true) {
+            Log.w("AudioRecorderImpl.start: already started")
+            return
+        }
+        job = scope.launch(Dispatchers.IO) {
+            runCatchingCancellable {
+                if (file.absolutePath == lastLoadedFile &&
+                    lastLoadedFileModified == file.lastModified &&
+                    mediaPlayer != null
+                ) {
+                    mediaPlayer?.seekTo(positionMs.toInt())
+                    mediaPlayer?.start()
                     listener.onStarted()
                     startCounting()
+                    return@launch
                 }
-                setOnErrorListener { _, what, extra ->
-                    Log.e("MediaPlayer error: what: $what, extra: $extra")
-                    false
+                dispose()
+                mediaPlayer = MediaPlayer().apply {
+                    setDataSource(file.absolutePath)
+                    prepareAsync()
+                    setOnPreparedListener {
+                        seekTo(positionMs.toInt())
+                        start()
+                        listener.onStarted()
+                        startCounting()
+                    }
+                    setOnErrorListener { _, what, extra ->
+                        Log.e("MediaPlayer error: what: $what, extra: $extra")
+                        false
+                    }
+                    setOnCompletionListener {
+                        listener.onStopped()
+                        stopCounting()
+                    }
                 }
-                setOnCompletionListener {
-                    listener.onStopped()
-                    stopCounting()
-                }
+                lastLoadedFile = file.absolutePath
+                lastLoadedFileModified = file.lastModified
+            }.onFailure {
+                Log.e(it)
+                dispose()
             }
-            lastLoadedFile = file.absolutePath
-            lastLoadedFileModified = file.lastModified
-        }.onFailure {
-            Log.e(it)
-            dispose()
         }
     }
 
@@ -69,19 +78,30 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
     }
 
     override fun stop() {
-        mediaPlayer?.pause()
-        listener.onStopped()
-        stopCounting()
+        scope.launch(Dispatchers.IO) {
+            runCatchingCancellable {
+                job?.cancelAndJoin()
+                mediaPlayer?.pause()
+                listener.onStopped()
+                stopCounting()
+            }.onFailure {
+                Log.e(it)
+                dispose()
+            }
+        }
     }
 
     override fun isPlaying(): Boolean = mediaPlayer?.isPlaying ?: false
 
     override fun dispose() {
-        stopCounting()
-        mediaPlayer?.release()
-        mediaPlayer = null
-        lastLoadedFile = null
-        lastLoadedFileModified = null
+        runCatching {
+            job?.cancel()
+            stopCounting()
+            mediaPlayer?.release()
+            mediaPlayer = null
+            lastLoadedFile = null
+            lastLoadedFileModified = null
+        }.onFailure { Log.e(it) }
     }
 
     private fun startCounting() {

@@ -24,6 +24,7 @@ import platform.AVFAudio.setActive
 import platform.CoreAudioTypes.kAudioFormatLinearPCM
 import ui.model.AppContext
 import util.Log
+import util.runCatchingCancellable
 import util.withNSError
 import util.withNSErrorCatching
 
@@ -36,14 +37,14 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener, context: A
     private val scope = context.coroutineScope
 
     override fun start(output: io.File) {
-        runCatching {
-            if (job?.isActive == true) {
-                Log.w("AudioRecorderImpl.start: already started")
-                return
-            }
-            waveData.clear()
-            _waveDataFlow.value = FloatArray(0)
-            job = scope.launch(Dispatchers.IO) {
+        if (job?.isActive == true) {
+            Log.w("AudioRecorderImpl.start: already started")
+            return
+        }
+        waveData.clear()
+        _waveDataFlow.value = FloatArray(0)
+        job = scope.launch(Dispatchers.IO) {
+            runCatchingCancellable {
                 withNSError { e ->
                     val settings = mapOf<Any?, Any>(
                         AVFormatIDKey to kAudioFormatLinearPCM,
@@ -75,16 +76,16 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener, context: A
                         listener.onStarted()
                     }
                 }
+            }.onFailure {
+                Log.e(it)
+                dispose()
             }
-        }.onFailure {
-            Log.e(it)
-            dispose()
         }
     }
 
     override fun stop() {
-        runCatching {
-            cleanupJob = scope.launch(Dispatchers.IO) {
+        cleanupJob = scope.launch(Dispatchers.IO) {
+            runCatchingCancellable {
                 recorder?.stop()
                 recorder = null
                 job?.cancelAndJoin()
@@ -94,10 +95,10 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener, context: A
                 withContext(Dispatchers.Main) {
                     listener.onStopped()
                 }
+            }.onFailure {
+                Log.e(it)
+                dispose()
             }
-        }.onFailure {
-            Log.e(it)
-            dispose()
         }
     }
 

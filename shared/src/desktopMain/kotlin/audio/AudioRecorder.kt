@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ui.model.AppContext
 import util.Log
+import util.runCatchingCancellable
 import util.toJavaFile
 import javax.sound.sampled.AudioFileFormat
 import javax.sound.sampled.AudioFormat
@@ -29,12 +30,12 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
     private var stream: InterceptedAudioInputStream? = null
 
     override fun start(output: File) {
-        runCatching {
-            if (job?.isActive == true) {
-                Log.w("AudioRecorderImpl.start: already started")
-                return
-            }
-            job = scope.launch {
+        if (job?.isActive == true) {
+            Log.w("AudioRecorderImpl.start: already started")
+            return
+        }
+        job = scope.launch {
+            runCatchingCancellable {
                 cleanupJob?.join()
                 cleanupJob = null
                 _waveDataFlow.value = FloatArray(0)
@@ -63,16 +64,16 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
                         output.toJavaFile(),
                     )
                 }
+            }.onFailure {
+                Log.e(it)
+                dispose()
             }
-        }.onFailure {
-            Log.e(it)
-            dispose()
         }
     }
 
     override fun stop() {
-        runCatching {
-            cleanupJob = scope.launch(Dispatchers.IO) {
+        cleanupJob = scope.launch(Dispatchers.IO) {
+            runCatchingCancellable {
                 line?.stop()
                 line?.flush()
                 line?.close()
@@ -84,10 +85,10 @@ class AudioRecorderImpl(private val listener: AudioRecorder.Listener) : AudioRec
                 withContext(Dispatchers.Main) {
                     listener.onStopped()
                 }
+            }.onFailure {
+                Log.e(it)
+                dispose()
             }
-        }.onFailure {
-            Log.e(it)
-            dispose()
         }
     }
 

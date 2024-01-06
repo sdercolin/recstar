@@ -43,6 +43,7 @@ import ui.model.LocalAppContext
 import ui.model.Sentence
 import ui.string.*
 import util.Log
+import util.runCatchingCancellable
 import util.savedMutableStateOf
 
 class SessionScreenModel(
@@ -442,7 +443,7 @@ class SessionScreenModel(
 
     fun renameSession(newName: String) {
         screenModelScope.launch(Dispatchers.IO) {
-            runCatching {
+            runCatchingCancellable {
                 val newSession = sessionRepository.rename(name, newName).getOrThrow()
                 reload(newSession)
             }.onFailure {

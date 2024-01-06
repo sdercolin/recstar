@@ -20,6 +20,7 @@ import kotlinx.io.writeIntLe
 import kotlinx.io.writeShortLe
 import ui.model.AppContext
 import util.Log
+import util.runCatchingCancellable
 import util.toJavaFile
 import util.writeRawString
 
@@ -61,15 +62,15 @@ class AudioRecorderImpl(
 
     @SuppressLint("MissingPermission")
     override fun start(output: File) {
-        runCatching {
-            if (job?.isActive == true) {
-                Log.w("AudioRecorderImpl.start: already started")
-                return
-            }
-            waveData.clear()
-            _waveDataFlow.value = FloatArray(0)
-            rawData.clear()
-            job = coroutineScope.launch(Dispatchers.IO) {
+        if (job?.isActive == true) {
+            Log.w("AudioRecorderImpl.start: already started")
+            return
+        }
+        waveData.clear()
+        _waveDataFlow.value = FloatArray(0)
+        rawData.clear()
+        job = coroutineScope.launch(Dispatchers.IO) {
+            runCatchingCancellable {
                 cleanupJob?.join()
                 cleanupJob = null
                 Log.i("AudioRecorderImpl.start: path: ${output.absolutePath}")
@@ -109,16 +110,16 @@ class AudioRecorderImpl(
                     Log.d("AudioRecorderImpl.start: waiting for file to be created")
                     Thread.sleep(100)
                 }
+            }.onFailure {
+                Log.e(it)
+                dispose()
             }
-        }.onFailure {
-            Log.e(it)
-            dispose()
         }
     }
 
     override fun stop() {
-        runCatching {
-            cleanupJob = coroutineScope.launch(Dispatchers.IO) {
+        cleanupJob = coroutineScope.launch(Dispatchers.IO) {
+            runCatchingCancellable {
                 job?.cancelAndJoin()
                 audioRecord?.release()
                 audioRecord = null
@@ -128,10 +129,10 @@ class AudioRecorderImpl(
                 withContext(Dispatchers.Main) {
                     listener.onStopped()
                 }
+            }.onFailure {
+                Log.e(it)
+                dispose()
             }
-        }.onFailure {
-            Log.e(it)
-            dispose()
         }
     }
 
@@ -139,7 +140,7 @@ class AudioRecorderImpl(
 
     override fun dispose() {
         coroutineScope.launch {
-            runCatching {
+            runCatchingCancellable {
                 job?.cancelAndJoin()
                 cleanupJob?.cancelAndJoin()
                 audioRecord?.release()

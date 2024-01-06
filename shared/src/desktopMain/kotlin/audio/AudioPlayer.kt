@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ui.model.AppContext
 import util.Log
+import util.runCatchingCancellable
 import util.toJavaFile
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.Clip
@@ -31,15 +32,15 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
         file: File,
         positionMs: Long,
     ) {
-        runCatching {
-            if (job?.isActive == true) {
-                Log.w("AudioPlayerImpl.start: already started")
-                return
+        if (job?.isActive == true) {
+            Log.w("AudioPlayerImpl.start: already started")
+            return
+        }
+        job = scope.launch {
+            if (initJob.isActive) {
+                initJob.join()
             }
-            job = scope.launch {
-                if (initJob.isActive) {
-                    initJob.join()
-                }
+            runCatchingCancellable {
                 cleanupJob?.join()
                 cleanupJob = null
                 withContext(Dispatchers.IO) {
@@ -56,42 +57,42 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                     listener.onStarted()
                     isPlaying = true
                 }
+            }.onFailure {
+                Log.e(it)
+                dispose()
             }
-        }.onFailure {
-            Log.e(it)
-            dispose()
         }
     }
 
     override fun seekAndPlay(positionMs: Long) {
-        runCatching {
-            seekingJob = scope.launch {
+        seekingJob = scope.launch {
+            runCatchingCancellable {
                 if (isPlaying) {
                     stop()
                 }
                 cleanupJob?.join()
                 play(requireNotNull(lastLoadedFile), positionMs)
+            }.onFailure {
+                Log.e(it)
+                dispose()
             }
-        }.onFailure {
-            Log.e(it)
-            dispose()
         }
     }
 
     override fun stop() {
-        runCatching {
-            listener.onStopped()
-            cleanupJob = scope.launch(Dispatchers.IO) {
+        listener.onStopped()
+        cleanupJob = scope.launch(Dispatchers.IO) {
+            runCatchingCancellable {
                 job?.cancelAndJoin()
                 countingJob?.cancelAndJoin()
                 clip.apply {
                     stop()
                     flush()
                 }
+            }.onFailure {
+                Log.e(it)
+                dispose()
             }
-        }.onFailure {
-            Log.e(it)
-            dispose()
         }
     }
 

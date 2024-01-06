@@ -15,6 +15,7 @@ import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
 import platform.AVFAudio.setActive
 import ui.model.AppContext
 import util.Log
+import util.runCatchingCancellable
 import util.withNSError
 
 @OptIn(ExperimentalForeignApi::class)
@@ -39,12 +40,12 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
         file: File,
         positionMs: Long,
     ) {
-        runCatching {
-            if (job?.isActive == true) {
-                Log.w("AudioRecorderImpl.start: already started")
-                return
-            }
-            job = scope.launch(Dispatchers.IO) {
+        if (job?.isActive == true) {
+            Log.w("AudioRecorderImpl.start: already started")
+            return
+        }
+        job = scope.launch(Dispatchers.IO) {
+            runCatchingCancellable {
                 setupAudioSession()
                 val lastModified = file.lastModified
                 if (lastLoadedFile != file || lastLoadedFileModified != lastModified) {
@@ -68,40 +69,40 @@ class AudioPlayerImpl(private val listener: AudioPlayer.Listener, context: AppCo
                     listener.onStarted()
                 }
                 startCounting()
+            }.onFailure {
+                Log.e(it)
+                dispose()
             }
-        }.onFailure {
-            Log.e(it)
-            dispose()
         }
     }
 
     override fun seekAndPlay(positionMs: Long) {
-        runCatching {
-            seekingJob = scope.launch(Dispatchers.IO) {
+        seekingJob = scope.launch(Dispatchers.IO) {
+            runCatchingCancellable {
                 if (isPlaying()) {
                     stop()
                 }
                 cleanupJob?.join()
                 play(requireNotNull(lastLoadedFile), positionMs)
+            }.onFailure {
+                Log.e(it)
+                dispose()
             }
-        }.onFailure {
-            Log.e(it)
-            dispose()
         }
     }
 
     override fun stop() {
-        runCatching {
-            cleanupJob = scope.launch(Dispatchers.IO) {
+        cleanupJob = scope.launch(Dispatchers.IO) {
+            runCatchingCancellable {
                 audioPlayer?.takeIf { it.isPlaying() }?.pause()
                 stopCounting()
                 withContext(Dispatchers.Main) {
                     listener.onStopped()
                 }
+            }.onFailure {
+                Log.e(it)
+                dispose()
             }
-        }.onFailure {
-            Log.e(it)
-            dispose()
         }
     }
 
