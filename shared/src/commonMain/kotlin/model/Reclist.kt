@@ -27,4 +27,4 @@ fun parseReclist(file: File): Result<Reclist> =
         Reclist(file.nameWithoutExtension, file.absolutePath, lines)
     }
 
-private val separators = arrayOf(' ', '\t', '\n', '\r', '　').toCharArray()
+private val separators = arrayOf(' ', '\n', '\r').toCharArray()
