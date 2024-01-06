@@ -69,6 +69,8 @@ class SessionScreenModel(
 
     val sentences: List<Sentence> get() = _sentences
 
+    private var comments: Map<String, String>? = session.reclist.comments
+
     var guideAudioConfig: GuideAudio? by mutableStateOf(session.guideAudioConfig)
         private set
 
@@ -81,11 +83,14 @@ class SessionScreenModel(
         }
     }
 
+    val shouldShowSubTitle: Boolean get() = comments != null
+
     private fun reload(session: Session) {
         name = session.name
         contentDirectory = session.directory
         _sentences.clear()
         _sentences.addAll(session.reclist.lines.map { Sentence(it, isFileExisting(it)) })
+        comments = session.reclist.comments
         guideAudioConfig = session.guideAudioConfig
         currentIndex = currentIndex.coerceAtMost(_sentences.size - 1)
         Log.d("Reloading session: $name")
@@ -143,6 +148,9 @@ class SessionScreenModel(
 
     val currentSentence: Sentence
         get() = _sentences[currentIndex]
+
+    val currentComment: String?
+        get() = comments?.get(currentSentence.text)
 
     private val playerListener = object : AudioPlayer.Listener {
         override fun onStarted() {

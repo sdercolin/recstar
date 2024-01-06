@@ -36,6 +36,7 @@ enum class Strings {
     MainScreenDeleteItemsTitle,
     MainScreenDeleteItemsMessage,
     SessionScreenCurrentSentenceLabel,
+    SessionScreenCommentEmpty,
     SessionScreenNoData,
     SessionScreenActionOpenDirectory,
     SessionScreenActionExport,

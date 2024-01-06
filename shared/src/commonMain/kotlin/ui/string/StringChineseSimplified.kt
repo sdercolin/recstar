@@ -42,6 +42,7 @@ fun Strings.zhHans(): String? =
         MainScreenDeleteItemsTitle -> "删除会话"
         MainScreenDeleteItemsMessage -> "确定要删除 {0} 个会话吗？录音文件将从设备中完全删除。"
         SessionScreenCurrentSentenceLabel -> "正在录制："
+        SessionScreenCommentEmpty -> "无注释。"
         SessionScreenNoData -> "暂无数据。"
         SessionScreenActionOpenDirectory -> "打开目录"
         SessionScreenActionExport -> "导出"

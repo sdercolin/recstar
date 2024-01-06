@@ -141,6 +141,18 @@ private fun RecorderTitleBar(model: SessionScreenModel) {
         style = MaterialTheme.typography.overline,
         fontSize = if (useSmallSizes) 8.sp else MaterialTheme.typography.overline.fontSize,
     )
+    MainTitle(model, useSmallSizes)
+    if (model.shouldShowSubTitle) {
+        SubTitle(model, useSmallSizes)
+    }
+    Spacer(modifier = Modifier.height(if (useSmallSizes) 12.dp else 22.dp))
+}
+
+@Composable
+private fun MainTitle(
+    model: SessionScreenModel,
+    useSmallSizes: Boolean,
+) {
     val style = if (useSmallSizes) MaterialTheme.typography.h6 else MaterialTheme.typography.h4
     val text = model.currentSentence.text
     val boxHeight = if (useSmallSizes) 32.dp else 52.dp
@@ -149,7 +161,7 @@ private fun RecorderTitleBar(model: SessionScreenModel) {
     var readyToDraw by remember(text) { mutableStateOf(false) }
     Box(Modifier.height(boxHeight).fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
         Text(
-            text = model.currentSentence.text,
+            text = text,
             modifier = Modifier.padding(start = 32.dp, end = 16.dp)
                 .drawWithContent {
                     if (readyToDraw) drawContent()
@@ -161,7 +173,7 @@ private fun RecorderTitleBar(model: SessionScreenModel) {
             onTextLayout = {
                 if (it.hasVisualOverflow) {
                     fontSize = fontSize.times(0.9f)
-                    if (fontSize * maxLines < style.fontSize) {
+                    if (fontSize * maxLines < style.fontSize && maxLines < 3) {
                         maxLines++
                         fontSize = style.fontSize
                     }
@@ -171,7 +183,47 @@ private fun RecorderTitleBar(model: SessionScreenModel) {
             },
         )
     }
-    Spacer(modifier = Modifier.height(if (useSmallSizes) 12.dp else 24.dp))
+}
+
+@Composable
+private fun SubTitle(
+    model: SessionScreenModel,
+    useSmallSizes: Boolean,
+) {
+    val topMargin = if (useSmallSizes) 4.dp else 8.dp
+    val style = if (useSmallSizes) MaterialTheme.typography.body2 else MaterialTheme.typography.body1
+    val text = model.currentComment ?: string(Strings.SessionScreenCommentEmpty)
+    val boxHeight = if (useSmallSizes) 20.dp else 32.dp
+    var fontSize by remember(text) { mutableStateOf(style.fontSize) }
+    var maxLines by remember(text) { mutableStateOf(1) }
+    var readyToDraw by remember(text) { mutableStateOf(false) }
+    Box(
+        modifier = Modifier.height(boxHeight).fillMaxWidth().padding(top = topMargin),
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(start = 32.dp, end = 16.dp)
+                .drawWithContent {
+                    if (readyToDraw) drawContent()
+                },
+            style = style,
+            fontSize = fontSize,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = maxLines,
+            onTextLayout = {
+                if (it.hasVisualOverflow) {
+                    fontSize = fontSize.times(0.9f)
+                    if (fontSize * maxLines < style.fontSize && maxLines < 3) {
+                        maxLines++
+                        fontSize = style.fontSize
+                    }
+                } else {
+                    readyToDraw = true
+                }
+            },
+        )
+    }
 }
 
 @Composable
