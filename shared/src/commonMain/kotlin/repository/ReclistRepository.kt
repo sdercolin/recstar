@@ -45,19 +45,29 @@ class ReclistRepository {
      *
      * @return true if the import was successful, false otherwise.
      */
-    fun import(file: File): Boolean {
-        Log.i("ReclistRepository.import: ${file.absolutePath}")
-        val reclist = parseReclist(file)
+    fun import(
+        file: File,
+        commentFile: File?,
+        findComment: Boolean,
+    ): Boolean {
+        val name = file.nameWithoutExtension
+        val resolvedCommentFile = if (commentFile == null && findComment) {
+            getCommentFile(name, folder = requireNotNull(file.parentFile))
+        } else {
+            commentFile
+        }
+        Log.i("ReclistRepository.import: ${file.absolutePath}, commentFile: ${resolvedCommentFile?.absolutePath}")
+        val reclist = parseReclist(file, resolvedCommentFile)
             .onFailure {
                 Log.e("ReclistRepository.import: failed to parse ${file.absolutePath}", it)
             }
             .getOrNull() ?: return false
-        val name = file.nameWithoutExtension
         if (map.containsKey(name)) {
             Log.w("ReclistRepository.import: $name already exists, overwriting...")
         }
         map[name] = reclist
         file.copyTo(folder.resolve(file.name), overwrite = true)
+        resolvedCommentFile?.copyTo(folder.resolve(resolvedCommentFile.name), overwrite = true)
         _items.value = listOf(name) + _items.value.minus(name)
         return true
     }
@@ -67,7 +77,8 @@ class ReclistRepository {
      */
     fun fetch() {
         val items = folder.listFiles()
-            .filter { it.extension == "txt" }
+            .filter { it.extension == Reclist.FILE_EXTENSION }
+            .filterNot { it.name.endsWith(Reclist.COMMENT_FILE_NAME_SUFFIX_EXTENSION) }
             .map { it.nameWithoutExtension }
         _items.value = items
     }
@@ -75,18 +86,29 @@ class ReclistRepository {
     /**
      * Gets the reclist with the given name.
      */
-    fun get(name: String): Reclist = map[name] ?: parseReclist(folder.resolve("$name.txt")).getOrThrow()
+    fun get(name: String): Reclist =
+        map[name] ?: parseReclist(
+            file = getFile(name),
+            commentFile = getCommentFile(name),
+        ).getOrThrow()
 
     /**
      * Deletes the reclists with the given names.
      */
     fun delete(names: List<String>) {
         names.forEach { name ->
-            val file = folder.resolve("$name.txt")
-            file.delete()
+            getFile(name).delete()
+            getCommentFile(name)?.delete()
         }
         _items.value = _items.value.filterNot { it in names }
     }
+
+    private fun getFile(name: String): File = folder.resolve("$name${Reclist.FILE_NAME_SUFFIX}")
+
+    private fun getCommentFile(
+        name: String,
+        folder: File = this.folder,
+    ): File? = folder.resolve("$name${Reclist.COMMENT_FILE_NAME_SUFFIX_EXTENSION}").takeIf { it.exists() }
 }
 
 val LocalReclistRepository = staticCompositionLocalOf<ReclistRepository> { error("No ReclistRepository provided") }

@@ -53,6 +53,7 @@ fun Strings.zhHans(): String? =
         SessionScreenAlertGuideAudioNotFoundMessage -> "找不到 BGM 文件。请重新设置 BGM。"
         CreateSessionReclistScreenTitle -> "选择录音表"
         CreateSessionReclistScreenActionImport -> "导入录音表"
+        CreateSessionReclistScreenActionImportCommentAlertMessage -> "是否要继续导入对应的注释文件（-comment.txt）？"
         CreateSessionReclistScreenAllReclists -> "全部录音表"
         CreateSessionReclistScreenEmpty -> "请先导入录音表。"
         CreateSessionReclistScreenContinue -> "完成"

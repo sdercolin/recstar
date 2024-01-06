@@ -31,6 +31,7 @@ import repository.LocalReclistRepository
 import ui.common.ActionMenu
 import ui.common.ActionMenuItem
 import ui.common.FloatingActionButtonWrapper
+import ui.common.LocalAlertDialogController
 import ui.common.LocalToastController
 import ui.common.ScrollableLazyColumn
 import ui.model.Screen
@@ -54,13 +55,14 @@ private fun CreateSessionReclistScreen.ScreenActions() {
         ActionMenu { closeMenu ->
             val fileInteractor = LocalFileInteractor.current
             val repository = LocalReclistRepository.current
+            val alertDialogController = LocalAlertDialogController.current
             val toastController = LocalToastController.current
             ActionMenuItem(
                 text = string(Strings.CommonImport),
                 icon = Icons.Default.Add,
                 onClick = {
                     closeMenu()
-                    Actions.importReclist(fileInteractor, repository, toastController)
+                    Actions.importReclist(fileInteractor, repository, alertDialogController, toastController)
                 },
             )
             ActionMenuItem(

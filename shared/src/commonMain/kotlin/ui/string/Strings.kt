@@ -47,6 +47,7 @@ enum class Strings {
     SessionScreenAlertGuideAudioNotFoundMessage,
     CreateSessionReclistScreenTitle,
     CreateSessionReclistScreenActionImport,
+    CreateSessionReclistScreenActionImportCommentAlertMessage,
     CreateSessionReclistScreenAllReclists,
     CreateSessionReclistScreenEmpty,
     CreateSessionReclistScreenContinue,

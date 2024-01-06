@@ -19,12 +19,43 @@ data class Reclist(
     val name: String,
     val path: String,
     val lines: List<String>,
-) : JavaSerializable
+    val comments: Map<String, String>?,
+) : JavaSerializable {
+    companion object {
+        const val FILE_EXTENSION = "txt"
+        const val FILE_NAME_SUFFIX = ".txt"
+        const val COMMENT_FILE_NAME_SUFFIX_EXTENSION = "-comment.txt"
+    }
+}
 
-fun parseReclist(file: File): Result<Reclist> =
+fun parseReclist(
+    file: File,
+    commentFile: File?,
+): Result<Reclist> =
     runCatching {
-        val lines = file.readTextDetectEncoding().split(*separators).filter { it.isValidFileName() }
-        Reclist(file.nameWithoutExtension, file.absolutePath, lines)
+        val lines = file.readTextDetectEncoding().split(*lineSeparators).filter { it.isValidFileName() }
+        val comments = commentFile?.readTextDetectEncoding()?.split(*commentLineSeparators)
+            ?.filterNot { it.startsWith("#") }
+            ?.mapNotNull { line ->
+                val sections = line.split(*commentKeyValueSeparators, limit = 2)
+                if (sections.size != 2) {
+                    null
+                } else {
+                    if (sections[0].isBlank() || sections[1].isBlank()) {
+                        null
+                    } else {
+                        sections[0] to sections[1]
+                    }
+                }
+            }
+            ?.toMap()
+        Reclist(file.nameWithoutExtension, file.absolutePath, lines, comments)
     }
 
-private val separators = arrayOf(' ', '\n', '\r').toCharArray()
+private val lineSeparators = arrayOf(' ', '\n', '\r').toCharArray()
+
+/**
+ * See OREMO docs for more info about the comment file format. http://nwp8861.blog92.fc2.com/blog-entry-335.html.
+ */
+private val commentLineSeparators = arrayOf('\n', '\r').toCharArray()
+private val commentKeyValueSeparators = arrayOf(' ', '\t', ':').toCharArray()

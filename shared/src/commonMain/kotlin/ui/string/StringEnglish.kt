@@ -56,6 +56,8 @@ fun Strings.en(): String =
             "The guide BGM file is not found. Please configure the guide BGM again."
         CreateSessionReclistScreenTitle -> "Select reclist to record"
         CreateSessionReclistScreenActionImport -> "Import Reclist"
+        CreateSessionReclistScreenActionImportCommentAlertMessage ->
+            "Do you want to import the corresponding comment file (-comment.txt)?"
         CreateSessionReclistScreenAllReclists -> "All Reclists"
         CreateSessionReclistScreenEmpty -> "Please import a reclist first."
         CreateSessionReclistScreenContinue -> "Finish"

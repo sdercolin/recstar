@@ -62,7 +62,12 @@ private fun MainScaffold(navigator: Navigator) {
     LaunchedEffect(appActionStore) {
         appActionStore.actions.collectLatest {
             when (it) {
-                Action.ImportReclist -> Actions.importReclist(fileInteractor, reclistRepository, toastController)
+                Action.ImportReclist -> Actions.importReclist(
+                    fileInteractor,
+                    reclistRepository,
+                    alertDialogController,
+                    toastController,
+                )
                 Action.ImportGuideAudio -> Actions.importGuideAudio(
                     fileInteractor,
                     guideAudioRepository,

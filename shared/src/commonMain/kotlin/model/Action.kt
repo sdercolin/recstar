@@ -42,19 +42,51 @@ object Actions {
     fun importReclist(
         fileInteractor: FileInteractor,
         repository: ReclistRepository,
+        alertDialogController: AlertDialogController,
         toastController: ToastController,
     ) {
+        fun import(
+            file: File,
+            commentFile: File?,
+            findComment: Boolean = false,
+        ) {
+            val imported = repository.import(file, commentFile, findComment)
+            if (imported) {
+                toastController.show(stringStatic(Strings.ToastImportReclistSuccess))
+            } else {
+                toastController.show(stringStatic(Strings.ToastImportReclistFailure))
+            }
+        }
+
         fileInteractor.pickFile(
             title = stringStatic(Strings.CreateSessionReclistScreenActionImport),
-            allowedExtensions = listOf("txt"),
+            allowedExtensions = listOf(Reclist.FILE_EXTENSION),
             onFinish = { file ->
                 file ?: return@pickFile
-                val imported = repository.import(file)
-                if (imported) {
-                    toastController.show(stringStatic(Strings.ToastImportReclistSuccess))
-                } else {
-                    toastController.show(stringStatic(Strings.ToastImportReclistFailure))
+                if (isDesktop) {
+                    // We can directly access the file system on Desktop,
+                    // so we can get the comment file without further user interaction.
+                    import(file, null, findComment = true)
+                    return@pickFile
                 }
+                alertDialogController.requestYesNo(
+                    message = stringStatic(Strings.CreateSessionReclistScreenActionImportCommentAlertMessage),
+                    onConfirm = {
+                        fileInteractor.pickFile(
+                            title = stringStatic(Strings.CreateSessionReclistScreenActionImport),
+                            allowedExtensions = listOf(Reclist.FILE_EXTENSION),
+                            onFinish = inner@{ commentFile ->
+                                // cancel the import if `Yes` is clicked but no comment file is selected
+                                commentFile ?: return@inner
+                                import(file, commentFile)
+                            },
+                        )
+                    },
+                    onDismiss = {
+                        // import only the reclist file without comments if `No` is clicked
+                        import(file, null)
+                    },
+                )
             },
         )
     }

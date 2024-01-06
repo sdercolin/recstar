@@ -53,6 +53,8 @@ fun Strings.ja(): String? =
         SessionScreenAlertGuideAudioNotFoundMessage -> "ガイド BGM ファイルが見つかりません。ガイド BGM を再設定してください。"
         CreateSessionReclistScreenTitle -> "録音リストを選択"
         CreateSessionReclistScreenActionImport -> "録音リストをインポート"
+        CreateSessionReclistScreenActionImportCommentAlertMessage ->
+            "続いてコメントファイル（-comment.txt）をインポートしますか？"
         CreateSessionReclistScreenAllReclists -> "すべての録音リスト"
         CreateSessionReclistScreenEmpty -> "録音リストをインポートしてください。"
         CreateSessionReclistScreenContinue -> "完了"
