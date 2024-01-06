@@ -137,7 +137,7 @@ private fun RecorderTitleBar(model: SessionScreenModel) {
     Spacer(modifier = Modifier.height(if (useSmallSizes) 12.dp else 24.dp))
     Text(
         text = string(Strings.SessionScreenCurrentSentenceLabel),
-        modifier = Modifier.padding(horizontal = 32.dp),
+        modifier = Modifier.padding(horizontal = 32.dp).padding(bottom = 4.dp),
         style = MaterialTheme.typography.overline,
         fontSize = if (useSmallSizes) 8.sp else MaterialTheme.typography.overline.fontSize,
     )
@@ -145,6 +145,7 @@ private fun RecorderTitleBar(model: SessionScreenModel) {
     val text = model.currentSentence.text
     val boxHeight = if (useSmallSizes) 32.dp else 52.dp
     var fontSize by remember(text) { mutableStateOf(style.fontSize) }
+    var maxLines by remember(text) { mutableStateOf(1) }
     var readyToDraw by remember(text) { mutableStateOf(false) }
     Box(Modifier.height(boxHeight).fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
         Text(
@@ -156,10 +157,14 @@ private fun RecorderTitleBar(model: SessionScreenModel) {
             style = style,
             fontSize = fontSize,
             overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
+            maxLines = maxLines,
             onTextLayout = {
                 if (it.hasVisualOverflow) {
                     fontSize = fontSize.times(0.9f)
+                    if (fontSize * maxLines < style.fontSize) {
+                        maxLines++
+                        fontSize = style.fontSize
+                    }
                 } else {
                     readyToDraw = true
                 }
