@@ -154,7 +154,7 @@ private fun MainTitle(
     useSmallSizes: Boolean,
 ) {
     val style = if (useSmallSizes) MaterialTheme.typography.h6 else MaterialTheme.typography.h4
-    val text = model.currentSentence.text
+    val text = model.getCurrentSentenceTitle()
     val boxHeight = if (useSmallSizes) 32.dp else 52.dp
     var fontSize by remember(text) { mutableStateOf(style.fontSize) }
     var maxLines by remember(text) { mutableStateOf(1) }
@@ -192,7 +192,7 @@ private fun SubTitle(
 ) {
     val topMargin = if (useSmallSizes) 4.dp else 8.dp
     val style = if (useSmallSizes) MaterialTheme.typography.body2 else MaterialTheme.typography.body1
-    val text = model.currentComment ?: string(Strings.SessionScreenCommentEmpty)
+    val text = model.getCurrentSentenceSubTitle().orEmpty()
     val boxHeight = if (useSmallSizes) 20.dp else 32.dp
     var fontSize by remember(text) { mutableStateOf(style.fontSize) }
     var maxLines by remember(text) { mutableStateOf(1) }

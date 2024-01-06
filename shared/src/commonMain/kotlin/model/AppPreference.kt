@@ -18,6 +18,7 @@ data class AppPreference(
     val orientation: ScreenOrientation = ScreenOrientation.Auto,
     val customContentRootPath: String? = null,
     val recording: Recording = Recording(),
+    val titleBarStyle: TitleBarStyle = TitleBarStyle.FileName,
 ) : JavaSerializable {
     enum class Language(private val language: StringLanguage?) : LocalizedText {
         Auto(null),
@@ -78,5 +79,12 @@ data class AppPreference(
                 Enter -> Key.Enter
                 R -> Key.R
             }
+    }
+
+    enum class TitleBarStyle(override val textKey: Strings, val hasSub: Boolean) : LocalizedText {
+        FileName(Strings.PreferenceTitleBarStyleFileName, false),
+        FileNameWithComment(Strings.PreferenceTitleBarStyleFileNameWithComment, true),
+        CommentWithFileName(Strings.PreferenceTitleBarStyleCommentWithFileName, true),
+        Comment(Strings.PreferenceTitleBarStyleComment, false),
     }
 }

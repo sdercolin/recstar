@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import model.AppPreference
 import model.GuideAudio
 import model.Session
 import repository.AppPreferenceRepository
@@ -52,7 +53,7 @@ import util.savedMutableStateOf
 class SessionScreenModel(
     session: Session,
     context: AppContext,
-    appPreferenceRepository: AppPreferenceRepository,
+    private val appPreferenceRepository: AppPreferenceRepository,
     private val sessionRepository: SessionRepository,
     private val alertDialogController: AlertDialogController,
     private val permissionChecker: PermissionChecker,
@@ -83,7 +84,7 @@ class SessionScreenModel(
         }
     }
 
-    val shouldShowSubTitle: Boolean get() = comments != null
+    val shouldShowSubTitle: Boolean get() = comments != null && appPreferenceRepository.value.titleBarStyle.hasSub
 
     private fun reload(session: Session) {
         name = session.name
@@ -149,8 +150,37 @@ class SessionScreenModel(
     val currentSentence: Sentence
         get() = _sentences[currentIndex]
 
-    val currentComment: String?
+    private val currentComment: String?
         get() = comments?.get(currentSentence.text)
+
+    @Composable
+    fun getCurrentSentenceTitle(): String =
+        when (appPreferenceRepository.value.titleBarStyle) {
+            AppPreference.TitleBarStyle.FileName,
+            AppPreference.TitleBarStyle.FileNameWithComment,
+            -> currentSentence.text
+            AppPreference.TitleBarStyle.CommentWithFileName,
+            AppPreference.TitleBarStyle.Comment,
+            -> {
+                val reclistHasComment = comments != null
+                if (reclistHasComment) {
+                    comments?.get(currentSentence.text) ?: string(Strings.SessionScreenCommentEmpty)
+                } else {
+                    // If the reclist is not configured with comments, show the file name regardless of the title bar style.
+                    currentSentence.text
+                }
+            }
+        }
+
+    @Composable
+    fun getCurrentSentenceSubTitle(): String? =
+        when (appPreferenceRepository.value.titleBarStyle) {
+            AppPreference.TitleBarStyle.FileName,
+            AppPreference.TitleBarStyle.Comment,
+            -> null
+            AppPreference.TitleBarStyle.CommentWithFileName -> currentSentence.text
+            AppPreference.TitleBarStyle.FileNameWithComment -> currentComment
+        }
 
     private val playerListener = object : AudioPlayer.Listener {
         override fun onStarted() {

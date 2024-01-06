@@ -132,6 +132,14 @@ private fun ScreenContent() {
                 onValueChanged = { repository.update { copy(recording = recording.copy(autoNext = it)) } },
             )
         }
+        Group(title = string(Strings.PreferenceGroupView)) {
+            SelectionItem(
+                title = string(Strings.PreferenceTitleBarStyle),
+                value = value.titleBarStyle,
+                onValueChanged = { repository.update { copy(titleBarStyle = it) } },
+                options = AppPreference.TitleBarStyle.entries.toList(),
+            )
+        }
         Group(title = string(Strings.PreferenceGroupMisc)) {
             if (isDesktop) {
                 val guideAudioRepository = LocalGuideAudioRepository.current
