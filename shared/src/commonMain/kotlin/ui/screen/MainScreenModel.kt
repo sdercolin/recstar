@@ -7,6 +7,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.flow.StateFlow
+import model.sorting.SortingMethod
 import repository.LocalSessionRepository
 import repository.SessionRepository
 import ui.common.AlertDialogController
@@ -30,7 +31,8 @@ class MainScreenModel(
             onDelete = { sessionRepository.delete(it) },
         ),
     ) {
-    val sessions: StateFlow<List<String>> = sessionRepository.items
+    val sessions: StateFlow<List<SessionRepository.Item>> = sessionRepository.items
+    val initialSortingMethod: SortingMethod = sessionRepository.sortingMethod
 
     init {
         sessionRepository.fetch()
@@ -42,7 +44,12 @@ class MainScreenModel(
                 Log.e("Failed to get session $name", it)
                 return
             }
+        sessionRepository.updateUsedTime(session.name)
         navigator push SessionScreen(session)
+    }
+
+    fun onSortingMethodChanged(method: SortingMethod) {
+        sessionRepository.sortingMethod = method
     }
 }
 

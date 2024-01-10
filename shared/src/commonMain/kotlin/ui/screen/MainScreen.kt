@@ -1,9 +1,11 @@
 package ui.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -34,6 +36,7 @@ import ui.common.ActionMenu
 import ui.common.ActionMenuItem
 import ui.common.FloatingActionButtonWrapper
 import ui.common.ScrollableLazyColumn
+import ui.common.SortingButton
 import ui.model.Screen
 import ui.screen.demo.DemoShowcaseScreen
 import ui.string.*
@@ -98,17 +101,28 @@ private fun MainScreen.ScreenContent() {
     Box(modifier = Modifier.fillMaxSize().background(color = MaterialTheme.colors.background)) {
         Column(modifier = Modifier.fillMaxSize()) {
             val titleText = model.getWrappedTitleText(string(Strings.MainScreenAllSessions))
-            Text(
-                text = titleText,
-                modifier = Modifier.padding(horizontal = 32.dp, vertical = 24.dp),
-                style = MaterialTheme.typography.h5,
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = titleText,
+                    modifier = Modifier.padding(horizontal = 32.dp, vertical = 24.dp),
+                    style = MaterialTheme.typography.h5,
+                )
+                SortingButton(
+                    modifier = Modifier.padding(end = 16.dp),
+                    initialMethod = model.initialSortingMethod,
+                    onMethodChanged = model::onSortingMethodChanged,
+                )
+            }
             ItemDivider()
             Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
                 ScrollableLazyColumn {
-                    items(sessions, key = { it }) { name ->
-                        model.ItemRow(name, model::openSession) {
-                            Text(name)
+                    items(sessions, key = { it }) { item ->
+                        model.ItemRow(item.name, model::openSession) {
+                            Text(item.name)
                         }
                         ItemDivider()
                     }

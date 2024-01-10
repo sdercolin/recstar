@@ -52,7 +52,11 @@ class AppDependencies(
     val permissionChecker: PermissionChecker = PermissionChecker(context),
     val reclistRepository: ReclistRepository = ReclistRepository(),
     val guideAudioRepository: GuideAudioRepository = GuideAudioRepository(),
-    val sessionRepository: SessionRepository = SessionRepository(reclistRepository, guideAudioRepository),
+    val sessionRepository: SessionRepository = SessionRepository(
+        reclistRepository,
+        guideAudioRepository,
+        appRecordRepository,
+    ),
 )
 
 @Composable

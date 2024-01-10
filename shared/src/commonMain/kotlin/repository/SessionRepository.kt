@@ -1,10 +1,12 @@
 package repository
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import exception.SessionRenameExistingException
 import exception.SessionRenameInvalidException
 import io.File
 import io.Paths
+import io.sessionUsageRecordFile
 import io.sessionsDirectory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -13,8 +15,12 @@ import kotlinx.coroutines.flow.StateFlow
 import model.Reclist
 import model.Session
 import model.SessionParams
+import model.sorting.Sortable
+import model.sorting.SortableListOwner
+import model.sorting.SortingMethod
 import model.toParams
 import util.DateTime
+import util.Log
 import util.isValidFileName
 import util.parseJson
 import util.stringifyJson
@@ -25,15 +31,45 @@ import util.stringifyJson
 class SessionRepository(
     private val reclistRepository: ReclistRepository,
     private val guideAudioRepository: GuideAudioRepository,
-) {
+    private val appRecordRepository: AppRecordRepository,
+) : SortableListOwner<SessionRepository.Item> {
+    @Immutable
+    data class Item(
+        val name: String,
+        val lastUsed: Long,
+    ) : Sortable<Item> {
+        override val sortableName: String
+            get() = name
+
+        override val sortableUsedTime: Long
+            get() = lastUsed
+    }
+
     private lateinit var folder: File
+
+    private val usedTimeMap: MutableMap<String, Long> = mutableMapOf()
+
+    private fun getUsedTime(name: String): Long = usedTimeMap[name] ?: 0L
+
+    private fun saveUsedTime(
+        name: String,
+        time: Long,
+    ) {
+        usedTimeMap[name] = time
+        runCatching {
+            Paths.sessionUsageRecordFile.writeText(usedTimeMap.stringifyJson())
+        }.onFailure {
+            Log.w(it)
+        }
+    }
+
     private val map = mutableMapOf<String, Session>()
-    private val _items = MutableStateFlow(emptyList<String>())
+    private val _items = MutableStateFlow(emptyList<Item>())
 
     /**
-     * The list of existing session names.
+     * The list of existing session references.
      */
-    val items: StateFlow<List<String>> = _items
+    val items: StateFlow<List<Item>> = _items
 
     private val _sessionUpdated = MutableSharedFlow<String>()
 
@@ -57,6 +93,15 @@ class SessionRepository(
         }
         map.clear()
         _items.value = emptyList()
+        runCatching {
+            Paths.sessionUsageRecordFile.takeIf { it.exists() }?.readText()?.parseJson<Map<String, Long>>()
+                ?.toMutableMap() ?: mutableMapOf()
+        }.onSuccess { map ->
+            usedTimeMap.clear()
+            usedTimeMap.putAll(map)
+        }.onFailure {
+            Log.w(it)
+        }
     }
 
     /**
@@ -66,8 +111,9 @@ class SessionRepository(
         val items = folder.listFiles()
             .filter { it.isDirectory }
             .filter { it.resolve(SESSION_PARAMS_FILE_NAME).isFile }
-            .map { it.name }
+            .map { Item(it.name, getUsedTime(it.name)) }
         _items.value = items
+        sort()
     }
 
     /**
@@ -79,7 +125,7 @@ class SessionRepository(
             val defaultName = "${reclist.name} $timeSuffix"
             var name = defaultName
             var repeat = 0
-            while (name in _items.value) {
+            while (name in _items.value.map { it.name }) {
                 repeat++
                 name = "$defaultName ($repeat)"
             }
@@ -88,10 +134,16 @@ class SessionRepository(
                 reclist,
                 folder.resolve(name).absolutePath,
             )
-        }.onSuccess {
-            _items.value = listOf(it.name) + _items.value.minus(it.name)
-            map[it.name] = it
-            save(it)
+        }.onSuccess { newSession ->
+            val newItem = Item(newSession.name, DateTime.getNow())
+            val items = _items.value.toMutableList()
+            items.removeAll { it.name == newItem.name }
+            items.add(newItem)
+            _items.value = items
+            sort()
+            map[newSession.name] = newSession
+            saveUsedTime(newSession.name, newItem.lastUsed)
+            save(newSession)
         }
 
     private fun createFromParams(
@@ -125,8 +177,22 @@ class SessionRepository(
         }
 
     /**
-     * Rename the session with the given [oldName] to [newName]. This will cause the session folder to be renamed as
-     * well.
+     * Updates the used time of the session with the given name to the current time.
+     */
+    fun updateUsedTime(name: String) {
+        _items.value = _items.value.map {
+            if (it.name == name) {
+                Item(name, DateTime.getNow())
+            } else {
+                it
+            }
+        }
+        sort()
+        saveUsedTime(name, DateTime.getNow())
+    }
+
+    /**
+     * Rename the session from [oldName] to [newName]. This will cause the session folder to be renamed as well.
      */
     fun rename(
         oldName: String,
@@ -154,18 +220,18 @@ class SessionRepository(
                 params = params,
             )
         }.onSuccess {
-            _items.value = _items.value.map { name ->
-                if (name == oldName) {
-                    newName
-                } else {
-                    name
-                }
-            }
+            val items = _items.value.toMutableList()
+            items.removeAll { it.name == oldName }
+            val newItem = Item(newName, DateTime.getNow())
+            items.add(newItem)
+            _items.value = items
             val oldSession = map[oldName]
             if (oldSession != null) {
                 map.remove(oldName)
-                map[newName] = oldSession
+                map[newItem.name] = oldSession
             }
+            sort()
+            saveUsedTime(newName, newItem.lastUsed)
         }
 
     /**
@@ -178,14 +244,15 @@ class SessionRepository(
     }
 
     /**
-     * Deletes the sessions with the given names.
+     * Deletes the given sessions.
      */
     fun delete(names: List<String>) {
         names.forEach { name ->
             val directory = folder.resolve(name)
             directory.delete()
+            map.remove(name)
         }
-        _items.value = _items.value.filterNot { it in names }
+        _items.value = _items.value.filterNot { it.name in names }
     }
 
     private fun save(session: Session) {
@@ -197,6 +264,20 @@ class SessionRepository(
         val params = session.toParams()
         file.writeText(params.stringifyJson())
     }
+
+    override val allowedSortingMethods: List<SortingMethod> = SortingMethod.entries.toList()
+    override var sortingMethod: SortingMethod =
+        appRecordRepository.value.sessionSortingMethod ?: SortingMethod.UsedDesc
+        set(value) {
+            field = value
+            sort()
+            appRecordRepository.update { copy(sessionSortingMethod = value) }
+        }
+    override var sortableList: List<Item>
+        get() = _items.value.toMutableList()
+        set(value) {
+            _items.value = value
+        }
 }
 
 private const val SESSION_PARAMS_FILE_NAME = "session.json"

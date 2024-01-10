@@ -27,6 +27,9 @@ val Paths.appRecordFile: File
 val Paths.appPreferenceFile: File
     get() = appRoot.resolve("preference.json")
 
+val Paths.sessionUsageRecordFile: File
+    get() = appRoot.resolve("session-usage-record.json")
+
 fun ensurePaths() {
     ensurePath(Paths.appRoot)
     ensurePath(Paths.contentRoot)
