@@ -210,3 +210,5 @@ actual class File actual constructor(private val path: String) {
 
     override fun hashCode(): Int = absolutePath.hashCode()
 }
+
+fun NSURL.toFile(): File = File(requireNotNull(this.path))
