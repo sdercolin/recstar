@@ -65,7 +65,7 @@ class SessionScreenModel(
     var contentDirectory: File by mutableStateOf(session.directory)
         private set
 
-    private val _sentences: SnapshotStateList<Sentence> = session.reclist.lines
+    private var _sentences: SnapshotStateList<Sentence> = session.reclist.lines
         .map { Sentence(it, isFileExisting(it)) }.toMutableStateList()
 
     val sentences: List<Sentence> get() = _sentences
@@ -89,11 +89,12 @@ class SessionScreenModel(
     private fun reload(session: Session) {
         name = session.name
         contentDirectory = session.directory
+        val newSentences = session.reclist.lines.map { Sentence(it, isFileExisting(it)) }
+        currentIndex = currentIndex.coerceAtMost(newSentences.size - 1)
         _sentences.clear()
-        _sentences.addAll(session.reclist.lines.map { Sentence(it, isFileExisting(it)) })
+        _sentences.addAll(newSentences)
         comments = session.reclist.comments
         guideAudioConfig = session.guideAudioConfig
-        currentIndex = currentIndex.coerceAtMost(_sentences.size - 1)
         Log.d("Reloading session: $name")
         Log.d("guideAudioConfig: $guideAudioConfig")
     }
@@ -126,6 +127,7 @@ class SessionScreenModel(
                 }
             }
         }
+        sessionRepository.updateUsedTime(session.name)
     }
 
     var currentIndex: Int by savedMutableStateOf(0) { waveformPainter.switch(currentFile) }

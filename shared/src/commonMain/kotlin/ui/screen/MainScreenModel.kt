@@ -44,7 +44,6 @@ class MainScreenModel(
                 Log.e("Failed to get session $name", it)
                 return
             }
-        sessionRepository.updateUsedTime(session.name)
         navigator push SessionScreen(session)
     }
 

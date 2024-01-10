@@ -9,6 +9,7 @@ import ui.common.OpenFileDialogRequest
 import ui.common.ToastController
 import ui.model.AppContext
 import util.JavaFile
+import util.Log
 import util.toFile
 import util.toJavaFile
 import java.awt.Desktop
@@ -19,7 +20,11 @@ actual class FileInteractor actual constructor(
     alertDialogController: AlertDialogController,
 ) {
     actual fun requestOpenFolder(folder: File) {
-        Desktop.getDesktop().open(folder.toJavaFile())
+        if (folder.isDirectory) {
+            Desktop.getDesktop().open(folder.toJavaFile())
+        } else {
+            Log.e("FileInteractor.requestOpenFolder: ${folder.absolutePath} is not a directory")
+        }
     }
 
     var fileDialogRequest: FileDialogResult? by mutableStateOf(null)

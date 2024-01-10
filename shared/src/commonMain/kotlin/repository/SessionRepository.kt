@@ -2,6 +2,7 @@ package repository
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
+import cafe.adriel.voyager.core.lifecycle.JavaSerializable
 import exception.SessionRenameExistingException
 import exception.SessionRenameInvalidException
 import io.File
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.serialization.Serializable
 import model.Reclist
 import model.Session
 import model.SessionParams
@@ -34,10 +36,11 @@ class SessionRepository(
     private val appRecordRepository: AppRecordRepository,
 ) : SortableListOwner<SessionRepository.Item> {
     @Immutable
+    @Serializable
     data class Item(
         val name: String,
         val lastUsed: Long,
-    ) : Sortable<Item> {
+    ) : Sortable<Item>, JavaSerializable {
         override val sortableName: String
             get() = name
 
@@ -219,17 +222,15 @@ class SessionRepository(
                 directory = newDirectory,
                 params = params,
             )
-        }.onSuccess {
+        }.onSuccess { newSession ->
             val items = _items.value.toMutableList()
             items.removeAll { it.name == oldName }
             val newItem = Item(newName, DateTime.getNow())
             items.add(newItem)
             _items.value = items
-            val oldSession = map[oldName]
-            if (oldSession != null) {
-                map.remove(oldName)
-                map[newItem.name] = oldSession
-            }
+            map.remove(oldName)
+            map[newItem.name] = newSession
+            save(newSession)
             sort()
             saveUsedTime(newName, newItem.lastUsed)
         }
