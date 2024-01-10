@@ -59,27 +59,41 @@ private fun SessionScreen.ScreenActions() {
         val fileInteractor = LocalFileInteractor.current
         val progressController = LocalProgressController.current
         val alertDialogController = LocalAlertDialogController.current
+        val appRecordRepository = LocalAppRecordRepository.current
         val useOpenDirectory = isDesktop || isIos
         val useExport = isMobile
+
+        fun wrapWithExportTips(block: () -> Unit) {
+            if (appRecordRepository.value.hasShownExportTips.not() && isIos) {
+                alertDialogController.requestConfirm(
+                    message = stringStatic(Strings.AlertExportTips),
+                ) {
+                    appRecordRepository.update { copy(hasShownExportTips = true) }
+                    block()
+                }
+            } else {
+                block()
+            }
+        }
         if (useOpenDirectory) {
             ActionMenuItem(
                 text = string(Strings.SessionScreenActionOpenDirectory),
                 icon = Icons.Default.Folder,
                 onClick = {
                     closeMenu()
-                    Actions.openDirectory(fileInteractor, model.contentDirectory)
+                    wrapWithExportTips {
+                        Actions.openDirectory(fileInteractor, model.contentDirectory)
+                    }
                 },
             )
         }
         if (useExport) {
-            val appRecordRepository = LocalAppRecordRepository.current
             ActionMenuItem(
                 text = string(Strings.SessionScreenActionExport),
                 icon = Icons.Default.IosShare,
                 onClick = {
                     closeMenu()
-
-                    fun export() {
+                    wrapWithExportTips {
                         val request = ExportDataRequest(
                             folder = model.contentDirectory,
                             allowedExtension = listOf("wav"),
@@ -89,16 +103,6 @@ private fun SessionScreen.ScreenActions() {
                             onError = { progressController.hide() },
                         )
                         fileInteractor.exportData(request)
-                    }
-                    if (appRecordRepository.value.hasShownExportTips.not()) {
-                        alertDialogController.requestConfirm(
-                            message = stringStatic(Strings.AlertExportTips),
-                        ) {
-                            appRecordRepository.update { copy(hasShownExportTips = true) }
-                            export()
-                        }
-                    } else {
-                        export()
                     }
                 },
             )
