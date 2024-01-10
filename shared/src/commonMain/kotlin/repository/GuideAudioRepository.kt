@@ -52,6 +52,7 @@ class GuideAudioRepository {
             .filter { it.name.endsWith(GUIDE_AUDIO_CONFIG_FILE_NAME_SUFFIX) }
             .map { it.name.removeSuffix(".$GUIDE_AUDIO_CONFIG_FILE_NAME_SUFFIX") }
         _items.value = items
+        sort()
     }
 
     /**
@@ -89,6 +90,7 @@ class GuideAudioRepository {
             .getOrNull() ?: return false
         map[config.name] = config
         _items.value = listOf(config.name) + _items.value.minus(config.name)
+        sort()
         return true
     }
 
@@ -111,6 +113,10 @@ class GuideAudioRepository {
             audioFile.delete()
         }
         _items.value = _items.value.filterNot { it in names }
+    }
+
+    private fun sort() {
+        _items.value = _items.value.sortedBy { it }
     }
 
     companion object {

@@ -69,6 +69,7 @@ class ReclistRepository {
         file.copyTo(folder.resolve(file.name), overwrite = true)
         resolvedCommentFile?.copyTo(folder.resolve(resolvedCommentFile.name), overwrite = true)
         _items.value = listOf(name) + _items.value.minus(name)
+        sort()
         return true
     }
 
@@ -81,6 +82,7 @@ class ReclistRepository {
             .filterNot { it.name.endsWith(Reclist.COMMENT_FILE_NAME_SUFFIX_EXTENSION) }
             .map { it.nameWithoutExtension }
         _items.value = items
+        sort()
     }
 
     /**
@@ -101,6 +103,10 @@ class ReclistRepository {
             getCommentFile(name)?.delete()
         }
         _items.value = _items.value.filterNot { it in names }
+    }
+
+    private fun sort() {
+        _items.value = _items.value.sortedBy { it }
     }
 
     private fun getFile(name: String): File = folder.resolve("$name${Reclist.FILE_NAME_SUFFIX}")
