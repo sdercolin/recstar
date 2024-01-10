@@ -11,7 +11,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import platform.AVFAudio.AVAudioPlayer
 import platform.AVFAudio.AVAudioSession
+import platform.AVFAudio.AVAudioSessionCategoryOptionAllowBluetooth
 import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
+import platform.AVFAudio.AVAudioSessionModeDefault
 import platform.AVFAudio.setActive
 import ui.common.UnexpectedErrorNotifier
 import ui.model.AppContext
@@ -147,7 +149,12 @@ class AudioPlayerImpl(
 
     private fun setupAudioSession() {
         withNSError { e ->
-            AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayAndRecord, error = e)
+            AVAudioSession.sharedInstance().setCategory(
+                AVAudioSessionCategoryPlayAndRecord,
+                mode = AVAudioSessionModeDefault,
+                options = AVAudioSessionCategoryOptionAllowBluetooth,
+                error = e,
+            )
         }
         withNSError { e ->
             AVAudioSession.sharedInstance().setActive(true, error = e)
