@@ -5,7 +5,7 @@ package audio
  */
 data class AudioFormat(
     val sampleRate: Int,
-    val bitRate: Int,
+    val bitDepth: Int,
     val channelCount: Int,
     val signed: Boolean,
     val littleEndian: Boolean,

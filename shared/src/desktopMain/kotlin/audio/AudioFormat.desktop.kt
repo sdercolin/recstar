@@ -7,7 +7,7 @@ typealias JavaAudioFormat = javax.sound.sampled.AudioFormat
 actual fun getDefaultAudioFormat(): AudioFormat =
     AudioFormat(
         sampleRate = WavFormat.SAMPLE_RATE,
-        bitRate = WavFormat.BITS_PER_SAMPLE,
+        bitDepth = WavFormat.BITS_PER_SAMPLE,
         channelCount = WavFormat.CHANNELS,
         signed = true,
         littleEndian = false,
@@ -16,7 +16,7 @@ actual fun getDefaultAudioFormat(): AudioFormat =
 fun AudioFormat.toJavaAudioFormat(): JavaAudioFormat =
     JavaAudioFormat(
         sampleRate.toFloat(),
-        bitRate,
+        bitDepth,
         channelCount,
         signed,
         littleEndian,
@@ -25,7 +25,7 @@ fun AudioFormat.toJavaAudioFormat(): JavaAudioFormat =
 fun JavaAudioFormat.toAudioFormat(): AudioFormat =
     AudioFormat(
         sampleRate = sampleRate.toInt(),
-        bitRate = sampleSizeInBits,
+        bitDepth = sampleSizeInBits,
         channelCount = channels,
         signed = encoding == javax.sound.sampled.AudioFormat.Encoding.PCM_SIGNED,
         littleEndian = isBigEndian,
