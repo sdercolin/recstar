@@ -2,6 +2,7 @@ package audio
 
 import io.File
 import kotlinx.coroutines.flow.Flow
+import repository.AppPreferenceRepository
 import ui.common.UnexpectedErrorNotifier
 import ui.model.AppContext
 
@@ -48,6 +49,7 @@ expect class AudioRecorderProvider(
     listener: AudioRecorder.Listener,
     context: AppContext,
     unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    appPreferenceRepository: AppPreferenceRepository,
 ) {
     fun get(): AudioRecorder
 }

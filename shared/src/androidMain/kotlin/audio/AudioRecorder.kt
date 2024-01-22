@@ -18,6 +18,7 @@ import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
 import kotlinx.io.writeIntLe
 import kotlinx.io.writeShortLe
+import repository.AppPreferenceRepository
 import ui.common.UnexpectedErrorNotifier
 import ui.model.AppContext
 import util.Log
@@ -29,6 +30,7 @@ class AudioRecorderImpl(
     private val listener: AudioRecorder.Listener,
     context: AppContext,
     private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val appPreferenceRepository: AppPreferenceRepository,
 ) : AudioRecorder {
     private val coroutineScope = context.coroutineScope
     private var job: Job? = null
@@ -171,6 +173,13 @@ actual class AudioRecorderProvider actual constructor(
     private val listener: AudioRecorder.Listener,
     private val context: AppContext,
     private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val appPreferenceRepository: AppPreferenceRepository,
 ) {
-    actual fun get(): AudioRecorder = AudioRecorderImpl(listener, context, unexpectedErrorNotifier)
+    actual fun get(): AudioRecorder =
+        AudioRecorderImpl(
+            listener = listener,
+            context = context,
+            unexpectedErrorNotifier = unexpectedErrorNotifier,
+            appPreferenceRepository = appPreferenceRepository,
+        )
 }

@@ -34,6 +34,7 @@ import platform.AVFAudio.AVSampleRateKey
 import platform.AVFAudio.setActive
 import platform.CoreAudioTypes.kAudioFormatLinearPCM
 import platform.Foundation.NSOutputStream
+import repository.AppPreferenceRepository
 import ui.common.UnexpectedErrorNotifier
 import ui.model.AppContext
 import util.Log
@@ -46,6 +47,7 @@ class AudioRecorderImpl(
     private val listener: AudioRecorder.Listener,
     context: AppContext,
     private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val appPreferenceRepository: AppPreferenceRepository,
 ) : AudioRecorder {
     private var recorder: AVAudioRecorder? = null
     private var engine: AVAudioEngine? = null
@@ -188,6 +190,13 @@ actual class AudioRecorderProvider actual constructor(
     private val listener: AudioRecorder.Listener,
     private val context: AppContext,
     private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val appPreferenceRepository: AppPreferenceRepository,
 ) {
-    actual fun get(): AudioRecorder = AudioRecorderImpl(listener, context, unexpectedErrorNotifier)
+    actual fun get(): AudioRecorder =
+        AudioRecorderImpl(
+            listener = listener,
+            context = context,
+            unexpectedErrorNotifier = unexpectedErrorNotifier,
+            appPreferenceRepository = appPreferenceRepository,
+        )
 }

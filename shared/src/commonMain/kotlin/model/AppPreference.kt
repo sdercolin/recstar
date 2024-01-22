@@ -19,6 +19,7 @@ data class AppPreference(
     val customContentRootPath: String? = null,
     val recording: Recording = Recording(),
     val titleBarStyle: TitleBarStyle = TitleBarStyle.FileName,
+    val desiredInputName: String? = null,
 ) : JavaSerializable {
     enum class Language(private val language: StringLanguage?) : LocalizedText {
         Auto(null),

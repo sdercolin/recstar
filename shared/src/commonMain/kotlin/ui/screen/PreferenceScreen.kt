@@ -26,6 +26,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -34,6 +35,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import audio.AudioDeviceInfoList
+import audio.getAudioInputDeviceInfos
+import audio.getDefaultAudioFormat
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import const.APP_NAME
@@ -132,6 +136,19 @@ private fun ScreenContent() {
                 onValueChanged = { repository.update { copy(recording = recording.copy(autoNext = it)) } },
             )
         }
+        if (isDesktop) {
+            Group(title = string(Strings.PreferenceGroupAudio)) {
+                val allDeviceInfo = produceState<AudioDeviceInfoList?>(null, value.desiredInputName) {
+                    this.value = getAudioInputDeviceInfos(value.desiredInputName, getDefaultAudioFormat())
+                }
+                SelectionItem(
+                    title = string(Strings.PreferenceInputDeviceName),
+                    value = allDeviceInfo.value?.selectedDeviceInfo,
+                    onValueChanged = { repository.update { copy(desiredInputName = it.name) } },
+                    options = allDeviceInfo.value?.deviceInfos?.filterNot { it.notFound } ?: emptyList(),
+                )
+            }
+        }
         Group(title = string(Strings.PreferenceGroupView)) {
             SelectionItem(
                 title = string(Strings.PreferenceTitleBarStyle),
@@ -198,14 +215,16 @@ private fun Group(
 @Composable
 private fun <T : LocalizedText> SelectionItem(
     title: String,
-    value: T,
+    value: T?,
     onValueChanged: (T) -> Unit,
     options: List<T>,
+    isError: (T) -> Boolean = { false },
 ) {
     var isShowingDialog by remember { mutableStateOf(false) }
     Item(
         title = title,
-        info = value.getText(),
+        info = value?.getText() ?: "",
+        isError = value?.let(isError) ?: false,
         onClick = { isShowingDialog = true },
     )
     if (isShowingDialog) {
@@ -275,6 +294,7 @@ private fun SwitchItem(
 private fun Item(
     title: String,
     info: String? = null,
+    isError: Boolean = false,
     subItem: @Composable (() -> Unit)? = if (useIosStyle) {
         {
             Icon(
@@ -307,7 +327,11 @@ private fun Item(
                 Text(
                     text = info,
                     style = MaterialTheme.typography.caption.copy(
-                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
+                        color = if (isError) {
+                            MaterialTheme.colors.error
+                        } else {
+                            MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
+                        },
                     ),
                     maxLines = 1,
                 )

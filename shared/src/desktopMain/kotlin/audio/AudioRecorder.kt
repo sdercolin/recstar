@@ -1,7 +1,6 @@
 package audio
 
 import androidx.compose.runtime.Stable
-import const.WavFormat
 import io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -11,27 +10,32 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import repository.AppPreferenceRepository
 import ui.common.UnexpectedErrorNotifier
 import ui.model.AppContext
 import util.Log
 import util.runCatchingCancellable
 import util.toJavaFile
 import javax.sound.sampled.AudioFileFormat
-import javax.sound.sampled.AudioFormat
 import javax.sound.sampled.AudioInputStream
 import javax.sound.sampled.AudioSystem
+import javax.sound.sampled.DataLine
+import javax.sound.sampled.Mixer
 import javax.sound.sampled.TargetDataLine
 
 @Stable
 class AudioRecorderImpl(
     private val listener: AudioRecorder.Listener,
     private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val appPreferenceRepository: AppPreferenceRepository,
 ) : AudioRecorder {
     private var line: TargetDataLine? = null
     private var job: Job? = null
     private var cleanupJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.Main)
     private var stream: InterceptedAudioInputStream? = null
+    private val audioFormat = getDefaultAudioFormat()
+    private val javaAudioFormat = audioFormat.toJavaAudioFormat()
 
     override fun start(output: File) {
         if (job?.isActive == true) {
@@ -43,16 +47,7 @@ class AudioRecorderImpl(
                 cleanupJob?.join()
                 cleanupJob = null
                 _waveDataFlow.value = FloatArray(0)
-                val format = AudioFormat(
-                    WavFormat.SAMPLE_RATE.toFloat(),
-                    WavFormat.BITS_PER_SAMPLE,
-                    WavFormat.CHANNELS,
-                    // signed
-                    true,
-                    // little endian
-                    false,
-                )
-                val line = AudioSystem.getTargetDataLine(format).apply {
+                val line = getTargetLine().apply {
                     open(format)
                     start()
                 }
@@ -63,7 +58,7 @@ class AudioRecorderImpl(
                     val stream = InterceptedAudioInputStream(line, 1792, _waveDataFlow)
                     this@AudioRecorderImpl.stream = stream
                     AudioSystem.write(
-                        AudioInputStream(stream, format, AudioSystem.NOT_SPECIFIED.toLong()),
+                        AudioInputStream(stream, javaAudioFormat, AudioSystem.NOT_SPECIFIED.toLong()),
                         AudioFileFormat.Type.WAVE,
                         output.toJavaFile(),
                     )
@@ -73,6 +68,29 @@ class AudioRecorderImpl(
                 dispose()
             }
         }
+    }
+
+    private suspend fun getTargetLine(): TargetDataLine {
+        val mixerInfos = AudioSystem.getMixerInfo()
+        val dataLineInfo = DataLine.Info(TargetDataLine::class.java, javaAudioFormat)
+        val deviceInfos = getAudioInputDeviceInfos(appPreferenceRepository.value.desiredInputName, audioFormat)
+        if (!AudioSystem.isLineSupported(dataLineInfo)) {
+            throw UnsupportedOperationException("DataLineInfo not supported: $dataLineInfo")
+        }
+        val selectedMixerInfo = selectMixer(mixerInfos, deviceInfos)
+        val selectedMixer = AudioSystem.getMixer(selectedMixerInfo)
+        return selectedMixer.getLine(dataLineInfo) as TargetDataLine
+    }
+
+    private fun selectMixer(
+        mixerInfos: Array<out Mixer.Info>,
+        deviceInfos: AudioDeviceInfoList,
+    ): Mixer.Info {
+        mixerInfos.find { it.name == deviceInfos.selectedDeviceInfo.name }?.let {
+            return it
+        }
+        val default = deviceInfos.deviceInfos.firstOrNull { it.isDefault } ?: deviceInfos.deviceInfos.first()
+        return mixerInfos.find { it.name == default.name } ?: mixerInfos.first()
     }
 
     override fun stop() {
@@ -118,12 +136,14 @@ class AudioRecorderImpl(
 actual class AudioRecorderProvider(
     private val listener: AudioRecorder.Listener,
     private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val appPreferenceRepository: AppPreferenceRepository,
 ) {
     actual constructor(
         listener: AudioRecorder.Listener,
         context: AppContext,
         unexpectedErrorNotifier: UnexpectedErrorNotifier,
-    ) : this(listener, unexpectedErrorNotifier)
+        appPreferenceRepository: AppPreferenceRepository,
+    ) : this(listener, unexpectedErrorNotifier, appPreferenceRepository)
 
-    actual fun get(): AudioRecorder = AudioRecorderImpl(listener, unexpectedErrorNotifier)
+    actual fun get(): AudioRecorder = AudioRecorderImpl(listener, unexpectedErrorNotifier, appPreferenceRepository)
 }

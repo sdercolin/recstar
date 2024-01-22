@@ -252,7 +252,12 @@ class SessionScreenModel(
 
     private val unexpectedErrorNotifier = UnexpectedErrorNotifier(alertDialogController, context, fileInteractor)
     private val player = AudioPlayerProvider(playerListener, context, unexpectedErrorNotifier).get()
-    private val recorder = AudioRecorderProvider(recorderListener, context, unexpectedErrorNotifier).get()
+    private val recorder = AudioRecorderProvider(
+        recorderListener,
+        context,
+        unexpectedErrorNotifier,
+        appPreferenceRepository,
+    ).get()
     private val waveformPainter = WaveformPainter(
         recorder.waveDataFlow,
         screenModelScope,
