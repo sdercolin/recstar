@@ -67,6 +67,7 @@ class PostRecordingScheduler(
         if (!isWaitingForPlayback) {
             return
         }
+        isWaitingForPlayback = false
         if (settings.autoNext) {
             job?.cancel()
             job = scope.launch {
