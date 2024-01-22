@@ -9,6 +9,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import repository.AppPreferenceRepository
 import ui.common.UnexpectedErrorNotifier
 import ui.model.AppContext
 import util.Log
@@ -16,8 +17,9 @@ import util.runCatchingCancellable
 
 class AudioPlayerImpl(
     private val listener: AudioPlayer.Listener,
-    private val context: AppContext,
+    context: AppContext,
     private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val appPreferenceRepository: AppPreferenceRepository,
 ) : AudioPlayer {
     private val scope = context.coroutineScope
     private var mediaPlayer: MediaPlayer? = null
@@ -136,6 +138,7 @@ actual class AudioPlayerProvider actual constructor(
     private val listener: AudioPlayer.Listener,
     private val context: AppContext,
     private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val appPreferenceRepository: AppPreferenceRepository,
 ) {
-    actual fun get(): AudioPlayer = AudioPlayerImpl(listener, context, unexpectedErrorNotifier)
+    actual fun get(): AudioPlayer = AudioPlayerImpl(listener, context, unexpectedErrorNotifier, appPreferenceRepository)
 }

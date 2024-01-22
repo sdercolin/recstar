@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import audio.AudioDeviceInfoList
 import audio.getAudioInputDeviceInfos
+import audio.getAudioOutputDeviceInfos
 import audio.getDefaultAudioFormat
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -138,14 +139,23 @@ private fun ScreenContent() {
         }
         if (isDesktop) {
             Group(title = string(Strings.PreferenceGroupAudio)) {
-                val allDeviceInfo = produceState<AudioDeviceInfoList?>(null, value.desiredInputName) {
+                val allInputDeviceInfo = produceState<AudioDeviceInfoList?>(null, value.desiredInputName) {
                     this.value = getAudioInputDeviceInfos(value.desiredInputName, getDefaultAudioFormat())
                 }
                 SelectionItem(
                     title = string(Strings.PreferenceInputDeviceName),
-                    value = allDeviceInfo.value?.selectedDeviceInfo,
+                    value = allInputDeviceInfo.value?.selectedDeviceInfo,
                     onValueChanged = { repository.update { copy(desiredInputName = it.name) } },
-                    options = allDeviceInfo.value?.deviceInfos?.filterNot { it.notFound } ?: emptyList(),
+                    options = allInputDeviceInfo.value?.deviceInfos?.filterNot { it.notFound } ?: emptyList(),
+                )
+                val allOutputDeviceInfo = produceState<AudioDeviceInfoList?>(null, value.desiredOutputName) {
+                    this.value = getAudioOutputDeviceInfos(value.desiredOutputName, getDefaultAudioFormat())
+                }
+                SelectionItem(
+                    title = string(Strings.PreferenceOutputDeviceName),
+                    value = allOutputDeviceInfo.value?.selectedDeviceInfo,
+                    onValueChanged = { repository.update { copy(desiredOutputName = it.name) } },
+                    options = allOutputDeviceInfo.value?.deviceInfos?.filterNot { it.notFound } ?: emptyList(),
                 )
             }
         }
@@ -225,7 +235,11 @@ private fun <T : LocalizedText> SelectionItem(
         title = title,
         info = value?.getText() ?: "",
         isError = value?.let(isError) ?: false,
-        onClick = { isShowingDialog = true },
+        onClick = {
+            if (options.isNotEmpty()) {
+                isShowingDialog = true
+            }
+        },
     )
     if (isShowingDialog) {
         AlertDialog(

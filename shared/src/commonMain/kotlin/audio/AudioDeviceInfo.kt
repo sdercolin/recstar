@@ -22,7 +22,7 @@ data class AudioDeviceInfo(
 
     @Composable
     override fun getText(): String =
-        if (notFound) string(Strings.PreferenceInputDeviceNameNotFoundTemplate, displayName) else displayName
+        if (notFound) string(Strings.PreferenceDeviceNameNotFoundTemplate, displayName) else displayName
 }
 
 /**
@@ -34,6 +34,11 @@ data class AudioDeviceInfoList(
 )
 
 expect suspend fun getAudioInputDeviceInfos(
+    desiredDeviceName: String?,
+    audioFormat: AudioFormat,
+): AudioDeviceInfoList
+
+expect suspend fun getAudioOutputDeviceInfos(
     desiredDeviceName: String?,
     audioFormat: AudioFormat,
 ): AudioDeviceInfoList

@@ -15,6 +15,7 @@ import platform.AVFAudio.AVAudioSessionCategoryOptionAllowBluetooth
 import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
 import platform.AVFAudio.AVAudioSessionModeDefault
 import platform.AVFAudio.setActive
+import repository.AppPreferenceRepository
 import ui.common.UnexpectedErrorNotifier
 import ui.model.AppContext
 import util.Log
@@ -26,6 +27,7 @@ class AudioPlayerImpl(
     private val listener: AudioPlayer.Listener,
     context: AppContext,
     private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val appPreferenceRepository: AppPreferenceRepository,
 ) : AudioPlayer {
     private val scope = context.coroutineScope
     private var audioPlayer: AVAudioPlayer? = null
@@ -166,6 +168,7 @@ actual class AudioPlayerProvider actual constructor(
     private val listener: AudioPlayer.Listener,
     private val context: AppContext,
     private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val appPreferenceRepository: AppPreferenceRepository,
 ) {
-    actual fun get(): AudioPlayer = AudioPlayerImpl(listener, context, unexpectedErrorNotifier)
+    actual fun get(): AudioPlayer = AudioPlayerImpl(listener, context, unexpectedErrorNotifier, appPreferenceRepository)
 }

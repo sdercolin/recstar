@@ -251,7 +251,12 @@ class SessionScreenModel(
     }
 
     private val unexpectedErrorNotifier = UnexpectedErrorNotifier(alertDialogController, context, fileInteractor)
-    private val player = AudioPlayerProvider(playerListener, context, unexpectedErrorNotifier).get()
+    private val player = AudioPlayerProvider(
+        playerListener,
+        context,
+        unexpectedErrorNotifier,
+        appPreferenceRepository,
+    ).get()
     private val recorder = AudioRecorderProvider(
         recorderListener,
         context,
@@ -269,7 +274,12 @@ class SessionScreenModel(
 
     val waveformFlow: Flow<Array<FloatArray>> = waveformPainter.flow
 
-    private val guidePlayer = AudioPlayerProvider(guidePlayerListener, context, unexpectedErrorNotifier).get()
+    private val guidePlayer = AudioPlayerProvider(
+        guidePlayerListener,
+        context,
+        unexpectedErrorNotifier,
+        appPreferenceRepository,
+    ).get()
 
     private var isPermissionGranted = permissionChecker.checkAndRequestRecordingPermission()
 
