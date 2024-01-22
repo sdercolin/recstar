@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import model.AppPreference
+import model.licenseReportResId
 import ui.model.AndroidContext
 import util.Log
 
@@ -46,5 +47,6 @@ class MainActivity : AppCompatActivity() {
         Paths.initializeContext(this)
         ensurePaths()
         Log.initialize()
+        licenseReportResId = R.raw.license_report
     }
 }

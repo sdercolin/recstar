@@ -1,10 +1,22 @@
+import com.github.jk1.license.render.JsonReportRenderer
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.internal.utils.localPropertiesFile
-import java.util.*
+import java.util.Properties
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+        classpath("com.codingfeline.buildkonfig:buildkonfig-gradle-plugin:0.15.1")
+    }
+}
 
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
+    id("com.github.jk1.dependency-license-report") version "2.5"
 }
 
 kotlin {
@@ -74,3 +86,16 @@ compose.desktop {
         }
     }
 }
+
+licenseReport {
+    renderers = arrayOf(JsonReportRenderer())
+    configurations = arrayOf("jvmRuntimeClasspath")
+}
+tasks.findByName("generateLicenseReport")?.apply {
+    doLast {
+        val generated = File("$buildDir/reports/dependency-license/index.json")
+        val source = File("$buildDir/processedResources/jvm/main/license-report.json")
+        generated.copyTo(source, overwrite = true)
+    }
+}
+tasks.findByName("jvmProcessResources")?.dependsOn("generateLicenseReport")

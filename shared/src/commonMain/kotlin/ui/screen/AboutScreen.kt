@@ -19,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import ui.common.LocalToastController
@@ -46,6 +48,7 @@ object AboutScreen : Screen {
     override fun Content() {
         val context = LocalAppContext.current
         val toastController = LocalToastController.current
+        val navigator = LocalNavigator.currentOrThrow
         Box(
             modifier = Modifier.fillMaxSize().background(color = MaterialTheme.colors.background),
             contentAlignment = Alignment.Center,
@@ -87,6 +90,9 @@ object AboutScreen : Screen {
                         // Newer versions of Android have a built-in toast message when copying.
                         toastController.show(stringStatic(Strings.AboutScreenDeviceInfoCopied))
                     }
+                }
+                AboutButton(Strings.AboutScreenViewLicenses) {
+                    navigator push LicenseScreen
                 }
                 AboutButton(Strings.AboutScreenViewOnGithub) {
                     Browser.openUrl(context, GITHUB_URL)

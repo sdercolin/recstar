@@ -1,4 +1,6 @@
 import com.codingfeline.buildkonfig.compiler.FieldSpec
+import com.github.jk1.license.render.JsonReportRenderer
+import org.gradle.kotlin.dsl.support.uppercaseFirstChar
 import java.util.*
 
 buildscript {
@@ -7,7 +9,8 @@ buildscript {
     }
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.20")
-        classpath("com.codingfeline.buildkonfig:buildkonfig-gradle-plugin:0.15.0")
+        classpath("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+        classpath("com.codingfeline.buildkonfig:buildkonfig-gradle-plugin:0.15.1")
     }
 }
 
@@ -17,6 +20,7 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.compose")
     id("com.codingfeline.buildkonfig") version "+"
+    id("com.github.jk1.dependency-license-report") version "2.5"
 }
 
 val localProperties =
@@ -93,7 +97,7 @@ kotlin {
         val androidMain by getting {
             dependsOn(sharedJvmMain)
             dependencies {
-                api("androidx.activity:activity-compose:1.8.0")
+                api("androidx.activity:activity-compose:1.8.2")
                 api("androidx.appcompat:appcompat:1.6.1")
                 api("androidx.core:core-ktx:1.12.0")
                 implementation("androidx.documentfile:documentfile:1.0.1")
@@ -108,6 +112,7 @@ kotlin {
                 iosX64Main.dependsOn(this)
                 iosArm64Main.dependsOn(this)
                 iosSimulatorArm64Main.dependsOn(this)
+                resources.srcDirs("$buildDir/generated/src/iosMain/resources")
             }
         }
         val desktopMain by getting {
@@ -183,6 +188,29 @@ task("updateProjectVersions") {
         val shellScriptFile = rootProject.file("tools/update_ios_version.sh")
         exec {
             commandLine("sh", shellScriptFile.absolutePath, versionName, versionCode)
+        }
+    }
+}
+
+if (includeIos) {
+    licenseReport {
+        renderers = arrayOf(JsonReportRenderer())
+        configurations = arrayOf("iosMainResolvableDependenciesMetadata")
+        excludes = arrayOf("org.jetbrains.skiko:skiko")
+    }
+
+    listOf(
+        "iosX64",
+        "iosArm64",
+        "iosSimulatorArm64",
+    ).forEach { target ->
+        tasks.findByName("compileKotlin${target.uppercaseFirstChar()}")?.apply {
+            dependsOn("generateLicenseReport")
+            doLast {
+                val generated = File("$buildDir/reports/dependency-license/index.json")
+                val source = File("$buildDir/generated/src/iosMain/resources/license-report.json")
+                generated.copyTo(source, overwrite = true)
+            }
         }
     }
 }
