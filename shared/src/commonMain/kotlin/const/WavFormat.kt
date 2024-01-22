@@ -6,7 +6,8 @@ object WavFormat {
     const val SUBCHUNK_1_ID = "fmt "
     const val SUBCHUNK_1_SIZE = 16
     const val SUBCHUNK_2_ID = "data"
-    const val AUDIO_FORMAT = 1.toShort()
+    const val AUDIO_FORMAT_PCM = 1.toShort()
+    const val AUDIO_FORMAT_FLOAT = 3.toShort()
     const val CHANNELS = 1
     const val SAMPLE_RATE = 44100
     const val BITS_PER_SAMPLE = 16

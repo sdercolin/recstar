@@ -51,7 +51,7 @@ class AudioRecorderImpl(
 
         buffer.writeRawString(WavFormat.SUBCHUNK_1_ID)
         buffer.writeIntLe(WavFormat.SUBCHUNK_1_SIZE)
-        buffer.writeShortLe(WavFormat.AUDIO_FORMAT)
+        buffer.writeShortLe(WavFormat.AUDIO_FORMAT_PCM)
         buffer.writeShortLe(WavFormat.CHANNELS.toShort())
         buffer.writeIntLe(WavFormat.SAMPLE_RATE)
         buffer.writeIntLe(WavFormat.BYTE_RATE)
