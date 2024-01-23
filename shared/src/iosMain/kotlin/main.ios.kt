@@ -11,6 +11,7 @@ import platform.UIKit.UIDevice
 import platform.UIKit.UIInterfaceOrientationUnknown
 import platform.UIKit.UIViewController
 import platform.UIKit.attemptRotationToDeviceOrientation
+import ui.model.ProvideSafeAreaInsets
 import ui.model.ProvideScreenOrientation
 import ui.model.ViewControllerContext
 import ui.model.requestedScreenOrientation
@@ -30,7 +31,9 @@ fun MainViewController() =
         }
         ProvideAppDependencies(dependencies) {
             ProvideScreenOrientation {
-                App()
+                ProvideSafeAreaInsets(viewController) {
+                    App()
+                }
             }
         }
     }
