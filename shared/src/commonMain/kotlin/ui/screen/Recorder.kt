@@ -61,6 +61,7 @@ import kotlinx.coroutines.flow.collectLatest
 import repository.LocalAppPreferenceRepository
 import repository.LocalKeyEventStore
 import ui.common.plainClickable
+import ui.model.LocalSafeAreaInsets
 import ui.model.LocalScreenOrientation
 import ui.model.ScreenOrientation
 import ui.string.*
@@ -342,7 +343,12 @@ private fun RecorderControls(
     onPrevious: () -> Unit,
 ) {
     Row(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
+            .padding(
+                bottom = LocalSafeAreaInsets.current.bottomDp(
+                    if (LocalScreenOrientation.current == ScreenOrientation.Landscape) 4f else 20f,
+                ),
+            ),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {

@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.collectLatest
 import ui.common.ReversedRow
 import ui.common.ScrollableLazyColumn
 import ui.common.plainClickable
+import ui.model.LocalSafeAreaInsets
 import ui.model.Sentence
 import ui.style.CustomColors
 
@@ -91,7 +92,10 @@ private fun SentenceItem(
             .height(itemHeight)
             .background(color = if (isCurrent) MaterialTheme.colors.primary else Color.Transparent)
             .plainClickable { onClickItem(index) }
-            .padding(horizontal = 32.dp),
+            .padding(
+                start = 32.dp,
+                end = 32.dp + LocalSafeAreaInsets.current.leftDp(20f),
+            ),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {

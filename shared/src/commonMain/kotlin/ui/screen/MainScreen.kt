@@ -37,6 +37,7 @@ import ui.common.ActionMenuItem
 import ui.common.FloatingActionButtonWrapper
 import ui.common.ScrollableLazyColumn
 import ui.common.SortingButton
+import ui.model.LocalSafeAreaInsets
 import ui.model.Screen
 import ui.screen.demo.DemoShowcaseScreen
 import ui.string.*
@@ -98,7 +99,12 @@ private fun MainScreen.ScreenContent() {
     val model = rememberMainScreenModel()
     val sessions by model.sessions.collectAsState()
 
-    Box(modifier = Modifier.fillMaxSize().background(color = MaterialTheme.colors.background)) {
+    Box(
+        modifier = Modifier.fillMaxSize().background(color = MaterialTheme.colors.background).padding(
+            start = LocalSafeAreaInsets.current.leftDp(8f),
+            end = LocalSafeAreaInsets.current.rightDp(8f),
+        ),
+    ) {
         Column(modifier = Modifier.fillMaxSize()) {
             val titleText = model.getWrappedTitleText(string(Strings.MainScreenAllSessions))
             Row(

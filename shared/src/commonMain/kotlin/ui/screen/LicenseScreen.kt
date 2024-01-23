@@ -28,6 +28,7 @@ import model.LicenseReport
 import model.getLicenseReport
 import ui.common.ScrollableLazyColumn
 import ui.model.LocalAppContext
+import ui.model.LocalSafeAreaInsets
 import ui.model.Screen
 import ui.string.*
 import util.Browser
@@ -59,7 +60,12 @@ object LicenseScreen : Screen {
 
 @Composable
 private fun Item(dependency: LicenseReport.Dependency) {
-    Column(modifier = Modifier.padding(horizontal = 30.dp, vertical = 15.dp)) {
+    Column(
+        modifier = Modifier.padding(horizontal = 30.dp, vertical = 15.dp).padding(
+            start = LocalSafeAreaInsets.current.leftDp(8f),
+            end = LocalSafeAreaInsets.current.rightDp(8f),
+        ),
+    ) {
         Text(
             text = buildAnnotatedString {
                 withStyle(

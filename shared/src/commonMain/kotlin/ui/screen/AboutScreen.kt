@@ -27,6 +27,7 @@ import ui.common.LocalToastController
 import ui.common.ScrollableColumn
 import ui.common.show
 import ui.model.LocalAppContext
+import ui.model.LocalSafeAreaInsets
 import ui.model.LocalScreenOrientation
 import ui.model.Screen
 import ui.model.ScreenOrientation
@@ -50,7 +51,8 @@ object AboutScreen : Screen {
         val toastController = LocalToastController.current
         val navigator = LocalNavigator.currentOrThrow
         Box(
-            modifier = Modifier.fillMaxSize().background(color = MaterialTheme.colors.background),
+            modifier = Modifier.fillMaxSize().background(color = MaterialTheme.colors.background)
+                .padding(bottom = LocalSafeAreaInsets.current.bottomDp()),
             contentAlignment = Alignment.Center,
         ) {
             val width = with(LocalDensity.current) {

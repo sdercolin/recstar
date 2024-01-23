@@ -34,6 +34,7 @@ import ui.common.FloatingActionButtonWrapper
 import ui.common.LocalAlertDialogController
 import ui.common.LocalToastController
 import ui.common.ScrollableLazyColumn
+import ui.model.LocalSafeAreaInsets
 import ui.model.Screen
 import ui.string.*
 
@@ -93,7 +94,14 @@ private fun CreateSessionReclistScreen.ScreenContent() {
             }
         }
     }
-    Box(modifier = Modifier.fillMaxSize().background(color = MaterialTheme.colors.background)) {
+    Box(
+        modifier = Modifier.fillMaxSize()
+            .background(color = MaterialTheme.colors.background)
+            .padding(
+                start = LocalSafeAreaInsets.current.leftDp(8f),
+                end = LocalSafeAreaInsets.current.rightDp(8f),
+            ),
+    ) {
         Column(modifier = Modifier.fillMaxSize()) {
             val titleText = model.getWrappedTitleText(string(Strings.CreateSessionReclistScreenAllReclists))
             Text(

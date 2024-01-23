@@ -51,6 +51,7 @@ import repository.LocalReclistRepository
 import repository.LocalSessionRepository
 import ui.common.DisabledMutableInteractionSource
 import ui.common.ScrollableColumn
+import ui.model.LocalSafeAreaInsets
 import ui.model.Screen
 import ui.string.*
 import util.Log
@@ -74,7 +75,12 @@ private fun ScreenContent() {
     val navigator = LocalNavigator.currentOrThrow
     val fileInteractor = LocalFileInteractor.current
     val value by repository.flow.collectAsState()
-    ScrollableColumn(modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background)) {
+    ScrollableColumn(
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background).padding(
+            start = LocalSafeAreaInsets.current.leftDp(8f),
+            end = LocalSafeAreaInsets.current.rightDp(8f),
+        ),
+    ) {
         Group(title = string(Strings.PreferenceGroupAppearance)) {
             SelectionItem(
                 title = string(Strings.PreferenceLanguage),
