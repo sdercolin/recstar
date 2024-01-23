@@ -3,7 +3,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalConfiguration
 import ui.model.LocalScreenOrientation
+import ui.model.ProvideSafeAreaInsets
 import ui.model.ScreenOrientation
+import ui.model.androidContext
 
 @Composable
 fun MainView(dependencies: AppDependencies) {
@@ -14,7 +16,9 @@ fun MainView(dependencies: AppDependencies) {
     }
     ProvideAppDependencies(dependencies) {
         CompositionLocalProvider(LocalScreenOrientation provides orientation) {
-            App()
+            ProvideSafeAreaInsets(dependencies.context.androidContext) {
+                App()
+            }
         }
     }
 }
