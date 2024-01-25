@@ -61,7 +61,7 @@ class ReclistRepository {
         }
         map[name] = reclist
         file.copyTo(folder.resolve(file.name), overwrite = true)
-        commentFile?.copyTo(folder.resolve(commentFile.name), overwrite = true)
+        commentFile?.copyTo(getCommentFile(name, folder), overwrite = true)
         _items.value = listOf(name) + _items.value.minus(name)
         sort()
         return true
@@ -85,7 +85,7 @@ class ReclistRepository {
     fun get(name: String): Reclist =
         map[name] ?: parseReclist(
             file = getFile(name),
-            commentFile = getCommentFile(name),
+            commentFile = getCommentFile(name).takeIf { it.exists() },
         ).getOrThrow()
 
     /**
@@ -94,7 +94,7 @@ class ReclistRepository {
     fun delete(names: List<String>) {
         names.forEach { name ->
             getFile(name).delete()
-            getCommentFile(name)?.delete()
+            getCommentFile(name).takeIf { it.exists() }?.delete()
         }
         _items.value = _items.value.filterNot { it in names }
     }
@@ -108,7 +108,7 @@ class ReclistRepository {
     private fun getCommentFile(
         name: String,
         folder: File = this.folder,
-    ): File? = folder.resolve("$name${Reclist.COMMENT_FILE_NAME_SUFFIX_EXTENSION}").takeIf { it.exists() }
+    ): File = folder.resolve("$name${Reclist.COMMENT_FILE_NAME_SUFFIX_EXTENSION}")
 }
 
 val LocalReclistRepository = staticCompositionLocalOf<ReclistRepository> { error("No ReclistRepository provided") }
