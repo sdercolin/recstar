@@ -48,16 +48,10 @@ class ReclistRepository {
     fun import(
         file: File,
         commentFile: File?,
-        findComment: Boolean,
     ): Boolean {
         val name = file.nameWithoutExtension
-        val resolvedCommentFile = if (commentFile == null && findComment) {
-            getCommentFile(name, folder = requireNotNull(file.parentFile))
-        } else {
-            commentFile
-        }
-        Log.i("ReclistRepository.import: ${file.absolutePath}, commentFile: ${resolvedCommentFile?.absolutePath}")
-        val reclist = parseReclist(file, resolvedCommentFile)
+        Log.i("ReclistRepository.import: ${file.absolutePath}, commentFile: ${commentFile?.absolutePath}")
+        val reclist = parseReclist(file, commentFile)
             .onFailure {
                 Log.e("ReclistRepository.import: failed to parse ${file.absolutePath}", it)
             }
@@ -67,7 +61,7 @@ class ReclistRepository {
         }
         map[name] = reclist
         file.copyTo(folder.resolve(file.name), overwrite = true)
-        resolvedCommentFile?.copyTo(folder.resolve(resolvedCommentFile.name), overwrite = true)
+        commentFile?.copyTo(folder.resolve(commentFile.name), overwrite = true)
         _items.value = listOf(name) + _items.value.minus(name)
         sort()
         return true
