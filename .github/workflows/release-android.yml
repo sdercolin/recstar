@@ -32,6 +32,7 @@ jobs:
             echo "Tag $TAG does not match app version $APP_VERSION"
             exit 1
           fi
+          echo $(ls /usr/local/lib/android/sdk/build-tools/)
 
       - name: Set Flavor
         run: echo "buildkonfig.flavor=release" >> gradle.properties
@@ -41,9 +42,6 @@ jobs:
         with:
           java-version: '17'
           distribution: 'corretto'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
 
       - name: Build APK with Gradle
         uses: gradle/gradle-build-action@v2
@@ -59,6 +57,8 @@ jobs:
           alias: ${{ secrets.ANDROID_KEYSTORE_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           keyPassword: ${{ secrets.ANDROID_KEYSTORE_KEY_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: "34.0.0"
 
       - name: Rename
         run: |
@@ -66,7 +66,7 @@ jobs:
           OUTPUT_FILE=${{steps.sign_apk.outputs.signedReleaseFile}}
           echo $VERSION
           echo $OUTPUT_FILE
-          mv OUTPUT_FILE ./recstar-$VERSION.apk
+          mv $OUTPUT_FILE ./recstar-$VERSION.apk
 
       - name: Release
         uses: softprops/action-gh-release@v1
