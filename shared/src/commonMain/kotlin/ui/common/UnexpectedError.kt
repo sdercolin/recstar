@@ -1,5 +1,6 @@
 package ui.common
 
+import exception.LocalizedException
 import io.FileInteractor
 import io.Paths
 import io.logsDirectory
@@ -16,6 +17,14 @@ class UnexpectedErrorNotifier(
 ) {
     fun notify(t: Throwable) {
         Log.e(t)
+        if (t is LocalizedException) {
+            alertDialogController.requestConfirmCancellable(
+                title = stringStatic(Strings.CommonError),
+                message = t.message ?: t.toString(),
+                onConfirm = {},
+            )
+            return
+        }
         if (isDesktop) {
             alertDialogController.requestConfirmCancellable(
                 message = stringStatic(Strings.AlertUnexpectedErrorOpenLog),

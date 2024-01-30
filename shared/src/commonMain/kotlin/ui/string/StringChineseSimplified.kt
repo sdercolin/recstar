@@ -23,6 +23,7 @@ fun Strings.zhHans(): String? =
         ExceptionRenameSessionExisting -> "已存在名为 {0} 的会话。"
         ExceptionRenameSessionInvalid -> "无效的会话名：{0}"
         ExceptionRenameSessionUnexpected -> "重命名会话失败。"
+        ExceptionUnsupportedAudioFormat -> "不支持的音频格式：{0}，请尝试调整音频设置。"
         AlertExportTips ->
             "在 iOS 和 macOS 上录制的文件可能具有带有特殊字符的文件名。" +
                 "在 Windows 上使用其他软件读取这些文件之前，请将文件名规范化为 NFC 格式。" +

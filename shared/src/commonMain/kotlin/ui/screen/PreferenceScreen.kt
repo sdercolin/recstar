@@ -36,9 +36,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import audio.AudioDeviceInfoList
+import audio.getAudioFormat
 import audio.getAudioInputDeviceInfos
 import audio.getAudioOutputDeviceInfos
-import audio.getDefaultAudioFormat
+import audio.isSupported
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import const.APP_NAME
@@ -56,6 +57,7 @@ import ui.model.Screen
 import ui.string.*
 import util.Log
 import util.appVersion
+import util.isDebug
 import util.isDesktop
 import util.runIf
 import util.runIfHave
@@ -145,8 +147,13 @@ private fun ScreenContent() {
         }
         Group(title = string(Strings.PreferenceGroupAudio)) {
             if (isDesktop) {
-                val allInputDeviceInfo = produceState<AudioDeviceInfoList?>(null, value.desiredInputName) {
-                    this.value = getAudioInputDeviceInfos(value.desiredInputName, getDefaultAudioFormat())
+                val allInputDeviceInfo = produceState<AudioDeviceInfoList?>(
+                    null,
+                    value.desiredInputName,
+                    value.sampleRate,
+                    value.bitDepth,
+                ) {
+                    this.value = getAudioInputDeviceInfos(value.desiredInputName, value.getAudioFormat())
                 }
                 SelectionItem(
                     title = string(Strings.PreferenceInputDeviceName),
@@ -154,8 +161,13 @@ private fun ScreenContent() {
                     onValueChanged = { repository.update { copy(desiredInputName = it.name) } },
                     options = allInputDeviceInfo.value?.deviceInfos?.filterNot { it.notFound } ?: emptyList(),
                 )
-                val allOutputDeviceInfo = produceState<AudioDeviceInfoList?>(null, value.desiredOutputName) {
-                    this.value = getAudioOutputDeviceInfos(value.desiredOutputName, getDefaultAudioFormat())
+                val allOutputDeviceInfo = produceState<AudioDeviceInfoList?>(
+                    null,
+                    value.desiredOutputName,
+                    value.sampleRate,
+                    value.bitDepth,
+                ) {
+                    this.value = getAudioOutputDeviceInfos(value.desiredOutputName, value.getAudioFormat())
                 }
                 SelectionItem(
                     title = string(Strings.PreferenceOutputDeviceName),
@@ -170,12 +182,17 @@ private fun ScreenContent() {
                 onValueChanged = { repository.update { copy(sampleRate = it) } },
                 options = AppPreference.SampleRateOption.entries.toList(),
             )
-            SelectionItem(
-                title = string(Strings.PreferenceBitDepth),
-                value = value.bitDepth,
-                onValueChanged = { repository.update { copy(bitDepth = it) } },
-                options = AppPreference.BitDepthOption.entries.toList(),
-            )
+            val bitDepthOptions = AppPreference.BitDepthOption.entries.filter {
+                it.isSupported() || isDebug
+            }
+            if (bitDepthOptions.size > 1) {
+                SelectionItem(
+                    title = string(Strings.PreferenceBitDepth),
+                    value = value.bitDepth,
+                    onValueChanged = { repository.update { copy(bitDepth = it) } },
+                    options = bitDepthOptions.toList(),
+                )
+            }
         }
         Group(title = string(Strings.PreferenceGroupView)) {
             SelectionItem(

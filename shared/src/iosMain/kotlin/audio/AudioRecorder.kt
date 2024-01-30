@@ -54,6 +54,7 @@ class AudioRecorderImpl(
     private var job: Job? = null
     private var cleanupJob: Job? = null
     private val scope = context.coroutineScope
+    private val format get() = appPreferenceRepository.value.getAudioFormat()
 
     override fun start(output: File) {
         if (job?.isActive == true) {
@@ -65,16 +66,17 @@ class AudioRecorderImpl(
         job = scope.launch(Dispatchers.IO) {
             runCatchingCancellable {
                 withNSError { e ->
+                    val desiredFormat = this@AudioRecorderImpl.format
                     val settings = mapOf<Any?, Any>(
                         AVFormatIDKey to kAudioFormatLinearPCM,
-                        AVSampleRateKey to 44100.0,
-                        AVNumberOfChannelsKey to 1,
-                        AVLinearPCMBitDepthKey to 16,
-                        AVLinearPCMIsBigEndianKey to false,
-                        AVLinearPCMIsFloatKey to false,
+                        AVSampleRateKey to desiredFormat.sampleRate.toDouble(),
+                        AVNumberOfChannelsKey to desiredFormat.channelCount,
+                        AVLinearPCMBitDepthKey to desiredFormat.bitDepth,
+                        AVLinearPCMIsBigEndianKey to desiredFormat.littleEndian.not(),
+                        AVLinearPCMIsFloatKey to desiredFormat.floating,
                     )
                     val url = output.toNSURL()
-                    Log.i("AudioRecorderImpl.start: url: $url")
+                    Log.i("AudioRecorderImpl.start: url: $url, settings: $settings")
                     recorder = AVAudioRecorder(url, settings, e)
 
                     val engine = AVAudioEngine()

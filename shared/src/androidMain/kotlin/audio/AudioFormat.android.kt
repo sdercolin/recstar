@@ -1,5 +1,10 @@
 package audio
 
-actual fun getDefaultAudioFormat(): AudioFormat {
-    throw NotImplementedError("Not yet used on Android")
-}
+import model.AppPreference
+
+actual fun AppPreference.BitDepthOption.isSupported(): Boolean =
+    when (this) {
+        AppPreference.BitDepthOption.BitDepth16 -> true
+        AppPreference.BitDepthOption.BitDepth32Float -> true
+        else -> false
+    }

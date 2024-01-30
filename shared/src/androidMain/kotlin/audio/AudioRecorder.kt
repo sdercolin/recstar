@@ -5,6 +5,7 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import const.WavFormat
+import exception.UnsupportedAudioFormatException
 import io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
+import kotlinx.io.writeFloatLe
 import kotlinx.io.writeIntLe
 import kotlinx.io.writeShortLe
 import repository.AppPreferenceRepository
@@ -36,28 +38,44 @@ class AudioRecorderImpl(
     private var job: Job? = null
     private var cleanupJob: Job? = null
     private var audioRecord: AudioRecord? = null
-    private val bufferSize = AudioRecord.getMinBufferSize(
-        WavFormat.SAMPLE_RATE,
-        AudioFormat.CHANNEL_IN_MONO,
-        AudioFormat.ENCODING_PCM_16BIT,
-    )
+    private val format get() = appPreferenceRepository.value.getAudioFormat()
+    private val bufferSize
+        get() = AudioRecord.getMinBufferSize(
+            format.sampleRate,
+            format.channelCount,
+            when (format.bitDepth) {
+                16 -> AudioFormat.ENCODING_PCM_16BIT
+                32 -> when (format.floating) {
+                    true -> AudioFormat.ENCODING_PCM_FLOAT
+                    false -> throw UnsupportedAudioFormatException(format)
+                }
+                else -> throw UnsupportedAudioFormatException(format)
+            },
+        )
     private val rawData = Buffer()
 
     private fun createHeader(dataSize: Int): ByteArray {
         val buffer = Buffer()
+        val format = format
         buffer.writeRawString(WavFormat.CHUNK_ID)
         buffer.writeIntLe(dataSize + WavFormat.HEADER_EXTRA_SIZE)
         buffer.writeRawString(WavFormat.FORMAT)
 
         buffer.writeRawString(WavFormat.SUBCHUNK_1_ID)
         buffer.writeIntLe(WavFormat.SUBCHUNK_1_SIZE)
-        buffer.writeShortLe(WavFormat.AUDIO_FORMAT_PCM)
-        buffer.writeShortLe(WavFormat.CHANNELS.toShort())
-        buffer.writeIntLe(WavFormat.SAMPLE_RATE)
-        buffer.writeIntLe(WavFormat.BYTE_RATE)
-        val blockAlign = WavFormat.CHANNELS * WavFormat.BITS_PER_SAMPLE / 8
+        val audioFormat = if (format.floating) {
+            WavFormat.AUDIO_FORMAT_FLOAT
+        } else {
+            WavFormat.AUDIO_FORMAT_PCM
+        }
+        buffer.writeShortLe(audioFormat)
+        buffer.writeShortLe(format.channelCount.toShort())
+        buffer.writeIntLe(format.sampleRate)
+        val byteRate = format.sampleRate * format.channelCount * format.bitDepth / 8
+        buffer.writeIntLe(byteRate)
+        val blockAlign = format.channelCount * format.bitDepth / 8
         buffer.writeShortLe(blockAlign.toShort())
-        buffer.writeShortLe(WavFormat.BITS_PER_SAMPLE.toShort())
+        buffer.writeShortLe(format.bitDepth.toShort())
 
         buffer.writeRawString(WavFormat.SUBCHUNK_2_ID)
         buffer.writeIntLe(dataSize)
@@ -75,32 +93,61 @@ class AudioRecorderImpl(
         rawData.clear()
         job = coroutineScope.launch(Dispatchers.IO) {
             runCatchingCancellable {
+                val format = format
                 cleanupJob?.join()
                 cleanupJob = null
-                Log.i("AudioRecorderImpl.start: path: ${output.absolutePath}")
+                Log.i("AudioRecorderImpl.start: path: ${output.absolutePath}, format: $format")
                 val audioRecord = AudioRecord(
                     MediaRecorder.AudioSource.MIC,
-                    WavFormat.SAMPLE_RATE,
-                    AudioFormat.CHANNEL_IN_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT,
+                    format.sampleRate,
+                    if (format.channelCount == 1) AudioFormat.CHANNEL_IN_MONO else AudioFormat.CHANNEL_IN_STEREO,
+                    when (format.bitDepth) {
+                        16 -> AudioFormat.ENCODING_PCM_16BIT
+                        32 -> when (format.floating) {
+                            true -> AudioFormat.ENCODING_PCM_FLOAT
+                            false -> throw UnsupportedAudioFormatException(format)
+                        }
+                        else -> throw UnsupportedAudioFormatException(format)
+                    },
                     bufferSize,
                 )
                 this@AudioRecorderImpl.audioRecord = audioRecord
-                val audioBuffer = ShortArray(bufferSize)
                 audioRecord.startRecording()
                 withContext(Dispatchers.Main) {
                     listener.onStarted()
                 }
-                while (isActive && this@AudioRecorderImpl.isRecording()) {
-                    val readResult = audioRecord.read(audioBuffer, 0, audioBuffer.size)
-                    if (readResult > 0) {
-                        val validAudioData = audioBuffer.copyOfRange(0, readResult)
-                        for (i in validAudioData.indices) {
-                            rawData.writeShortLe(validAudioData[i])
+                if (format.bitDepth == 16) {
+                    val audioBuffer = ShortArray(bufferSize)
+                    while (isActive && this@AudioRecorderImpl.isRecording()) {
+                        val readResult = audioRecord.read(audioBuffer, 0, audioBuffer.size)
+                        if (readResult > 0) {
+                            val validAudioData = audioBuffer.copyOfRange(0, readResult)
+                            for (i in validAudioData.indices) {
+                                rawData.writeShortLe(validAudioData[i])
+                            }
+                            addWaveData(validAudioData)
+                        } else {
+                            Log.w("Error reading audio data: $readResult")
                         }
-                        addWaveData(validAudioData)
-                    } else {
-                        Log.w("Error reading audio data: $readResult")
+                    }
+                } else {
+                    val audioBuffer = FloatArray(bufferSize)
+                    while (isActive && this@AudioRecorderImpl.isRecording()) {
+                        val readResult = audioRecord.read(
+                            audioBuffer,
+                            0,
+                            audioBuffer.size,
+                            AudioRecord.READ_BLOCKING,
+                        )
+                        if (readResult > 0) {
+                            val validAudioData = audioBuffer.copyOfRange(0, readResult)
+                            for (i in validAudioData.indices) {
+                                rawData.writeFloatLe(validAudioData[i])
+                            }
+                            addWaveData(validAudioData)
+                        } else {
+                            Log.w("Error reading audio data: $readResult")
+                        }
                     }
                 }
                 audioRecord.stop()
@@ -163,6 +210,11 @@ class AudioRecorderImpl(
     private fun addWaveData(buffer: ShortArray) {
         val value = buffer.map { it.toFloat() / Short.MAX_VALUE }
         waveData.addAll(value)
+        _waveDataFlow.value = waveData.toFloatArray().map { arrayOf(it).toFloatArray() }.toTypedArray()
+    }
+
+    private fun addWaveData(buffer: FloatArray) {
+        waveData.addAll(buffer.toList())
         _waveDataFlow.value = waveData.toFloatArray().map { arrayOf(it).toFloatArray() }.toTypedArray()
     }
 

@@ -155,7 +155,7 @@ class AudioPlayerImpl(
         val mixerInfos = AudioSystem.getMixerInfo()
         val deviceInfos = getAudioOutputDeviceInfos(
             appPreferenceRepository.value.desiredOutputName,
-            getDefaultAudioFormat(),
+            appPreferenceRepository.value.getAudioFormat(),
         )
         mixerInfos.find { it.name == deviceInfos.selectedDeviceInfo.name }?.let {
             return it

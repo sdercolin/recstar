@@ -23,6 +23,7 @@ fun Strings.en(): String =
         ExceptionRenameSessionExisting -> "Session named {0} already exists."
         ExceptionRenameSessionInvalid -> "Invalid session name: {0}"
         ExceptionRenameSessionUnexpected -> "Failed to rename session."
+        ExceptionUnsupportedAudioFormat -> "Unsupported audio format: {0}, please try adjusting the audio settings."
         AlertExportTips ->
             "Files recorded on iOS and macOS may have file names with special characters. " +
                 "Before using them on Windows with other software, please normalize the file names to NFC form. " +

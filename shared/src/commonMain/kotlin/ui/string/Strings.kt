@@ -20,6 +20,7 @@ enum class Strings {
     ExceptionRenameSessionExisting,
     ExceptionRenameSessionInvalid,
     ExceptionRenameSessionUnexpected,
+    ExceptionUnsupportedAudioFormat,
     AlertExportTips,
     ToastExportDataSuccess,
     ToastExportDataCancel,

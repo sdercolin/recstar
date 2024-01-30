@@ -23,6 +23,8 @@ fun Strings.ja(): String? =
         ExceptionRenameSessionExisting -> "名前が {0} のセッションが既に存在します。"
         ExceptionRenameSessionInvalid -> "無効なセッション名：{0}"
         ExceptionRenameSessionUnexpected -> "セッション名の編集に失敗しました。"
+        ExceptionUnsupportedAudioFormat ->
+            "指定のオーディオフォーマットはサポートされていません：{0}、オーディオ設定を調整してください。"
         AlertExportTips ->
             "iOS や macOS で録音したファイルには、ファイル名が特殊文字を含む場合があります。" +
                 "Windows 上の他のソフトウェアでこれらのファイルを使用する前に、ファイル名を NFC 形式に正規化してください。" +

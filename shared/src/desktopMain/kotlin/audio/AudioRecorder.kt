@@ -1,6 +1,7 @@
 package audio
 
 import androidx.compose.runtime.Stable
+import exception.UnsupportedAudioFormatException
 import io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,8 +35,6 @@ class AudioRecorderImpl(
     private var cleanupJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.Main)
     private var stream: InterceptedAudioInputStream? = null
-    private val audioFormat = getDefaultAudioFormat()
-    private val javaAudioFormat = audioFormat.toJavaAudioFormat()
 
     override fun start(output: File) {
         if (job?.isActive == true) {
@@ -52,13 +51,20 @@ class AudioRecorderImpl(
                     start()
                 }
                 this@AudioRecorderImpl.line = line
-                Log.i("AudioRecorderImpl.start: path: ${output.absolutePath}")
+                Log.i("AudioRecorderImpl.start: path: ${output.absolutePath}, format: ${line.format}")
                 listener.onStarted()
                 withContext(Dispatchers.IO) {
                     val stream = InterceptedAudioInputStream(line, 1792, _waveDataFlow)
                     this@AudioRecorderImpl.stream = stream
                     AudioSystem.write(
-                        AudioInputStream(stream, javaAudioFormat, AudioSystem.NOT_SPECIFIED.toLong()),
+                        AudioInputStream(
+                            // stream =
+                            stream,
+                            // format =
+                            appPreferenceRepository.value.getAudioFormat().toJavaAudioFormat(),
+                            // length =
+                            AudioSystem.NOT_SPECIFIED.toLong(),
+                        ),
                         AudioFileFormat.Type.WAVE,
                         output.toJavaFile(),
                     )
@@ -72,10 +78,11 @@ class AudioRecorderImpl(
 
     private suspend fun getTargetLine(): TargetDataLine {
         val mixerInfos = AudioSystem.getMixerInfo()
-        val dataLineInfo = DataLine.Info(TargetDataLine::class.java, javaAudioFormat)
-        val deviceInfos = getAudioInputDeviceInfos(appPreferenceRepository.value.desiredInputName, audioFormat)
+        val format = appPreferenceRepository.value.getAudioFormat()
+        val dataLineInfo = DataLine.Info(TargetDataLine::class.java, format.toJavaAudioFormat())
+        val deviceInfos = getAudioInputDeviceInfos(appPreferenceRepository.value.desiredInputName, format)
         if (!AudioSystem.isLineSupported(dataLineInfo)) {
-            throw UnsupportedOperationException("DataLineInfo not supported: $dataLineInfo")
+            throw UnsupportedAudioFormatException(format)
         }
         val selectedMixerInfo = selectMixer(mixerInfos, deviceInfos)
         val selectedMixer = AudioSystem.getMixer(selectedMixerInfo)
