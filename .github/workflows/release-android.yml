@@ -51,7 +51,7 @@ jobs:
         run: |
           VERSION=${{ github.ref_name }}
           echo $VERSION
-          mv ./androidApp/build/outputs/apk/release/androidApp-release-unsigned.apk ./recstar-$VERSION.apk
+          mv ./androidApp/build/outputs/apk/release/androidApp-release.apk ./recstar-$VERSION.apk
 
       - name: Release
         uses: softprops/action-gh-release@v1
