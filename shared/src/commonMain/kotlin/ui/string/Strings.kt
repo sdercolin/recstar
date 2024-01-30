@@ -13,6 +13,7 @@ enum class Strings {
     CommonEdit,
     CommonCheck,
     CommonImport,
+    CommonDoNotShowAgain,
     AlertNeedManualPermissionGrantTitle,
     AlertNeedManualPermissionGrantMessage,
     ErrorReadFileFailedMessage,

@@ -31,13 +31,15 @@ import ui.common.ActionMenuItem
 import ui.common.ActionMenuToggleItem
 import ui.common.LocalAlertDialogController
 import ui.common.LocalProgressController
-import ui.common.requestConfirm
+import ui.common.requestYesNo
 import ui.model.LocalScreenOrientation
 import ui.model.Screen
 import ui.model.ScreenOrientation
 import ui.string.*
+import util.containsJapaneseVoiceMark
 import util.isDesktop
 import util.isIos
+import util.isMacOrIos
 import util.isMobile
 
 data class SessionScreen(val initialSession: Session) : Screen {
@@ -63,14 +65,26 @@ private fun SessionScreen.ScreenActions() {
         val useOpenDirectory = isDesktop || isIos
         val useExport = isMobile
 
-        fun wrapWithExportTips(block: () -> Unit) {
-            if (appRecordRepository.value.hasShownExportTips.not() && isIos) {
-                alertDialogController.requestConfirm(
+        fun wrapWithExportTips(
+            title: String,
+            block: () -> Unit,
+        ) {
+            val hasJapaneseVoicedMark = model.sentences.any { it.text.containsJapaneseVoiceMark() }
+            val ignored = appRecordRepository.value.ignoreExportTips
+            if (isMacOrIos && hasJapaneseVoicedMark && !ignored) {
+                alertDialogController.requestYesNo(
+                    title = title,
                     message = stringStatic(Strings.AlertExportTips),
-                ) {
-                    appRecordRepository.update { copy(hasShownExportTips = true) }
-                    block()
-                }
+                    confirmButton = stringStatic(Strings.CommonOkay),
+                    dismissButton = stringStatic(Strings.CommonDoNotShowAgain),
+                    onConfirm = {
+                        block()
+                    },
+                    onDismiss = {
+                        appRecordRepository.update { copy(ignoreExportTips = true) }
+                        block()
+                    },
+                )
             } else {
                 block()
             }
@@ -81,7 +95,7 @@ private fun SessionScreen.ScreenActions() {
                 icon = Icons.Default.Folder,
                 onClick = {
                     closeMenu()
-                    wrapWithExportTips {
+                    wrapWithExportTips(title = stringStatic(Strings.SessionScreenActionOpenDirectory)) {
                         Actions.openDirectory(fileInteractor, model.contentDirectory)
                     }
                 },
@@ -93,7 +107,7 @@ private fun SessionScreen.ScreenActions() {
                 icon = Icons.Default.IosShare,
                 onClick = {
                     closeMenu()
-                    wrapWithExportTips {
+                    wrapWithExportTips(title = stringStatic(Strings.SessionScreenActionExport)) {
                         val request = ExportDataRequest(
                             folder = model.contentDirectory,
                             allowedExtension = listOf("wav"),

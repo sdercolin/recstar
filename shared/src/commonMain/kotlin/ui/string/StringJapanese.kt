@@ -16,6 +16,7 @@ fun Strings.ja(): String? =
         CommonEdit -> "編集"
         CommonCheck -> "選択"
         CommonImport -> "インポート"
+        CommonDoNotShowAgain -> "次回から表示しない"
         AlertNeedManualPermissionGrantTitle -> "権限が必要です"
         AlertNeedManualPermissionGrantMessage -> "アプリは音声を録音するために権限が必要です。システム設定で権限を許可してください。"
         ErrorReadFileFailedMessage -> "ファイルの読み込みに失敗しました。"
@@ -26,8 +27,10 @@ fun Strings.ja(): String? =
         ExceptionUnsupportedAudioFormat ->
             "指定のオーディオフォーマットはサポートされていません：{0}、オーディオ設定を調整してください。"
         AlertExportTips ->
-            "iOS や macOS で録音したファイルには、ファイル名が特殊文字を含む場合があります。" +
-                "Windows 上の他のソフトウェアでこれらのファイルを使用する前に、ファイル名を NFC 形式に正規化してください。" +
+            "録音リストには日本語の濁点記号を含む行があります。" +
+                "MacOS/iOSの仕様により、これらのファイル名は特殊なエンコーディングで保存され、" +
+                "他の OS では正しく認識されない可能性があります。" +
+                "Windows や他のOS上の他のソフトウェアでこれらのファイルを使用する前に、ファイル名を NFC 形式に正規化してください。" +
                 "これは、`vLabeler` アプリの「ツール」メニューの「ファイル名を正規化」ツールで実行できます。"
         ToastExportDataSuccess -> "成功しました"
         ToastExportDataCancel -> "キャンセルされました"

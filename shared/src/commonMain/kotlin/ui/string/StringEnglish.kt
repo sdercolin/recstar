@@ -15,6 +15,7 @@ fun Strings.en(): String =
         CommonEdit -> "Edit"
         CommonCheck -> "Check"
         CommonImport -> "Import"
+        CommonDoNotShowAgain -> "Do not show again"
         AlertNeedManualPermissionGrantTitle -> "Permission Required"
         AlertNeedManualPermissionGrantMessage ->
             "The app needs your permission to record audio. Please grant the permission in system settings."
@@ -25,8 +26,12 @@ fun Strings.en(): String =
         ExceptionRenameSessionUnexpected -> "Failed to rename session."
         ExceptionUnsupportedAudioFormat -> "Unsupported audio format: {0}, please try adjusting the audio settings."
         AlertExportTips ->
-            "Files recorded on iOS and macOS may have file names with special characters. " +
-                "Before using them on Windows with other software, please normalize the file names to NFC form. " +
+            "Your reclist contains sentences with Japanese voice marked characters " +
+                "which will be saved in a special encoding, " +
+                "making it unable to be recognized correctly on other platforms, " +
+                "due to the specification of MacOS/iOS. " +
+                "Before using them on other platforms with other software," +
+                "please normalize the file names to NFC form. " +
                 "You can use the \"File Name Normalizer\" tool in the \"Tools\" menu of \"vLabeler\" app to do this."
         ToastExportDataSuccess -> "Exported successfully"
         ToastExportDataCancel -> "Export cancelled"

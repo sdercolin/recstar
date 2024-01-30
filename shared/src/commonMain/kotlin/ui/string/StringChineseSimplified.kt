@@ -16,6 +16,7 @@ fun Strings.zhHans(): String? =
         CommonEdit -> "编辑"
         CommonCheck -> "选择"
         CommonImport -> "导入"
+        CommonDoNotShowAgain -> "不再显示"
         AlertNeedManualPermissionGrantTitle -> "无权限"
         AlertNeedManualPermissionGrantMessage -> "应用需要您的录音权限，请在系统设置中授予。"
         ErrorReadFileFailedMessage -> "无法读取文件。"
@@ -25,8 +26,8 @@ fun Strings.zhHans(): String? =
         ExceptionRenameSessionUnexpected -> "重命名会话失败。"
         ExceptionUnsupportedAudioFormat -> "不支持的音频格式：{0}，请尝试调整音频设置。"
         AlertExportTips ->
-            "在 iOS 和 macOS 上录制的文件可能具有带有特殊字符的文件名。" +
-                "在 Windows 上使用其他软件读取这些文件之前，请将文件名规范化为 NFC 格式。" +
+            "您的录音表中包含带有日语浊音标记字符的行。由于MacOS/iOS的规范，这些行将以特殊编码被保存，导致在其他平台上可能无法正确被识别。" +
+                "在 Windows 等其他平台上使用其他软件读取这些文件之前，请将文件名规范化为 NFC 格式。" +
                 "您可以使用 `vLabeler` 应用程序的「工具」菜单中的「文件名规范化」工具来执行此操作。"
         ToastExportDataSuccess -> "导出成功"
         ToastExportDataCancel -> "导出已被取消"

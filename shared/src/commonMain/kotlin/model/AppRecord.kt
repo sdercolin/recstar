@@ -8,6 +8,6 @@ import model.sorting.SortingMethod
 @Serializable
 data class AppRecord(
     val windowSizeDp: Pair<Float, Float> = Pair(800f, 500f),
-    val hasShownExportTips: Boolean = false,
+    val ignoreExportTips: Boolean = false,
     val sessionSortingMethod: SortingMethod? = null,
 )
