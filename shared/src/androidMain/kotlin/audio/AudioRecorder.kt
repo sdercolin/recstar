@@ -71,7 +71,7 @@ class AudioRecorderImpl(
             return
         }
         waveData.clear()
-        _waveDataFlow.value = FloatArray(0)
+        _waveDataFlow.value = arrayOf(FloatArray(0))
         rawData.clear()
         job = coroutineScope.launch(Dispatchers.IO) {
             runCatchingCancellable {
@@ -158,15 +158,15 @@ class AudioRecorderImpl(
     }
 
     private val waveData = mutableListOf<Float>()
-    private val _waveDataFlow = MutableStateFlow(FloatArray(0))
+    private val _waveDataFlow = MutableStateFlow(arrayOf(FloatArray(0)))
 
     private fun addWaveData(buffer: ShortArray) {
         val value = buffer.map { it.toFloat() / Short.MAX_VALUE }
         waveData.addAll(value)
-        _waveDataFlow.value = waveData.toFloatArray()
+        _waveDataFlow.value = waveData.toFloatArray().map { arrayOf(it).toFloatArray() }.toTypedArray()
     }
 
-    override val waveDataFlow: Flow<FloatArray> = _waveDataFlow
+    override val waveDataFlow: Flow<WavData> = _waveDataFlow
 }
 
 actual class AudioRecorderProvider actual constructor(

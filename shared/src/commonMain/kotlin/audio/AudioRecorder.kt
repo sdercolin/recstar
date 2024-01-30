@@ -40,9 +40,9 @@ interface AudioRecorder {
     fun dispose()
 
     /**
-     * A [Flow] of the recorded audio data.
+     * A [Flow] of the recorded [WavData].
      */
-    val waveDataFlow: Flow<FloatArray>
+    val waveDataFlow: Flow<WavData>
 }
 
 expect class AudioRecorderProvider(

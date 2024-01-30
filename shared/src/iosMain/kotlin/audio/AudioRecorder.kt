@@ -61,7 +61,7 @@ class AudioRecorderImpl(
             return
         }
         waveData.clear()
-        _waveDataFlow.value = FloatArray(0)
+        _waveDataFlow.value = arrayOf(FloatArray(0))
         job = scope.launch(Dispatchers.IO) {
             runCatchingCancellable {
                 withNSError { e ->
@@ -178,12 +178,12 @@ class AudioRecorderImpl(
         for (i in 0 until frameLength) {
             waveData.add(channelData[i])
         }
-        _waveDataFlow.value = waveData.toFloatArray()
+        _waveDataFlow.value = waveData.map { arrayOf(it).toFloatArray() }.toTypedArray()
     }
 
     private val waveData = mutableListOf<Float>()
-    private val _waveDataFlow = MutableStateFlow(FloatArray(0))
-    override val waveDataFlow: Flow<FloatArray> = _waveDataFlow
+    private val _waveDataFlow = MutableStateFlow(arrayOf(FloatArray(0)))
+    override val waveDataFlow: Flow<WavData> = _waveDataFlow
 }
 
 actual class AudioRecorderProvider actual constructor(

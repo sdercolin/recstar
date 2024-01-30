@@ -272,7 +272,7 @@ class SessionScreenModel(
         recorderListener.waveformPainter = this
     }
 
-    val waveformFlow: Flow<Array<FloatArray>> = waveformPainter.flow
+    val waveformFlow: Flow<Array<Array<FloatArray>>> = waveformPainter.flow
 
     private val guidePlayer = AudioPlayerProvider(
         guidePlayerListener,

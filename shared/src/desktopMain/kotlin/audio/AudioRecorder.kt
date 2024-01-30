@@ -46,7 +46,7 @@ class AudioRecorderImpl(
             runCatchingCancellable {
                 cleanupJob?.join()
                 cleanupJob = null
-                _waveDataFlow.value = FloatArray(0)
+                _waveDataFlow.value = arrayOf(FloatArray(0))
                 val line = getTargetLine().apply {
                     open(format)
                     start()
@@ -129,8 +129,8 @@ class AudioRecorderImpl(
         }
     }
 
-    private val _waveDataFlow = MutableStateFlow(FloatArray(0))
-    override val waveDataFlow: Flow<FloatArray> = _waveDataFlow
+    private val _waveDataFlow = MutableStateFlow(arrayOf(FloatArray(0)))
+    override val waveDataFlow: Flow<WavData> = _waveDataFlow
 }
 
 actual class AudioRecorderProvider(

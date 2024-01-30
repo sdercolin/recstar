@@ -9,7 +9,7 @@ import javax.sound.sampled.TargetDataLine
 class InterceptedAudioInputStream(
     private val line: TargetDataLine,
     bufferSize: Int,
-    private val flow: MutableStateFlow<FloatArray>,
+    private val flow: MutableStateFlow<Array<FloatArray>>,
 ) : InputStream() {
     private val buffer: ByteArray = ByteArray(bufferSize)
     private val shortBuffer = ShortArray(bufferSize / 2)
@@ -26,7 +26,7 @@ class InterceptedAudioInputStream(
             }
             buffer.toShortArray(shortBuffer, isLittleEndian = true)
             data.addAll(shortBuffer.map { it.toFloat() / Short.MAX_VALUE })
-            flow.value = data.toFloatArray()
+            flow.value = data.map { arrayOf(it).toFloatArray() }.toTypedArray()
         }
         val value = buffer[buffer.size - bytesRead].toInt() and 0xFF
         bytesRead--

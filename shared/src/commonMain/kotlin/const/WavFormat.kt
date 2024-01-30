@@ -8,6 +8,7 @@ object WavFormat {
     const val SUBCHUNK_2_ID = "data"
     const val AUDIO_FORMAT_PCM = 1.toShort()
     const val AUDIO_FORMAT_FLOAT = 3.toShort()
+    const val AUDIO_FORMAT_EXTENSIBLE = (-2).toShort()
     const val CHANNELS = 1
     const val SAMPLE_RATE = 44100
     const val BITS_PER_SAMPLE = 16

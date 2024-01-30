@@ -231,7 +231,7 @@ private fun SubTitle(
 private fun ColumnScope.RecorderWaveform(
     hasFile: Boolean,
     isRecording: Boolean,
-    flow: Flow<Array<FloatArray>>,
+    flow: Flow<Array<Array<FloatArray>>>,
     playingProgress: Float?,
     isInteractionSuspended: Boolean,
     onTogglePlaying: () -> Unit,
@@ -248,41 +248,47 @@ private fun ColumnScope.RecorderWaveform(
             if (isRecording) MaterialTheme.colors.primaryVariant else MaterialTheme.colors.onBackground
         }
         val playerCursorColor = if (isDarkMode) MaterialTheme.colors.secondary else MaterialTheme.colors.primaryVariant
-        Canvas(modifier = Modifier.fillMaxSize().padding(bottom = 8.dp)) {
-            val width = size.width.toInt()
-            val height = size.height.toInt()
-            val halfHeight = height / 2
-            val dataLength = data.size
-            val ratio = (dataLength.toFloat() / width).coerceAtLeast(1f)
-            val offset = (dataLength - width).coerceAtMost(0)
-            for (i in 0 until width) {
-                val x = i.toFloat()
-                val dataPosStart = (i * ratio).toInt() + offset
-                val dataPosEnd = ((i + 1) * ratio).toInt() + offset
-                if (dataPosStart < 0 || dataPosStart >= dataLength ||
-                    dataPosEnd - 1 < 0 || dataPosEnd - 1 >= dataLength
-                ) {
-                    continue
+
+        Column(modifier = Modifier.fillMaxSize().padding(bottom = 8.dp)) {
+            for (channelIndex in data.indices) {
+                Canvas(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                    val width = size.width.toInt()
+                    val height = size.height.toInt()
+                    val halfHeight = height / 2
+                    val channelData = data[channelIndex]
+                    val dataLength = channelData.size
+                    val ratio = (dataLength.toFloat() / width).coerceAtLeast(1f)
+                    val offset = (dataLength - width).coerceAtMost(0)
+                    for (i in 0 until width) {
+                        val x = i.toFloat()
+                        val dataPosStart = (i * ratio).toInt() + offset
+                        val dataPosEnd = ((i + 1) * ratio).toInt() + offset
+                        if (dataPosStart < 0 || dataPosStart >= dataLength ||
+                            dataPosEnd - 1 < 0 || dataPosEnd - 1 >= dataLength
+                        ) {
+                            continue
+                        }
+                        val dataInPoint = channelData.copyOfRange(dataPosStart, dataPosEnd)
+                        val max = dataInPoint.maxOfOrNull { it[0] } ?: continue
+                        val min = dataInPoint.minOfOrNull { it[1] } ?: continue
+                        val maxY = max * halfHeight
+                        val minY = min * halfHeight
+                        drawLine(
+                            color = color,
+                            start = Offset(x, halfHeight + maxY),
+                            end = Offset(x, halfHeight + minY),
+                        )
+                    }
+                    if (playingProgress != null && playingProgress in 0f..1f) {
+                        val x = playingProgress * width
+                        drawLine(
+                            color = playerCursorColor,
+                            start = Offset(x, 0f),
+                            end = Offset(x, height.toFloat()),
+                            strokeWidth = 2f,
+                        )
+                    }
                 }
-                val dataInPoint = data.copyOfRange(dataPosStart, dataPosEnd)
-                val max = dataInPoint.maxOfOrNull { it[0] } ?: continue
-                val min = dataInPoint.minOfOrNull { it[1] } ?: continue
-                val maxY = max * halfHeight
-                val minY = min * halfHeight
-                drawLine(
-                    color = color,
-                    start = Offset(x, halfHeight + maxY),
-                    end = Offset(x, halfHeight + minY),
-                )
-            }
-            if (playingProgress != null && playingProgress in 0f..1f) {
-                val x = playingProgress * width
-                drawLine(
-                    color = playerCursorColor,
-                    start = Offset(x, 0f),
-                    end = Offset(x, height.toFloat()),
-                    strokeWidth = 2f,
-                )
             }
         }
         val iconTint = if (isDarkMode) {
