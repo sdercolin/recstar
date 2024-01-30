@@ -54,11 +54,6 @@ android {
     lint {
         checkReleaseBuilds = false
     }
-    buildTypes {
-        getByName("release") {
-            signingConfig = signingConfigs.getByName("debug")
-        }
-    }
 }
 
 licenseReport {

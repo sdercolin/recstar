@@ -47,11 +47,23 @@ jobs:
         with:
           arguments: assembleRelease
 
+      - uses: r0adkll/sign-android-release@v1
+        name: Sign apk file
+        id: sign_apk
+        with:
+          releaseDirectory: androidApp/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
+          alias: ${{ secrets.ANDROID_KEYSTORE_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          keyPassword: ${{ secrets.ANDROID_KEYSTORE_KEY_PASSWORD }}
+
       - name: Rename
         run: |
           VERSION=${{ github.ref_name }}
+          OUTPUT_FILE=${{steps.sign_apk.outputs.signedReleaseFile}}
           echo $VERSION
-          mv ./androidApp/build/outputs/apk/release/androidApp-release.apk ./recstar-$VERSION.apk
+          echo $OUTPUT_FILE
+          mv OUTPUT_FILE ./recstar-$VERSION.apk
 
       - name: Release
         uses: softprops/action-gh-release@v1
