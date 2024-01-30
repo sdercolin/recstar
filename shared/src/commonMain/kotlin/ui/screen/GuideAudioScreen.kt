@@ -128,7 +128,7 @@ private fun GuideAudioScreen.ScreenContent() {
                 if (names.isEmpty()) {
                     Text(
                         text = string(Strings.GuideAudioScreenEmpty),
-                        modifier = Modifier.align(Alignment.Center),
+                        modifier = Modifier.align(Alignment.Center).padding(16.dp),
                     )
                 }
             }

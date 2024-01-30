@@ -136,7 +136,7 @@ private fun MainScreen.ScreenContent() {
                 if (sessions.isEmpty()) {
                     Text(
                         text = string(Strings.MainScreenEmpty),
-                        modifier = Modifier.align(Alignment.Center),
+                        modifier = Modifier.align(Alignment.Center).padding(16.dp),
                     )
                 }
             }

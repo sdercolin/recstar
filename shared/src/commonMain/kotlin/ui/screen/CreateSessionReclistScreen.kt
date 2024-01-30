@@ -122,7 +122,7 @@ private fun CreateSessionReclistScreen.ScreenContent() {
                 if (reclists.isEmpty()) {
                     Text(
                         text = string(Strings.CreateSessionReclistScreenEmpty),
-                        modifier = Modifier.align(Alignment.Center),
+                        modifier = Modifier.align(Alignment.Center).padding(16.dp),
                     )
                 }
             }
