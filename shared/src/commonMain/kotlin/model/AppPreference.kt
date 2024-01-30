@@ -21,6 +21,8 @@ data class AppPreference(
     val titleBarStyle: TitleBarStyle = TitleBarStyle.FileName,
     val desiredInputName: String? = null,
     val desiredOutputName: String? = null,
+    val sampleRate: SampleRateOption = SampleRateOption.Hz44100,
+    val bitDepth: BitDepthOption = BitDepthOption.BitDepth16,
 ) : JavaSerializable {
     enum class Language(private val language: StringLanguage?) : LocalizedText {
         Auto(null),
@@ -88,5 +90,30 @@ data class AppPreference(
         FileNameWithComment(Strings.PreferenceTitleBarStyleFileNameWithComment, true),
         CommentWithFileName(Strings.PreferenceTitleBarStyleCommentWithFileName, true),
         Comment(Strings.PreferenceTitleBarStyleComment, false),
+    }
+
+    enum class SampleRateOption(val value: Int) : LocalizedText {
+        Hz44100(44100),
+        Hz48000(48000),
+        Hz96000(96000),
+        ;
+
+        override val textKey: Strings get() = error("Not accessible")
+
+        @Composable
+        override fun getText(): String = "$value Hz"
+    }
+
+    enum class BitDepthOption(val text: String) : LocalizedText {
+        BitDepth16("16bit"),
+        BitDepth24("24bit"),
+        BitDepth32("32bit"),
+        BitDepth32Float("32bit float"),
+        ;
+
+        override val textKey: Strings get() = error("Not accessible")
+
+        @Composable
+        override fun getText(): String = text
     }
 }

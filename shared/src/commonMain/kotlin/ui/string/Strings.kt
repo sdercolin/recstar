@@ -96,6 +96,8 @@ enum class Strings {
     PreferenceGroupAudio,
     PreferenceInputDeviceName,
     PreferenceOutputDeviceName,
+    PreferenceSampleRate,
+    PreferenceBitDepth,
     PreferenceDeviceNameNotFoundTemplate,
     PreferenceGroupView,
     PreferenceTitleBarStyle,

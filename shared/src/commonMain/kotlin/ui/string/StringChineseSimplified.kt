@@ -102,6 +102,8 @@ fun Strings.zhHans(): String? =
         PreferenceGroupAudio -> "音频"
         PreferenceInputDeviceName -> "输入设备"
         PreferenceOutputDeviceName -> "输出设备"
+        PreferenceSampleRate -> "采样率"
+        PreferenceBitDepth -> "位深度"
         PreferenceDeviceNameNotFoundTemplate -> "{0}（未知）"
         PreferenceGroupView -> "视图"
         PreferenceTitleBarStyle -> "标题栏样式"

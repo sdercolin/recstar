@@ -143,8 +143,8 @@ private fun ScreenContent() {
                 onValueChanged = { repository.update { copy(recording = recording.copy(autoNext = it)) } },
             )
         }
-        if (isDesktop) {
-            Group(title = string(Strings.PreferenceGroupAudio)) {
+        Group(title = string(Strings.PreferenceGroupAudio)) {
+            if (isDesktop) {
                 val allInputDeviceInfo = produceState<AudioDeviceInfoList?>(null, value.desiredInputName) {
                     this.value = getAudioInputDeviceInfos(value.desiredInputName, getDefaultAudioFormat())
                 }
@@ -164,6 +164,18 @@ private fun ScreenContent() {
                     options = allOutputDeviceInfo.value?.deviceInfos?.filterNot { it.notFound } ?: emptyList(),
                 )
             }
+            SelectionItem(
+                title = string(Strings.PreferenceSampleRate),
+                value = value.sampleRate,
+                onValueChanged = { repository.update { copy(sampleRate = it) } },
+                options = AppPreference.SampleRateOption.entries.toList(),
+            )
+            SelectionItem(
+                title = string(Strings.PreferenceBitDepth),
+                value = value.bitDepth,
+                onValueChanged = { repository.update { copy(bitDepth = it) } },
+                options = AppPreference.BitDepthOption.entries.toList(),
+            )
         }
         Group(title = string(Strings.PreferenceGroupView)) {
             SelectionItem(

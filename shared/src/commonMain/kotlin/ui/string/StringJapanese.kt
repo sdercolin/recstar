@@ -103,6 +103,8 @@ fun Strings.ja(): String? =
         PreferenceGroupAudio -> "音声"
         PreferenceInputDeviceName -> "入力デバイス"
         PreferenceOutputDeviceName -> "出力デバイス"
+        PreferenceSampleRate -> "サンプリングレート"
+        PreferenceBitDepth -> "ビット深度"
         PreferenceDeviceNameNotFoundTemplate -> "{0}（不明）"
         PreferenceGroupView -> "表示"
         PreferenceTitleBarStyle -> "タイトルバーのスタイル"

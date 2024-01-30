@@ -107,6 +107,8 @@ fun Strings.en(): String =
         PreferenceGroupAudio -> "Audio"
         PreferenceInputDeviceName -> "Input Device"
         PreferenceOutputDeviceName -> "Output Device"
+        PreferenceSampleRate -> "Sample Rate"
+        PreferenceBitDepth -> "Bit Depth"
         PreferenceDeviceNameNotFoundTemplate -> "{0} (Not Found)"
         PreferenceGroupView -> "View"
         PreferenceTitleBarStyle -> "Title Bar Style"
