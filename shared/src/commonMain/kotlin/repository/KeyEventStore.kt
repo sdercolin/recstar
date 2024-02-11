@@ -28,9 +28,7 @@ class KeyEventStore(
             coroutineScope.launch {
                 appPreferenceRepository.flow.collectLatest {
                     keys.clear()
-                    if (it.recording.recordWhileHolding) {
-                        keys.add(it.recording.recordingShortKey.getKey())
-                    }
+                    keys.add(it.recording.recordingShortKey.getKey())
                 }
             }
         }

@@ -485,23 +485,28 @@ private fun LaunchRecordingKeyPress(model: SessionScreenModel) {
     val recordingKey = appPreference.value.recording.recordingShortKey.getKey()
     val isHoldingMode = appPreference.value.recording.recordWhileHolding
     LaunchedEffect(keyEventFlow, isHoldingMode) {
-        if (isHoldingMode.not()) return@LaunchedEffect
         keyEventFlow.collectLatest { ev ->
             if (ev.key != recordingKey) return@collectLatest
             val isRecording = model.isRecording
             val isBusy = model.isBusy
-            when (ev.type) {
-                KeyEventType.KeyDown -> {
-                    if (isRecording || isBusy || holding) return@collectLatest
-                    holding = true
+            if (isHoldingMode) {
+                when (ev.type) {
+                    KeyEventType.KeyDown -> {
+                        if (isRecording || isBusy || holding) return@collectLatest
+                        holding = true
+                        model.toggleRecording()
+                    }
+                    KeyEventType.KeyUp -> {
+                        if (!isRecording || isBusy || !holding) return@collectLatest
+                        holding = false
+                        model.toggleRecording()
+                    }
+                    else -> return@collectLatest
+                }
+            } else {
+                if (ev.type == KeyEventType.KeyUp) {
                     model.toggleRecording()
                 }
-                KeyEventType.KeyUp -> {
-                    if (!isRecording || isBusy || !holding) return@collectLatest
-                    holding = false
-                    model.toggleRecording()
-                }
-                else -> return@collectLatest
             }
         }
     }

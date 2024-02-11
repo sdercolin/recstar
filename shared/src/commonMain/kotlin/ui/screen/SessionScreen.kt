@@ -161,7 +161,9 @@ private fun SessionScreen.ScreenContent() {
                 Action.Exit -> navigator.pop()
                 Action.RenameSession -> Actions.renameSession(alertDialogController, model)
                 Action.ConfigureGuideAudio -> navigator push GuideAudioScreen(model.name)
-                Action.ToggleRecording -> model.toggleRecording()
+                Action.ToggleRecording -> {
+                    // handled via KeyEventStore
+                }
                 Action.NextSentence -> model.next()
                 Action.PreviousSentence -> model.previous()
                 else -> Unit

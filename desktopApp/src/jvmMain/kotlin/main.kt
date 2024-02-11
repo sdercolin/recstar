@@ -59,7 +59,7 @@ fun main() =
                 title = APP_NAME,
                 icon = painterResource("icon.ico"),
                 state = windowState,
-                onKeyEvent = { dependencies.keyEventStore.dispatch(it) },
+                onPreviewKeyEvent = { dependencies.keyEventStore.dispatch(it) },
                 onCloseRequest = ::exitApplication,
             ) {
                 LaunchObserveWindowSize(windowState, dependencies.appRecordRepository)
