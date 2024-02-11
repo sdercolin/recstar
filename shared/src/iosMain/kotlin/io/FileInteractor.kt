@@ -1,6 +1,8 @@
 package io
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import platform.Foundation.NSDirectoryEnumerationSkipsHiddenFiles
 import platform.Foundation.NSError
 import platform.Foundation.NSFileManager
@@ -25,7 +27,7 @@ import util.withNSError
 
 @OptIn(ExperimentalForeignApi::class)
 actual class FileInteractor actual constructor(
-    context: AppContext,
+    private val context: AppContext,
     private val toastController: ToastController,
     private val alertDialogController: AlertDialogController,
 ) {
@@ -69,7 +71,9 @@ actual class FileInteractor actual constructor(
             asCopy = true,
         )
         documentPicker.delegate = documentPickerDelegate
-        uiViewController.presentModalViewController(documentPicker, animated = true)
+        context.coroutineScope.launch(Dispatchers.Main) {
+            uiViewController.presentModalViewController(documentPicker, animated = true)
+        }
     }
 
     actual fun exportData(request: ExportDataRequest) {
@@ -136,7 +140,9 @@ actual class FileInteractor actual constructor(
                     }
                 }
 
-            uiViewController.presentModalViewController(this, true)
+            context.coroutineScope.launch(Dispatchers.Main) {
+                uiViewController.presentModalViewController(this@apply, true)
+            }
         }
     }
 }

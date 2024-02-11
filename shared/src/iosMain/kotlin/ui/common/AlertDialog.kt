@@ -1,6 +1,8 @@
 package ui.common
 
 import androidx.compose.runtime.Composable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import platform.UIKit.UIAlertAction
 import platform.UIKit.UIAlertActionStyleCancel
 import platform.UIKit.UIAlertActionStyleDefault
@@ -56,7 +58,9 @@ actual class AlertDialogController actual constructor(private val context: AppCo
             )
         }
 
-        context.uiViewControllerContext.uiViewController.presentModalViewController(alertController, true)
+        context.coroutineScope.launch(Dispatchers.Main) {
+            context.uiViewControllerContext.uiViewController.presentModalViewController(alertController, true)
+        }
     }
 
     @Composable
