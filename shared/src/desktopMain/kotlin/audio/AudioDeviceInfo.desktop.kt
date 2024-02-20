@@ -45,7 +45,7 @@ private suspend fun getAudioDeviceInfos(
             .map { info ->
                 AudioDeviceInfo(
                     name = info.name,
-                    displayName = info.description,
+                    displayName = info.name,
                     isDefault = info.name == defaultMixerInfo.name,
                 )
             }.toMutableList()
