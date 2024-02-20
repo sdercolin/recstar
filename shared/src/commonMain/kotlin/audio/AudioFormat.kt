@@ -30,4 +30,4 @@ fun AppPreference.getAudioFormat(): AudioFormat =
         floating = bitDepth == BitDepthOption.BitDepth32Float,
     )
 
-expect fun BitDepthOption.isSupported(): Boolean
+expect suspend fun BitDepthOption.isSupported(appPreference: AppPreference): Boolean

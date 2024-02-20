@@ -26,8 +26,5 @@ fun AudioFormat.toJavaAudioFormat(): JavaAudioFormat =
         )
     }
 
-actual fun AppPreference.BitDepthOption.isSupported(): Boolean =
-    when (this) {
-        AppPreference.BitDepthOption.BitDepth16 -> true
-        else -> false
-    }
+actual suspend fun AppPreference.BitDepthOption.isSupported(appPreference: AppPreference): Boolean =
+    getAudioInputDeviceInfos(null, appPreference.copy(bitDepth = this).getAudioFormat()) != null

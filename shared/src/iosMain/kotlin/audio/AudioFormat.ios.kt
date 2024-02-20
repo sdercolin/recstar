@@ -2,4 +2,4 @@ package audio
 
 import model.AppPreference
 
-actual fun AppPreference.BitDepthOption.isSupported(): Boolean = true
+actual suspend fun AppPreference.BitDepthOption.isSupported(appPreference: AppPreference): Boolean = true

@@ -22,6 +22,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -57,7 +58,6 @@ import ui.model.Screen
 import ui.string.*
 import util.Log
 import util.appVersion
-import util.isDebug
 import util.isDesktop
 import util.runIf
 import util.runIfHave
@@ -186,15 +186,17 @@ private fun ScreenContent() {
                 onValueChanged = { repository.update { copy(sampleRate = it) } },
                 options = AppPreference.SampleRateOption.entries.toList(),
             )
-            val bitDepthOptions = AppPreference.BitDepthOption.entries.filter {
-                it.isSupported() || isDebug
+            val bitDepthOptions: State<List<AppPreference.BitDepthOption>> = produceState(listOf()) {
+                this.value = AppPreference.BitDepthOption.entries.filter {
+                    it.isSupported(value)
+                }
             }
-            if (bitDepthOptions.size > 1) {
+            if (bitDepthOptions.value.size > 1) {
                 SelectionItem(
                     title = string(Strings.PreferenceBitDepth),
                     value = value.bitDepth,
                     onValueChanged = { repository.update { copy(bitDepth = it) } },
-                    options = bitDepthOptions.toList(),
+                    options = bitDepthOptions.value.toList(),
                 )
             }
         }
