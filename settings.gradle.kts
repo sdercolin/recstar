@@ -1,4 +1,5 @@
-rootProject.name = "RecStar"
+val isWindows = System.getProperty("os.name").lowercase().startsWith("win")
+rootProject.name = if (isWindows) "recstar" else "RecStar"
 
 include(":androidApp")
 include(":shared")
@@ -29,7 +30,7 @@ pluginManagement {
 }
 
 plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version("0.4.0")
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.4.0"
 }
 
 dependencyResolutionManagement {
