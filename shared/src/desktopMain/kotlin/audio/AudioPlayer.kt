@@ -18,6 +18,7 @@ import util.runCatchingCancellable
 import util.toJavaFile
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.Clip
+import javax.sound.sampled.LineEvent
 import javax.sound.sampled.Mixer
 
 class AudioPlayerImpl(
@@ -52,6 +53,24 @@ class AudioPlayerImpl(
                 clip.close()
             }
             clip = AudioSystem.getClip(getSelectedMixerInfo())
+            clip.addLineListener {
+                Log.d("AudioPlayerImpl.initClip: ${it.type} at ${clip.microsecondPosition}")
+                when (it.type) {
+                    LineEvent.Type.START -> {
+                        startCounting()
+                        isPlaying = true
+                        scope.launch(Dispatchers.Main) {
+                            listener.onStarted()
+                        }
+                    }
+                    LineEvent.Type.STOP -> {
+                        isPlaying = false
+                        scope.launch(Dispatchers.Main) {
+                            listener.onStopped()
+                        }
+                    }
+                }
+            }
         }
 
     override fun play(
@@ -77,11 +96,8 @@ class AudioPlayerImpl(
                     }
                     clip.microsecondPosition = positionMs
                     clip.start()
-                    startCounting()
                     lastLoadedFile = file
                     lastLoadedFileModified = file.lastModified
-                    listener.onStarted()
-                    isPlaying = true
                 }
             }.onFailure {
                 unexpectedErrorNotifier.notify(it)
@@ -106,7 +122,6 @@ class AudioPlayerImpl(
     }
 
     override fun stop() {
-        listener.onStopped()
         cleanupJob = scope.launch(Dispatchers.IO) {
             runCatchingCancellable {
                 job?.cancelAndJoin()
@@ -125,7 +140,7 @@ class AudioPlayerImpl(
     override fun isPlaying(): Boolean = isPlaying
 
     private fun startCounting() {
-        countingJob = scope.launch {
+        countingJob = scope.launch(Dispatchers.IO) {
             while (clip.isRunning) {
                 val progress = clip.microsecondPosition.toFloat() / clip.microsecondLength.toFloat()
                 withContext(Dispatchers.Main) {
