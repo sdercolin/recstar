@@ -36,9 +36,9 @@ data class AudioDeviceInfoList(
 expect suspend fun getAudioInputDeviceInfos(
     desiredDeviceName: String?,
     audioFormat: AudioFormat,
-): AudioDeviceInfoList
+): AudioDeviceInfoList?
 
 expect suspend fun getAudioOutputDeviceInfos(
     desiredDeviceName: String?,
     audioFormat: AudioFormat,
-): AudioDeviceInfoList
+): AudioDeviceInfoList?

@@ -52,7 +52,12 @@ class AudioPlayerImpl(
             if (::clip.isInitialized) {
                 clip.close()
             }
-            clip = AudioSystem.getClip(getSelectedMixerInfo())
+            val selectedMixerInfo = getSelectedMixerInfo()
+            clip = if (selectedMixerInfo != null) {
+                AudioSystem.getClip(selectedMixerInfo)
+            } else {
+                AudioSystem.getClip()
+            }
             clip.addLineListener {
                 Log.d("AudioPlayerImpl.initClip: ${it.type} at ${clip.microsecondPosition}")
                 when (it.type) {
@@ -166,12 +171,12 @@ class AudioPlayerImpl(
         }
     }
 
-    private suspend fun getSelectedMixerInfo(): Mixer.Info {
+    private suspend fun getSelectedMixerInfo(): Mixer.Info? {
         val mixerInfos = AudioSystem.getMixerInfo()
         val deviceInfos = getAudioOutputDeviceInfos(
             appPreferenceRepository.value.desiredOutputName,
             appPreferenceRepository.value.getAudioFormat(),
-        )
+        ) ?: return null
         mixerInfos.find { it.name == deviceInfos.selectedDeviceInfo.name }?.let {
             return it
         }

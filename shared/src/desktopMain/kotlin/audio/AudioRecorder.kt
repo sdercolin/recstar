@@ -81,6 +81,7 @@ class AudioRecorderImpl(
         val format = appPreferenceRepository.value.getAudioFormat()
         val dataLineInfo = DataLine.Info(TargetDataLine::class.java, format.toJavaAudioFormat())
         val deviceInfos = getAudioInputDeviceInfos(appPreferenceRepository.value.desiredInputName, format)
+            ?: return AudioSystem.getTargetDataLine(format.toJavaAudioFormat())
         if (!AudioSystem.isLineSupported(dataLineInfo)) {
             throw UnsupportedAudioFormatException(format)
         }

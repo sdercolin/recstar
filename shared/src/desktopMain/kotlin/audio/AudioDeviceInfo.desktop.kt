@@ -10,12 +10,12 @@ import javax.sound.sampled.TargetDataLine
 actual suspend fun getAudioInputDeviceInfos(
     desiredDeviceName: String?,
     audioFormat: AudioFormat,
-): AudioDeviceInfoList = getAudioDeviceInfos(desiredDeviceName, audioFormat, AudioDeviceType.INPUT)
+): AudioDeviceInfoList? = getAudioDeviceInfos(desiredDeviceName, audioFormat, AudioDeviceType.INPUT)
 
 actual suspend fun getAudioOutputDeviceInfos(
     desiredDeviceName: String?,
     audioFormat: AudioFormat,
-): AudioDeviceInfoList = getAudioDeviceInfos(desiredDeviceName, audioFormat, AudioDeviceType.OUTPUT)
+): AudioDeviceInfoList? = getAudioDeviceInfos(desiredDeviceName, audioFormat, AudioDeviceType.OUTPUT)
 
 private enum class AudioDeviceType {
     INPUT,
@@ -26,7 +26,7 @@ private suspend fun getAudioDeviceInfos(
     desiredDeviceName: String?,
     audioFormat: AudioFormat,
     deviceType: AudioDeviceType,
-): AudioDeviceInfoList =
+): AudioDeviceInfoList? =
     withContext(Dispatchers.IO) {
         val mixerInfos = AudioSystem.getMixerInfo()
         val defaultMixerInfo = AudioSystem.getMixer(null).mixerInfo
@@ -49,6 +49,8 @@ private suspend fun getAudioDeviceInfos(
                     isDefault = info.name == defaultMixerInfo.name,
                 )
             }.toMutableList()
+
+        if (deviceInfos.isEmpty()) return@withContext null
 
         addDesiredDeviceIfNotFound(desiredDeviceName, deviceInfos)
 

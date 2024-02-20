@@ -155,12 +155,14 @@ private fun ScreenContent() {
                 ) {
                     this.value = getAudioInputDeviceInfos(value.desiredInputName, value.getAudioFormat())
                 }
-                SelectionItem(
-                    title = string(Strings.PreferenceInputDeviceName),
-                    value = allInputDeviceInfo.value?.selectedDeviceInfo,
-                    onValueChanged = { repository.update { copy(desiredInputName = it.name) } },
-                    options = allInputDeviceInfo.value?.deviceInfos?.filterNot { it.notFound } ?: emptyList(),
-                )
+                allInputDeviceInfo.value?.let { info ->
+                    SelectionItem(
+                        title = string(Strings.PreferenceInputDeviceName),
+                        value = info.selectedDeviceInfo,
+                        onValueChanged = { repository.update { copy(desiredInputName = it.name) } },
+                        options = info.deviceInfos.filterNot { it.notFound },
+                    )
+                }
                 val allOutputDeviceInfo = produceState<AudioDeviceInfoList?>(
                     null,
                     value.desiredOutputName,
@@ -169,12 +171,14 @@ private fun ScreenContent() {
                 ) {
                     this.value = getAudioOutputDeviceInfos(value.desiredOutputName, value.getAudioFormat())
                 }
-                SelectionItem(
-                    title = string(Strings.PreferenceOutputDeviceName),
-                    value = allOutputDeviceInfo.value?.selectedDeviceInfo,
-                    onValueChanged = { repository.update { copy(desiredOutputName = it.name) } },
-                    options = allOutputDeviceInfo.value?.deviceInfos?.filterNot { it.notFound } ?: emptyList(),
-                )
+                allOutputDeviceInfo.value?.let { info ->
+                    SelectionItem(
+                        title = string(Strings.PreferenceOutputDeviceName),
+                        value = info.selectedDeviceInfo,
+                        onValueChanged = { repository.update { copy(desiredOutputName = it.name) } },
+                        options = info.deviceInfos.filterNot { it.notFound },
+                    )
+                }
             }
             SelectionItem(
                 title = string(Strings.PreferenceSampleRate),
