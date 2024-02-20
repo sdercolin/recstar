@@ -170,6 +170,11 @@ private fun SessionScreen.ScreenContent() {
             }
         }
     }
+    LaunchedEffect(model) {
+        model.requestExit.collectLatest {
+            navigator.pop()
+        }
+    }
     if (screenOrientation == ScreenOrientation.Landscape) {
         Layout(
             modifier = Modifier.fillMaxSize(),

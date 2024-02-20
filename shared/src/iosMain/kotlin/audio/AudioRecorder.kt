@@ -35,7 +35,7 @@ import platform.AVFAudio.setActive
 import platform.CoreAudioTypes.kAudioFormatLinearPCM
 import platform.Foundation.NSOutputStream
 import repository.AppPreferenceRepository
-import ui.common.UnexpectedErrorNotifier
+import ui.common.ErrorNotifier
 import ui.model.AppContext
 import util.Log
 import util.runCatchingCancellable
@@ -46,7 +46,7 @@ import util.withNSErrorCatching
 class AudioRecorderImpl(
     private val listener: AudioRecorder.Listener,
     context: AppContext,
-    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val errorNotifier: ErrorNotifier,
     private val appPreferenceRepository: AppPreferenceRepository,
 ) : AudioRecorder {
     private var recorder: AVAudioRecorder? = null
@@ -98,7 +98,7 @@ class AudioRecorderImpl(
                     }
                 }
             }.onFailure {
-                unexpectedErrorNotifier.notify(it)
+                errorNotifier.notify(it)
                 dispose()
             }
         }
@@ -121,7 +121,7 @@ class AudioRecorderImpl(
                     listener.onStopped()
                 }
             }.onFailure {
-                unexpectedErrorNotifier.notify(it)
+                errorNotifier.notify(it)
                 dispose()
             }
         }
@@ -143,7 +143,7 @@ class AudioRecorderImpl(
                 Log.e("Failed to free AVAudioSession", it)
             }
         }.onFailure {
-            unexpectedErrorNotifier.notify(it)
+            errorNotifier.notify(it)
         }
     }
 
@@ -191,14 +191,14 @@ class AudioRecorderImpl(
 actual class AudioRecorderProvider actual constructor(
     private val listener: AudioRecorder.Listener,
     private val context: AppContext,
-    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val errorNotifier: ErrorNotifier,
     private val appPreferenceRepository: AppPreferenceRepository,
 ) {
     actual fun get(): AudioRecorder =
         AudioRecorderImpl(
             listener = listener,
             context = context,
-            unexpectedErrorNotifier = unexpectedErrorNotifier,
+            errorNotifier = errorNotifier,
             appPreferenceRepository = appPreferenceRepository,
         )
 }

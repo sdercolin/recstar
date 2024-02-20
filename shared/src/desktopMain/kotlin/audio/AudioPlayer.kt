@@ -1,5 +1,6 @@
 package audio
 
+import exception.UnsupportedAudioFormatException
 import io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -11,7 +12,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import repository.AppPreferenceRepository
-import ui.common.UnexpectedErrorNotifier
+import ui.common.ErrorNotifier
 import ui.model.AppContext
 import util.Log
 import util.runCatchingCancellable
@@ -24,11 +25,11 @@ import javax.sound.sampled.Mixer
 class AudioPlayerImpl(
     private val listener: AudioPlayer.Listener,
     context: AppContext,
-    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val errorNotifier: ErrorNotifier,
     private val appPreferenceRepository: AppPreferenceRepository,
 ) : AudioPlayer {
     private val scope = context.coroutineScope
-    private lateinit var clip: Clip
+    private var clip: Clip? = null
     private var lastLoadedFile: File? = null
     private var lastLoadedFileModified: Long? = null
     private var job: Job? = null
@@ -49,32 +50,35 @@ class AudioPlayerImpl(
 
     private fun initClip() =
         scope.launch(Dispatchers.IO) {
-            if (::clip.isInitialized) {
-                clip.close()
-            }
-            val selectedMixerInfo = getSelectedMixerInfo()
-            clip = if (selectedMixerInfo != null) {
-                AudioSystem.getClip(selectedMixerInfo)
-            } else {
-                AudioSystem.getClip()
-            }
-            clip.addLineListener {
-                Log.d("AudioPlayerImpl.initClip: ${it.type} at ${clip.microsecondPosition}")
-                when (it.type) {
-                    LineEvent.Type.START -> {
-                        startCounting()
-                        isPlaying = true
-                        scope.launch(Dispatchers.Main) {
-                            listener.onStarted()
-                        }
-                    }
-                    LineEvent.Type.STOP -> {
-                        isPlaying = false
-                        scope.launch(Dispatchers.Main) {
-                            listener.onStopped()
+            runCatchingCancellable {
+                clip?.close()
+                val selectedMixerInfo = getSelectedMixerInfo()
+                clip = if (selectedMixerInfo != null) {
+                    AudioSystem.getClip(selectedMixerInfo)
+                } else {
+                    AudioSystem.getClip()
+                }.also {
+                    it.addLineListener { ev ->
+                        Log.d("AudioPlayerImpl.initClip: ${ev.type} at ${it.microsecondPosition}")
+                        when (ev.type) {
+                            LineEvent.Type.START -> {
+                                startCounting()
+                                isPlaying = true
+                                scope.launch(Dispatchers.Main) {
+                                    listener.onStarted()
+                                }
+                            }
+                            LineEvent.Type.STOP -> {
+                                isPlaying = false
+                                scope.launch(Dispatchers.Main) {
+                                    listener.onStopped()
+                                }
+                            }
                         }
                     }
                 }
+            }.onFailure {
+                errorNotifier.notify(it)
             }
         }
 
@@ -82,6 +86,7 @@ class AudioPlayerImpl(
         file: File,
         positionMs: Long,
     ) {
+        val clip = clip ?: return
         if (job?.isActive == true) {
             Log.w("AudioPlayerImpl.start: already started")
             return
@@ -105,7 +110,7 @@ class AudioPlayerImpl(
                     lastLoadedFileModified = file.lastModified
                 }
             }.onFailure {
-                unexpectedErrorNotifier.notify(it)
+                errorNotifier.notify(it)
                 dispose()
             }
         }
@@ -120,13 +125,14 @@ class AudioPlayerImpl(
                 cleanupJob?.join()
                 play(requireNotNull(lastLoadedFile), positionMs)
             }.onFailure {
-                unexpectedErrorNotifier.notify(it)
+                errorNotifier.notify(it)
                 dispose()
             }
         }
     }
 
     override fun stop() {
+        val clip = clip ?: return
         cleanupJob = scope.launch(Dispatchers.IO) {
             runCatchingCancellable {
                 job?.cancelAndJoin()
@@ -136,7 +142,7 @@ class AudioPlayerImpl(
                     flush()
                 }
             }.onFailure {
-                unexpectedErrorNotifier.notify(it)
+                errorNotifier.notify(it)
                 dispose()
             }
         }
@@ -145,6 +151,7 @@ class AudioPlayerImpl(
     override fun isPlaying(): Boolean = isPlaying
 
     private fun startCounting() {
+        val clip = clip ?: return
         countingJob = scope.launch(Dispatchers.IO) {
             while (clip.isRunning) {
                 val progress = clip.microsecondPosition.toFloat() / clip.microsecondLength.toFloat()
@@ -163,20 +170,21 @@ class AudioPlayerImpl(
             seekingJob?.cancel()
             cleanupJob?.cancel()
             countingJob?.cancel()
-            clip.close()
+            clip?.close()
             lastLoadedFile = null
             lastLoadedFileModified = null
         }.onFailure {
-            unexpectedErrorNotifier.notify(it)
+            errorNotifier.notify(it)
         }
     }
 
     private suspend fun getSelectedMixerInfo(): Mixer.Info? {
         val mixerInfos = AudioSystem.getMixerInfo()
+        val format = appPreferenceRepository.value.getAudioFormat()
         val deviceInfos = getAudioOutputDeviceInfos(
             appPreferenceRepository.value.desiredOutputName,
-            appPreferenceRepository.value.getAudioFormat(),
-        ) ?: return null
+            format,
+        ) ?: throw UnsupportedAudioFormatException(format)
         mixerInfos.find { it.name == deviceInfos.selectedDeviceInfo.name }?.let {
             return it
         }
@@ -188,8 +196,8 @@ class AudioPlayerImpl(
 actual class AudioPlayerProvider actual constructor(
     private val listener: AudioPlayer.Listener,
     private val context: AppContext,
-    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val errorNotifier: ErrorNotifier,
     private val appPreferenceRepository: AppPreferenceRepository,
 ) {
-    actual fun get(): AudioPlayer = AudioPlayerImpl(listener, context, unexpectedErrorNotifier, appPreferenceRepository)
+    actual fun get(): AudioPlayer = AudioPlayerImpl(listener, context, errorNotifier, appPreferenceRepository)
 }

@@ -21,7 +21,7 @@ import kotlinx.io.writeFloatLe
 import kotlinx.io.writeIntLe
 import kotlinx.io.writeShortLe
 import repository.AppPreferenceRepository
-import ui.common.UnexpectedErrorNotifier
+import ui.common.ErrorNotifier
 import ui.model.AppContext
 import util.Log
 import util.runCatchingCancellable
@@ -31,7 +31,7 @@ import util.writeRawString
 class AudioRecorderImpl(
     private val listener: AudioRecorder.Listener,
     context: AppContext,
-    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val errorNotifier: ErrorNotifier,
     private val appPreferenceRepository: AppPreferenceRepository,
 ) : AudioRecorder {
     private val coroutineScope = context.coroutineScope
@@ -162,7 +162,7 @@ class AudioRecorderImpl(
                     Thread.sleep(100)
                 }
             }.onFailure {
-                unexpectedErrorNotifier.notify(it)
+                errorNotifier.notify(it)
                 dispose()
             }
         }
@@ -181,7 +181,7 @@ class AudioRecorderImpl(
                     listener.onStopped()
                 }
             }.onFailure {
-                unexpectedErrorNotifier.notify(it)
+                errorNotifier.notify(it)
                 dispose()
             }
         }
@@ -199,7 +199,7 @@ class AudioRecorderImpl(
                 audioRecord = null
                 cleanupJob = null
             }.onFailure {
-                unexpectedErrorNotifier.notify(it)
+                errorNotifier.notify(it)
             }
         }
     }
@@ -224,14 +224,14 @@ class AudioRecorderImpl(
 actual class AudioRecorderProvider actual constructor(
     private val listener: AudioRecorder.Listener,
     private val context: AppContext,
-    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val errorNotifier: ErrorNotifier,
     private val appPreferenceRepository: AppPreferenceRepository,
 ) {
     actual fun get(): AudioRecorder =
         AudioRecorderImpl(
             listener = listener,
             context = context,
-            unexpectedErrorNotifier = unexpectedErrorNotifier,
+            errorNotifier = errorNotifier,
             appPreferenceRepository = appPreferenceRepository,
         )
 }

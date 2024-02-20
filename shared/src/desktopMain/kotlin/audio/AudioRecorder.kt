@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import repository.AppPreferenceRepository
-import ui.common.UnexpectedErrorNotifier
+import ui.common.ErrorNotifier
 import ui.model.AppContext
 import util.Log
 import util.runCatchingCancellable
@@ -27,7 +27,7 @@ import javax.sound.sampled.TargetDataLine
 @Stable
 class AudioRecorderImpl(
     private val listener: AudioRecorder.Listener,
-    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val errorNotifier: ErrorNotifier,
     private val appPreferenceRepository: AppPreferenceRepository,
 ) : AudioRecorder {
     private var line: TargetDataLine? = null
@@ -70,7 +70,7 @@ class AudioRecorderImpl(
                     )
                 }
             }.onFailure {
-                unexpectedErrorNotifier.notify(it)
+                errorNotifier.notify(it)
                 dispose()
             }
         }
@@ -81,7 +81,7 @@ class AudioRecorderImpl(
         val format = appPreferenceRepository.value.getAudioFormat()
         val dataLineInfo = DataLine.Info(TargetDataLine::class.java, format.toJavaAudioFormat())
         val deviceInfos = getAudioInputDeviceInfos(appPreferenceRepository.value.desiredInputName, format)
-            ?: return AudioSystem.getTargetDataLine(format.toJavaAudioFormat())
+            ?: throw UnsupportedAudioFormatException(format)
         if (!AudioSystem.isLineSupported(dataLineInfo)) {
             throw UnsupportedAudioFormatException(format)
         }
@@ -116,7 +116,7 @@ class AudioRecorderImpl(
                     listener.onStopped()
                 }
             }.onFailure {
-                unexpectedErrorNotifier.notify(it)
+                errorNotifier.notify(it)
                 dispose()
             }
         }
@@ -133,7 +133,7 @@ class AudioRecorderImpl(
             line?.close()
             line = null
         }.onFailure {
-            unexpectedErrorNotifier.notify(it)
+            errorNotifier.notify(it)
         }
     }
 
@@ -143,15 +143,15 @@ class AudioRecorderImpl(
 
 actual class AudioRecorderProvider(
     private val listener: AudioRecorder.Listener,
-    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val errorNotifier: ErrorNotifier,
     private val appPreferenceRepository: AppPreferenceRepository,
 ) {
     actual constructor(
         listener: AudioRecorder.Listener,
         context: AppContext,
-        unexpectedErrorNotifier: UnexpectedErrorNotifier,
+        errorNotifier: ErrorNotifier,
         appPreferenceRepository: AppPreferenceRepository,
-    ) : this(listener, unexpectedErrorNotifier, appPreferenceRepository)
+    ) : this(listener, errorNotifier, appPreferenceRepository)
 
-    actual fun get(): AudioRecorder = AudioRecorderImpl(listener, unexpectedErrorNotifier, appPreferenceRepository)
+    actual fun get(): AudioRecorder = AudioRecorderImpl(listener, errorNotifier, appPreferenceRepository)
 }

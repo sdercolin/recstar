@@ -24,7 +24,9 @@ fun Strings.en(): String =
         ExceptionRenameSessionExisting -> "Session named {0} already exists."
         ExceptionRenameSessionInvalid -> "Invalid session name: {0}"
         ExceptionRenameSessionUnexpected -> "Failed to rename session."
-        ExceptionUnsupportedAudioFormat -> "Unsupported audio format: {0}, please try adjusting the audio settings."
+        ExceptionUnsupportedAudioFormat ->
+            "Could not find any audio device that supports the current audio format: {0}, " +
+                "please check and adjust the audio settings, especially the sample rate and bit depth."
         AlertExportTips ->
             "Your reclist contains sentences with Japanese voice marked characters " +
                 "which will be saved in a special encoding, " +

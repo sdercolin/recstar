@@ -191,7 +191,7 @@ private fun ScreenContent() {
                     it.isSupported(value)
                 }
             }
-            if (bitDepthOptions.value.size > 1) {
+            if (bitDepthOptions.value.isNotEmpty()) {
                 SelectionItem(
                     title = string(Strings.PreferenceBitDepth),
                     value = value.bitDepth,

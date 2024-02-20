@@ -2,7 +2,7 @@ package audio
 
 import io.File
 import repository.AppPreferenceRepository
-import ui.common.UnexpectedErrorNotifier
+import ui.common.ErrorNotifier
 import ui.model.AppContext
 
 /**
@@ -52,7 +52,7 @@ interface AudioPlayer {
 expect class AudioPlayerProvider(
     listener: AudioPlayer.Listener,
     context: AppContext,
-    unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    errorNotifier: ErrorNotifier,
     appPreferenceRepository: AppPreferenceRepository,
 ) {
     fun get(): AudioPlayer

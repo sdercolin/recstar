@@ -23,8 +23,8 @@ import io.LocalPermissionChecker
 import io.Paths
 import kotlinx.datetime.Clock
 import repository.LocalAppPreferenceRepository
+import ui.common.ErrorNotifier
 import ui.common.LocalAlertDialogController
-import ui.common.UnexpectedErrorNotifier
 import ui.model.LocalAppContext
 import ui.model.Screen
 
@@ -56,15 +56,16 @@ private fun RecorderDemo() {
     val permissionChecker = LocalPermissionChecker.current
     val alertDialogController = LocalAlertDialogController.current
     val appPreferenceRepository = LocalAppPreferenceRepository.current
-    val unexpectedErrorNotifier = remember(context, alertDialogController, fileInteractor) {
-        UnexpectedErrorNotifier(
+    val errorNotifier = remember(context, alertDialogController, fileInteractor) {
+        ErrorNotifier(
             context = context,
             alertDialogController = alertDialogController,
             fileInteractor = fileInteractor,
+            onFatalError = {},
         )
     }
     val recorder = remember {
-        AudioRecorderProvider(listener, context, unexpectedErrorNotifier, appPreferenceRepository).get()
+        AudioRecorderProvider(listener, context, errorNotifier, appPreferenceRepository).get()
     }
     var isPermissionGranted by remember {
         mutableStateOf(permissionChecker.checkAndRequestRecordingPermission())

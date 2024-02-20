@@ -10,7 +10,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import repository.AppPreferenceRepository
-import ui.common.UnexpectedErrorNotifier
+import ui.common.ErrorNotifier
 import ui.model.AppContext
 import util.Log
 import util.runCatchingCancellable
@@ -18,7 +18,7 @@ import util.runCatchingCancellable
 class AudioPlayerImpl(
     private val listener: AudioPlayer.Listener,
     context: AppContext,
-    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val errorNotifier: ErrorNotifier,
     private val appPreferenceRepository: AppPreferenceRepository,
 ) : AudioPlayer {
     private val scope = context.coroutineScope
@@ -71,7 +71,7 @@ class AudioPlayerImpl(
                 lastLoadedFile = file.absolutePath
                 lastLoadedFileModified = file.lastModified
             }.onFailure {
-                unexpectedErrorNotifier.notify(it)
+                errorNotifier.notify(it)
                 dispose()
             }
         }
@@ -92,7 +92,7 @@ class AudioPlayerImpl(
                 listener.onStopped()
                 stopCounting()
             }.onFailure {
-                unexpectedErrorNotifier.notify(it)
+                errorNotifier.notify(it)
                 dispose()
             }
         }
@@ -109,7 +109,7 @@ class AudioPlayerImpl(
             lastLoadedFile = null
             lastLoadedFileModified = null
         }.onFailure {
-            unexpectedErrorNotifier.notify(it)
+            errorNotifier.notify(it)
         }
     }
 
@@ -137,8 +137,8 @@ class AudioPlayerImpl(
 actual class AudioPlayerProvider actual constructor(
     private val listener: AudioPlayer.Listener,
     private val context: AppContext,
-    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val errorNotifier: ErrorNotifier,
     private val appPreferenceRepository: AppPreferenceRepository,
 ) {
-    actual fun get(): AudioPlayer = AudioPlayerImpl(listener, context, unexpectedErrorNotifier, appPreferenceRepository)
+    actual fun get(): AudioPlayer = AudioPlayerImpl(listener, context, errorNotifier, appPreferenceRepository)
 }

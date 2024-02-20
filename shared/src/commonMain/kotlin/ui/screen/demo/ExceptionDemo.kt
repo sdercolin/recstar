@@ -16,9 +16,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import ui.common.ErrorNotifier
 import ui.common.LocalAlertDialogController
 import ui.common.LocalToastController
-import ui.common.UnexpectedErrorNotifier
 import ui.common.show
 import ui.model.LocalAppContext
 import ui.model.Screen
@@ -39,11 +39,12 @@ private fun ExceptionDemo() {
     val fileInteractor = LocalFileInteractor.current
     val toastController = LocalToastController.current
     val alertDialogController = LocalAlertDialogController.current
-    val unexpectedErrorNotifier = remember(context, alertDialogController, fileInteractor) {
-        UnexpectedErrorNotifier(
+    val errorNotifier = remember(context, alertDialogController, fileInteractor) {
+        ErrorNotifier(
             context = context,
             alertDialogController = alertDialogController,
             fileInteractor = fileInteractor,
+            onFatalError = {},
         )
     }
     Column(
@@ -82,7 +83,7 @@ private fun ExceptionDemo() {
                     runCatching {
                         throw Exception("Caught exception tested in IO coroutine scope")
                     }.onFailure {
-                        unexpectedErrorNotifier.notify(it)
+                        errorNotifier.notify(it)
                     }
                 }
             },

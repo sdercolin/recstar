@@ -10,12 +10,12 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import ui.common.UnexpectedErrorNotifier
+import ui.common.ErrorNotifier
 
 class WaveformPainter(
     private val recordingFlow: Flow<WavData>,
     private val coroutineScope: CoroutineScope,
-    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val errorNotifier: ErrorNotifier,
 ) {
     private var pointPerPixel = 60
 
@@ -39,7 +39,7 @@ class WaveformPainter(
             runCatching {
                 wavReader.read(file)
             }.onFailure {
-                unexpectedErrorNotifier.notify(it)
+                errorNotifier.notify(it)
             }.onSuccess {
                 _flow.value = getSampledData(it)
             }

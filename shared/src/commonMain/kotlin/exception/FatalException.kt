@@ -1,0 +1,3 @@
+package exception
+
+interface FatalException

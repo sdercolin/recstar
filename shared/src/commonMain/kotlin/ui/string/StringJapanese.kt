@@ -25,7 +25,8 @@ fun Strings.ja(): String? =
         ExceptionRenameSessionInvalid -> "無効なセッション名：{0}"
         ExceptionRenameSessionUnexpected -> "セッション名の編集に失敗しました。"
         ExceptionUnsupportedAudioFormat ->
-            "指定のオーディオフォーマットはサポートされていません：{0}、オーディオ設定を調整してください。"
+            "現在のオーディオフォーマットをサポートするオーディオデバイスが見つかりませんでした。" +
+                "オーディオ設定、特にサンプリングレートとビット深度を確認し、調整してください。"
         AlertExportTips ->
             "録音リストには日本語の濁点記号を含む行があります。" +
                 "MacOS/iOSの仕様により、これらのファイル名は特殊なエンコーディングで保存され、" +

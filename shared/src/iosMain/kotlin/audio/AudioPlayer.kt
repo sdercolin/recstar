@@ -16,7 +16,7 @@ import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
 import platform.AVFAudio.AVAudioSessionModeDefault
 import platform.AVFAudio.setActive
 import repository.AppPreferenceRepository
-import ui.common.UnexpectedErrorNotifier
+import ui.common.ErrorNotifier
 import ui.model.AppContext
 import util.Log
 import util.runCatchingCancellable
@@ -26,7 +26,7 @@ import util.withNSError
 class AudioPlayerImpl(
     private val listener: AudioPlayer.Listener,
     context: AppContext,
-    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val errorNotifier: ErrorNotifier,
     private val appPreferenceRepository: AppPreferenceRepository,
 ) : AudioPlayer {
     private val scope = context.coroutineScope
@@ -79,7 +79,7 @@ class AudioPlayerImpl(
                 }
                 startCounting()
             }.onFailure {
-                unexpectedErrorNotifier.notify(it)
+                errorNotifier.notify(it)
                 dispose()
             }
         }
@@ -94,7 +94,7 @@ class AudioPlayerImpl(
                 cleanupJob?.join()
                 play(requireNotNull(lastLoadedFile), positionMs)
             }.onFailure {
-                unexpectedErrorNotifier.notify(it)
+                errorNotifier.notify(it)
                 dispose()
             }
         }
@@ -109,7 +109,7 @@ class AudioPlayerImpl(
                     listener.onStopped()
                 }
             }.onFailure {
-                unexpectedErrorNotifier.notify(it)
+                errorNotifier.notify(it)
                 dispose()
             }
         }
@@ -129,7 +129,7 @@ class AudioPlayerImpl(
             lastLoadedFile = null
             lastLoadedFileModified = null
         }.onFailure {
-            unexpectedErrorNotifier.notify(it)
+            errorNotifier.notify(it)
         }
     }
 
@@ -167,8 +167,8 @@ class AudioPlayerImpl(
 actual class AudioPlayerProvider actual constructor(
     private val listener: AudioPlayer.Listener,
     private val context: AppContext,
-    private val unexpectedErrorNotifier: UnexpectedErrorNotifier,
+    private val errorNotifier: ErrorNotifier,
     private val appPreferenceRepository: AppPreferenceRepository,
 ) {
-    actual fun get(): AudioPlayer = AudioPlayerImpl(listener, context, unexpectedErrorNotifier, appPreferenceRepository)
+    actual fun get(): AudioPlayer = AudioPlayerImpl(listener, context, errorNotifier, appPreferenceRepository)
 }

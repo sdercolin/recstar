@@ -38,8 +38,8 @@ import repository.LocalAppPreferenceRepository
 import repository.LocalSessionRepository
 import repository.SessionRepository
 import ui.common.AlertDialogController
+import ui.common.ErrorNotifier
 import ui.common.LocalAlertDialogController
-import ui.common.UnexpectedErrorNotifier
 import ui.common.requestConfirm
 import ui.common.requestConfirmError
 import ui.model.AppContext
@@ -85,6 +85,9 @@ class SessionScreenModel(
     }
 
     val shouldShowSubTitle: Boolean get() = comments != null && appPreferenceRepository.value.titleBarStyle.hasSub
+
+    private val _requestExit = MutableSharedFlow<Unit>()
+    val requestExit: Flow<Unit> = _requestExit
 
     private fun reload(session: Session) {
         name = session.name
@@ -250,23 +253,32 @@ class SessionScreenModel(
         }
     }
 
-    private val unexpectedErrorNotifier = UnexpectedErrorNotifier(alertDialogController, context, fileInteractor)
+    private val errorNotifier = ErrorNotifier(
+        alertDialogController = alertDialogController,
+        context = context,
+        fileInteractor = fileInteractor,
+        onFatalError = {
+            screenModelScope.launch(Dispatchers.Main) {
+                _requestExit.emit(Unit)
+            }
+        },
+    )
     private val player = AudioPlayerProvider(
         playerListener,
         context,
-        unexpectedErrorNotifier,
+        errorNotifier,
         appPreferenceRepository,
     ).get()
     private val recorder = AudioRecorderProvider(
         recorderListener,
         context,
-        unexpectedErrorNotifier,
+        errorNotifier,
         appPreferenceRepository,
     ).get()
     private val waveformPainter = WaveformPainter(
         recorder.waveDataFlow,
         screenModelScope,
-        unexpectedErrorNotifier,
+        errorNotifier,
     ).apply {
         switch(currentFile)
         recorderListener.waveformPainter = this
@@ -277,7 +289,7 @@ class SessionScreenModel(
     private val guidePlayer = AudioPlayerProvider(
         guidePlayerListener,
         context,
-        unexpectedErrorNotifier,
+        errorNotifier,
         appPreferenceRepository,
     ).get()
 

@@ -1,5 +1,6 @@
 package ui.common
 
+import exception.FatalException
 import exception.LocalizedException
 import io.FileInteractor
 import io.Paths
@@ -10,18 +11,18 @@ import util.Clipboard
 import util.Log
 import util.isDesktop
 
-class UnexpectedErrorNotifier(
+class ErrorNotifier(
     private val alertDialogController: AlertDialogController,
     private val context: AppContext,
     private val fileInteractor: FileInteractor,
+    private val onFatalError: () -> Unit,
 ) {
     fun notify(t: Throwable) {
         Log.e(t)
         if (t is LocalizedException) {
-            alertDialogController.requestConfirmCancellable(
-                title = stringStatic(Strings.CommonError),
+            alertDialogController.requestConfirmError(
                 message = t.message ?: t.toString(),
-                onConfirm = {},
+                onFinish = { if (t is FatalException) onFatalError() },
             )
             return
         }
