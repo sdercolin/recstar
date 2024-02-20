@@ -1,4 +1,4 @@
-rootProject.name = "RecStar"
+rootProject.name = "recstar"
 
 include(":androidApp")
 include(":shared")
