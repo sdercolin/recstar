@@ -2,9 +2,7 @@
 
 A UTAU style reclist recorder application for Desktop/iOS/Android.
 
-This project is currently on an early development stage.
-
-If you have any feedback, please join our [Discord Server](https://discord.gg/TyEcQ6P73y) and find the #recstar-prototype channel.
+If you have any feedback, please join our [Discord Server](https://discord.gg/TyEcQ6P73y) and find the #recstar channel.
 
 ## Download
 
