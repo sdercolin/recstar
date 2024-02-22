@@ -54,7 +54,7 @@ class GuideAudioRepository(
     }
 
     /**
-     * Fetches the list of guide audio names.
+     * Fetches the list of guide audio references.
      */
     fun fetch() {
         val items = folder.listFiles()

@@ -87,10 +87,12 @@ private fun MainScreen.ScreenContent() {
     val model = rememberMainScreenModel()
     val navigator = LocalNavigator.currentOrThrow
     Box(
-        modifier = Modifier.fillMaxSize().background(color = MaterialTheme.colors.background).padding(
-            start = LocalSafeAreaInsets.current.leftDp(8f),
-            end = LocalSafeAreaInsets.current.rightDp(8f),
-        ),
+        modifier = Modifier.fillMaxSize()
+            .background(color = MaterialTheme.colors.background)
+            .padding(
+                start = LocalSafeAreaInsets.current.leftDp(8f),
+                end = LocalSafeAreaInsets.current.rightDp(8f),
+            ),
     ) {
         ItemListScreenContent(model, string(Strings.MainScreenAllSessions))
         FloatingActionButton(

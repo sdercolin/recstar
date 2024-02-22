@@ -3,25 +3,34 @@ package repository
 import androidx.compose.runtime.staticCompositionLocalOf
 import io.File
 import io.Paths
+import io.reclistRecordFile
 import io.reclistsDirectory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import model.Reclist
+import model.ReclistItem
 import model.parseReclist
+import util.DateTime
 import util.Log
 
 /**
  * A repository to manage reclist files.
  */
-class ReclistRepository {
+class ReclistRepository(
+    private val _items: MutableStateFlow<List<ReclistItem>> = MutableStateFlow(emptyList()),
+) : ItemUsedTimeRepository<ReclistItem> by ItemUsedTimeRepositoryImpl(
+        recordFile = Paths.reclistRecordFile,
+        updateItems = { update ->
+            _items.value = update(_items.value)
+        },
+    ) {
     private lateinit var folder: File
     private val map = mutableMapOf<String, Reclist>()
-    private val _items = MutableStateFlow(emptyList<String>())
 
     /**
-     * The list of reclist names.
+     * The list of reclist references.
      */
-    val items: StateFlow<List<String>> = _items
+    val items: StateFlow<List<ReclistItem>> = _items
 
     init {
         init()
@@ -38,6 +47,7 @@ class ReclistRepository {
         }
         map.clear()
         _items.value = emptyList()
+        loadUsedTimes()
     }
 
     /**
@@ -59,11 +69,15 @@ class ReclistRepository {
         if (map.containsKey(name)) {
             Log.w("ReclistRepository.import: $name already exists, overwriting...")
         }
-        map[name] = reclist
         file.copyTo(folder.resolve(file.name), overwrite = true)
         commentFile?.copyTo(getCommentFile(name, folder), overwrite = true)
-        _items.value = listOf(name) + _items.value.minus(name)
-        sort()
+        val newItem = ReclistItem(name, DateTime.getNow())
+        val items = _items.value.toMutableList()
+        items.removeAll { it.name == name }
+        items.add(newItem)
+        _items.value = items
+        map[name] = reclist
+        saveUsedTime(name, newItem.lastUsed)
         return true
     }
 
@@ -75,8 +89,8 @@ class ReclistRepository {
             .filter { it.extension == Reclist.FILE_EXTENSION }
             .filterNot { it.name.endsWith(Reclist.COMMENT_FILE_NAME_SUFFIX_EXTENSION) }
             .map { it.nameWithoutExtension }
+            .map { ReclistItem(it, getUsedTime(it)) }
         _items.value = items
-        sort()
     }
 
     /**
@@ -96,11 +110,7 @@ class ReclistRepository {
             getFile(name).delete()
             getCommentFile(name).takeIf { it.exists() }?.delete()
         }
-        _items.value = _items.value.filterNot { it in names }
-    }
-
-    private fun sort() {
-        _items.value = _items.value.sortedBy { it }
+        _items.value = _items.value.filterNot { it.name in names }
     }
 
     private fun getFile(name: String): File = folder.resolve("$name${Reclist.FILE_NAME_SUFFIX}")

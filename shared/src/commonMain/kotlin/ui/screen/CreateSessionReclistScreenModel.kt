@@ -1,20 +1,21 @@
 package ui.screen
 
 import androidx.compose.runtime.Composable
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
+import model.ReclistItem
+import model.SortingMethod
+import repository.AppRecordRepository
+import repository.LocalAppRecordRepository
 import repository.LocalReclistRepository
 import repository.LocalSessionRepository
 import repository.ReclistRepository
 import repository.SessionRepository
 import ui.common.AlertDialogController
-import ui.common.EditableListConfig
-import ui.common.EditableListScreenModel
-import ui.common.EditableListScreenModelImpl
+import ui.common.ItemListScreenModel
 import ui.common.LocalAlertDialogController
 import ui.common.requestConfirm
 import ui.string.*
@@ -22,30 +23,38 @@ import util.Log
 
 class CreateSessionReclistScreenModel(
     private val sessionRepository: SessionRepository,
+    private val appRecordRepository: AppRecordRepository,
     private val reclistRepository: ReclistRepository,
     private val navigator: Navigator,
     private val alertDialogController: AlertDialogController,
-) : ScreenModel,
-    EditableListScreenModel<String> by EditableListScreenModelImpl(
+) : ItemListScreenModel<ReclistItem>(
         alertDialogController,
-        EditableListConfig(
-            deleteAlertTitle = { stringStatic(Strings.CreateSessionReclistScreenDeleteItemsTitle) },
-            deleteAlertMessage = { count -> stringStatic(Strings.CreateSessionReclistScreenDeleteItemsMessage, count) },
-            onDelete = { reclistRepository.delete(it) },
-        ),
+        allowedSortingMethods = SortingMethod.entries.toList(),
+        initialSortingMethod = appRecordRepository.value.reclistSortingMethod ?: SortingMethod.NameAsc,
+        saveSortingMethod = { appRecordRepository.update { copy(reclistSortingMethod = it) } },
     ) {
-    val reclists: StateFlow<List<String>> = reclistRepository.items
-
     init {
-        reclistRepository.fetch()
+        load()
     }
 
     private var finished = false
 
-    fun select(name: String) {
+    override fun getDeleteAlertTitle(): String = stringStatic(Strings.CreateSessionReclistScreenDeleteItemsTitle)
+
+    override fun getDeleteAlertMessage(count: Int): String =
+        stringStatic(Strings.CreateSessionReclistScreenDeleteItemsMessage, count)
+
+    override fun fetch() = reclistRepository.fetch()
+
+    override val upstream: Flow<List<ReclistItem>>
+        get() = reclistRepository.items
+
+    override fun onDelete(items: List<ReclistItem>) = reclistRepository.delete(items.map { it.name })
+
+    override fun onClick(item: ReclistItem) {
         if (finished) return
         finished = true
-        val reclist = reclistRepository.get(name)
+        val reclist = reclistRepository.get(item.name)
         val session = sessionRepository.create(reclist)
             .onFailure {
                 Log.e(it)
@@ -55,6 +64,7 @@ class CreateSessionReclistScreenModel(
                 finished = false
             }
             .getOrNull() ?: return
+        reclistRepository.updateUsedTime(item.name)
         navigator.replace(SessionScreen(session))
     }
 }
@@ -62,10 +72,17 @@ class CreateSessionReclistScreenModel(
 @Composable
 fun CreateSessionReclistScreen.rememberCreateSessionReclistScreenModel(): CreateSessionReclistScreenModel {
     val sessionRepository = LocalSessionRepository.current
+    val appRecordRepository = LocalAppRecordRepository.current
     val reclistRepository = LocalReclistRepository.current
     val navigator = LocalNavigator.currentOrThrow
     val alertDialogController = LocalAlertDialogController.current
     return rememberScreenModel {
-        CreateSessionReclistScreenModel(sessionRepository, reclistRepository, navigator, alertDialogController)
+        CreateSessionReclistScreenModel(
+            sessionRepository,
+            appRecordRepository,
+            reclistRepository,
+            navigator,
+            alertDialogController,
+        )
     }
 }

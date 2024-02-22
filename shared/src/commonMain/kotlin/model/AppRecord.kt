@@ -10,4 +10,5 @@ data class AppRecord(
     val ignoreExportTips: Boolean = false,
     val sessionSortingMethod: SortingMethod? = null,
     val guideAudioSortingMethod: SortingMethod? = null,
+    val reclistSortingMethod: SortingMethod? = null,
 )
