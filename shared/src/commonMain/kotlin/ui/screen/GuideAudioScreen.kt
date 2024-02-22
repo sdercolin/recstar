@@ -31,7 +31,7 @@ import repository.LocalAppActionStore
 import repository.LocalGuideAudioRepository
 import ui.common.ActionMenu
 import ui.common.ActionMenuItem
-import ui.common.FloatingActionButtonWrapper
+import ui.common.FloatingActionButton
 import ui.common.LocalAlertDialogController
 import ui.common.LocalToastController
 import ui.common.ScrollableLazyColumn
@@ -133,7 +133,7 @@ private fun GuideAudioScreen.ScreenContent() {
                 }
             }
         }
-        FloatingActionButtonWrapper(model)
+        FloatingActionButton(model)
     }
 }
 

@@ -1,19 +1,11 @@
 package ui.screen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Code
@@ -21,24 +13,18 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import const.APP_NAME
 import kotlinx.coroutines.flow.collectLatest
 import model.Action
 import repository.LocalAppActionStore
+import ui.common.ActionButtonWrapper
 import ui.common.ActionMenu
 import ui.common.ActionMenuItem
-import ui.common.FloatingActionButtonWrapper
-import ui.common.ReversedRow
-import ui.common.ScrollableLazyColumn
-import ui.common.SearchBar
-import ui.common.SortingButton
+import ui.common.FloatingActionButton
+import ui.common.ItemListScreenContent
 import ui.model.LocalSafeAreaInsets
 import ui.model.Screen
 import ui.screen.demo.DemoShowcaseScreen
@@ -70,7 +56,7 @@ private fun MainScreen.ScreenAction() {
             }
         }
     }
-    model.ActionButtonWrapper {
+    ActionButtonWrapper(model) {
         ActionMenu { closeMenu ->
             ActionMenuItem(
                 text = string(Strings.CommonEdit),
@@ -99,84 +85,23 @@ private fun MainScreen.ScreenAction() {
 @Composable
 private fun MainScreen.ScreenContent() {
     val model = rememberMainScreenModel()
-    val sessions by model.sessions.collectAsState(listOf())
-
+    val navigator = LocalNavigator.currentOrThrow
     Box(
         modifier = Modifier.fillMaxSize().background(color = MaterialTheme.colors.background).padding(
             start = LocalSafeAreaInsets.current.leftDp(8f),
             end = LocalSafeAreaInsets.current.rightDp(8f),
         ),
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            val titleText = model.getWrappedTitleText(string(Strings.MainScreenAllSessions))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(
-                    text = titleText,
-                    modifier = Modifier.padding(horizontal = 32.dp, vertical = 24.dp),
-                    style = MaterialTheme.typography.h5,
+        ItemListScreenContent(model, string(Strings.MainScreenAllSessions))
+        FloatingActionButton(
+            model = model,
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = string(Strings.MainScreenNewSession),
                 )
-                ReversedRow(
-                    modifier = Modifier.padding(start = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    SortingButton(
-                        initialMethod = model.sortingMethod,
-                        onMethodChanged = { model.sortingMethod = it },
-                        allowedMethods = model.allowedSortingMethods,
-                    )
-                    SearchBar(
-                        text = model.searchText,
-                        onTextChanged = { model.searchText = it },
-                    )
-                }
-            }
-            ItemDivider()
-            Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
-                ScrollableLazyColumn {
-                    items(sessions, key = { it }) { item ->
-                        model.ItemRow(item.name, model::openSession) {
-                            Text(item.name)
-                        }
-                        ItemDivider()
-                    }
-                }
-                if (sessions.isEmpty()) {
-                    Text(
-                        text = if (model.hasSessions()) {
-                            string(Strings.CommonNoMatch)
-                        } else {
-                            string(Strings.MainScreenEmpty)
-                        },
-                        modifier = Modifier.align(Alignment.Center).padding(16.dp),
-                    )
-                }
-            }
-        }
-        Fab(model)
+            },
+            onClick = { navigator push CreateSessionReclistScreen },
+        )
     }
-}
-
-@Composable
-private fun ItemDivider() {
-    Divider(modifier = Modifier.padding(start = 16.dp))
-}
-
-@Composable
-private fun BoxScope.Fab(model: MainScreenModel) {
-    val navigator = LocalNavigator.currentOrThrow
-    FloatingActionButtonWrapper(
-        model = model,
-        icon = {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = string(Strings.MainScreenNewSession),
-            )
-        },
-        onClick = { navigator push CreateSessionReclistScreen },
-    )
 }

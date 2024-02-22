@@ -116,7 +116,7 @@ interface EditableListScreenModel<T : Any> {
 }
 
 @Composable
-fun <T : Any> BoxScope.FloatingActionButtonWrapper(
+fun <T : Any> BoxScope.FloatingActionButton(
     model: EditableListScreenModel<T>,
     icon: (@Composable () -> Unit)? = null,
     onClick: (() -> Unit)? = null,

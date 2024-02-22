@@ -1,8 +1,6 @@
 package repository
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
-import cafe.adriel.voyager.core.lifecycle.JavaSerializable
 import exception.SessionRenameExistingException
 import exception.SessionRenameInvalidException
 import io.File
@@ -12,11 +10,10 @@ import io.sessionsDirectory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.serialization.Serializable
 import model.Reclist
 import model.Session
+import model.SessionItem
 import model.SessionParams
-import model.sorting.Sortable
 import model.toParams
 import util.DateTime
 import util.Log
@@ -31,19 +28,6 @@ class SessionRepository(
     private val reclistRepository: ReclistRepository,
     private val guideAudioRepository: GuideAudioRepository,
 ) {
-    @Immutable
-    @Serializable
-    data class Item(
-        val name: String,
-        val lastUsed: Long,
-    ) : Sortable<Item>, JavaSerializable {
-        override val sortableName: String
-            get() = name
-
-        override val sortableUsedTime: Long
-            get() = lastUsed
-    }
-
     private lateinit var folder: File
 
     private val usedTimeMap: MutableMap<String, Long> = mutableMapOf()
@@ -63,12 +47,12 @@ class SessionRepository(
     }
 
     private val map = mutableMapOf<String, Session>()
-    private val _items = MutableStateFlow(emptyList<Item>())
+    private val _items = MutableStateFlow(emptyList<SessionItem>())
 
     /**
      * The list of existing session references.
      */
-    val items: Flow<List<Item>> = _items
+    val items: Flow<List<SessionItem>> = _items
 
     private val _sessionUpdated = MutableSharedFlow<String>()
 
@@ -110,7 +94,7 @@ class SessionRepository(
         val items = folder.listFiles()
             .filter { it.isDirectory }
             .filter { it.resolve(SESSION_PARAMS_FILE_NAME).isFile }
-            .map { Item(it.name, getUsedTime(it.name)) }
+            .map { SessionItem(it.name, getUsedTime(it.name)) }
         _items.value = items
     }
 
@@ -133,7 +117,7 @@ class SessionRepository(
                 folder.resolve(name).absolutePath,
             )
         }.onSuccess { newSession ->
-            val newItem = Item(newSession.name, DateTime.getNow())
+            val newItem = SessionItem(newSession.name, DateTime.getNow())
             val items = _items.value.toMutableList()
             items.removeAll { it.name == newItem.name }
             items.add(newItem)
@@ -179,7 +163,7 @@ class SessionRepository(
     fun updateUsedTime(name: String) {
         _items.value = _items.value.map {
             if (it.name == name) {
-                Item(name, DateTime.getNow())
+                SessionItem(name, DateTime.getNow())
             } else {
                 it
             }
@@ -218,7 +202,7 @@ class SessionRepository(
         }.onSuccess { newSession ->
             val items = _items.value.toMutableList()
             items.removeAll { it.name == oldName }
-            val newItem = Item(newName, DateTime.getNow())
+            val newItem = SessionItem(newName, DateTime.getNow())
             items.add(newItem)
             _items.value = items
             map.remove(oldName)
