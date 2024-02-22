@@ -16,6 +16,7 @@ fun Strings.en(): String =
         CommonCheck -> "Check"
         CommonImport -> "Import"
         CommonDoNotShowAgain -> "Do not show again"
+        CommonNoMatch -> "No match."
         AlertNeedManualPermissionGrantTitle -> "Permission Required"
         AlertNeedManualPermissionGrantMessage ->
             "The app needs your permission to record audio. Please grant the permission in system settings."
@@ -82,6 +83,8 @@ fun Strings.en(): String =
         GuideAudioScreenItemSelectedLabel -> "Selected"
         GuideAudioScreenDeleteItemsTitle -> "Delete Guide BGMs"
         GuideAudioScreenDeleteItemsMessage -> "Are you sure you want to delete {0} guide BGM(s)?"
+        SearchBar -> "Search"
+        SearchBarClear -> "Clear"
         SortingMethod -> "Sorting Method"
         SortingMethodNameAsc -> "Name (Asc)"
         SortingMethodNameDesc -> "Name (Desc)"

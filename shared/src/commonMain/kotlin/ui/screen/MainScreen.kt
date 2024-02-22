@@ -36,6 +36,7 @@ import ui.common.ActionMenu
 import ui.common.ActionMenuItem
 import ui.common.FloatingActionButtonWrapper
 import ui.common.ScrollableLazyColumn
+import ui.common.SearchBar
 import ui.common.SortingButton
 import ui.model.LocalSafeAreaInsets
 import ui.model.Screen
@@ -97,7 +98,7 @@ private fun MainScreen.ScreenAction() {
 @Composable
 private fun MainScreen.ScreenContent() {
     val model = rememberMainScreenModel()
-    val sessions by model.sessions.collectAsState()
+    val sessions by model.sessions.collectAsState(listOf())
 
     Box(
         modifier = Modifier.fillMaxSize().background(color = MaterialTheme.colors.background).padding(
@@ -117,11 +118,21 @@ private fun MainScreen.ScreenContent() {
                     modifier = Modifier.padding(horizontal = 32.dp, vertical = 24.dp),
                     style = MaterialTheme.typography.h5,
                 )
-                SortingButton(
+                Row(
                     modifier = Modifier.padding(end = 16.dp),
-                    initialMethod = model.initialSortingMethod,
-                    onMethodChanged = model::onSortingMethodChanged,
-                )
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    SearchBar(
+                        text = model.searchText,
+                        onTextChanged = { model.searchText = it },
+                    )
+                    SortingButton(
+                        initialMethod = model.sortingMethod,
+                        onMethodChanged = { model.sortingMethod = it },
+                        allowedMethods = model.allowedSortingMethods,
+                    )
+                }
             }
             ItemDivider()
             Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
@@ -135,7 +146,11 @@ private fun MainScreen.ScreenContent() {
                 }
                 if (sessions.isEmpty()) {
                     Text(
-                        text = string(Strings.MainScreenEmpty),
+                        text = if (model.hasSessions()) {
+                            string(Strings.CommonNoMatch)
+                        } else {
+                            string(Strings.MainScreenEmpty)
+                        },
                         modifier = Modifier.align(Alignment.Center).padding(16.dp),
                     )
                 }

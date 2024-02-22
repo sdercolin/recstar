@@ -12,14 +12,11 @@ import io.sessionsDirectory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 import model.Reclist
 import model.Session
 import model.SessionParams
 import model.sorting.Sortable
-import model.sorting.SortableListOwner
-import model.sorting.SortingMethod
 import model.toParams
 import util.DateTime
 import util.Log
@@ -33,8 +30,7 @@ import util.stringifyJson
 class SessionRepository(
     private val reclistRepository: ReclistRepository,
     private val guideAudioRepository: GuideAudioRepository,
-    private val appRecordRepository: AppRecordRepository,
-) : SortableListOwner<SessionRepository.Item> {
+) {
     @Immutable
     @Serializable
     data class Item(
@@ -72,7 +68,7 @@ class SessionRepository(
     /**
      * The list of existing session references.
      */
-    val items: StateFlow<List<Item>> = _items
+    val items: Flow<List<Item>> = _items
 
     private val _sessionUpdated = MutableSharedFlow<String>()
 
@@ -116,7 +112,6 @@ class SessionRepository(
             .filter { it.resolve(SESSION_PARAMS_FILE_NAME).isFile }
             .map { Item(it.name, getUsedTime(it.name)) }
         _items.value = items
-        sort()
     }
 
     /**
@@ -143,7 +138,6 @@ class SessionRepository(
             items.removeAll { it.name == newItem.name }
             items.add(newItem)
             _items.value = items
-            sort()
             map[newSession.name] = newSession
             saveUsedTime(newSession.name, newItem.lastUsed)
             save(newSession)
@@ -190,7 +184,6 @@ class SessionRepository(
                 it
             }
         }
-        sort()
         saveUsedTime(name, DateTime.getNow())
     }
 
@@ -231,7 +224,6 @@ class SessionRepository(
             map.remove(oldName)
             map[newItem.name] = newSession
             save(newSession)
-            sort()
             saveUsedTime(newName, newItem.lastUsed)
         }
 
@@ -265,20 +257,6 @@ class SessionRepository(
         val params = session.toParams()
         file.writeText(params.stringifyJson())
     }
-
-    override val allowedSortingMethods: List<SortingMethod> = SortingMethod.entries.toList()
-    override var sortingMethod: SortingMethod =
-        appRecordRepository.value.sessionSortingMethod ?: SortingMethod.UsedDesc
-        set(value) {
-            field = value
-            sort()
-            appRecordRepository.update { copy(sessionSortingMethod = value) }
-        }
-    override var sortableList: List<Item>
-        get() = _items.value.toMutableList()
-        set(value) {
-            _items.value = value
-        }
 }
 
 private const val SESSION_PARAMS_FILE_NAME = "session.json"
