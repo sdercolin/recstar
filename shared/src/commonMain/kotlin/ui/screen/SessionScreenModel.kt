@@ -486,6 +486,7 @@ class SessionScreenModel(
         if (index == null) {
             Log.d("SessionScreenModel nextWithScheduler: no next sentence")
             scheduler.finish()
+            requestStopRecording()
             return
         }
         selectSentence(index, scheduled = true)
