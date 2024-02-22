@@ -44,6 +44,9 @@ class CreateSessionReclistScreenModel(
     override fun getDeleteAlertMessage(count: Int): String =
         stringStatic(Strings.CreateSessionReclistScreenDeleteItemsMessage, count)
 
+    @Composable
+    override fun getItemsEmptyPlaceholder(): String = string(Strings.CreateSessionReclistScreenEmpty)
+
     override fun fetch() = reclistRepository.fetch()
 
     override val upstream: Flow<List<ReclistItem>>

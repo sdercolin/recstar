@@ -55,6 +55,9 @@ class GuideAudioScreenModel(
     override fun getDeleteAlertMessage(count: Int): String =
         stringStatic(Strings.GuideAudioScreenDeleteItemsMessage, count)
 
+    @Composable
+    override fun getItemsEmptyPlaceholder(): String = string(Strings.GuideAudioScreenEmpty)
+
     override fun fetch() = guideAudioRepository.fetch()
 
     override val upstream: Flow<List<GuideAudioItem>>

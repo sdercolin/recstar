@@ -57,6 +57,9 @@ abstract class ItemListScreenModel<T : ListItem<T>>(
 
     abstract fun getDeleteAlertMessage(count: Int): String
 
+    @Composable
+    abstract fun getItemsEmptyPlaceholder(): String
+
     abstract fun fetch()
 
     abstract val upstream: Flow<List<T>>
@@ -228,7 +231,7 @@ private fun <T : ListItem<T>> ColumnScope.ItemList(model: ItemListScreenModel<T>
                 text = if (model.totalCount > 0) {
                     string(Strings.CommonNoMatch)
                 } else {
-                    string(Strings.MainScreenEmpty)
+                    model.getItemsEmptyPlaceholder()
                 },
                 modifier = Modifier.align(Alignment.Center).padding(16.dp),
             )

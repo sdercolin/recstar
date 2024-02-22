@@ -37,6 +37,9 @@ class MainScreenModel(
 
     override fun getDeleteAlertMessage(count: Int): String = stringStatic(Strings.MainScreenDeleteItemsMessage, count)
 
+    @Composable
+    override fun getItemsEmptyPlaceholder(): String = string(Strings.MainScreenEmpty)
+
     override fun fetch() = sessionRepository.fetch()
 
     override val upstream: Flow<List<SessionItem>> get() = sessionRepository.items
