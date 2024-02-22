@@ -33,7 +33,7 @@ enum class Strings {
     AlertUnexpectedErrorCopyLogToClipboard,
     AlertUnexpectedErrorCopyLogToClipboardButton,
     MainScreenAllSessions,
-    MainScreenItemSelecting,
+    ItemSelectingTitle,
     MainScreenNewSession,
     MainScreenEmpty,
     MainScreenDeleteItemsTitle,

@@ -261,7 +261,7 @@ private fun <T : ListItem<T>> getWrappedTitleText(
     text: String,
 ): String =
     if (model.isEditing) {
-        string(Strings.MainScreenItemSelecting, model.selectedItemsForEdition.size)
+        string(Strings.ItemSelectingTitle, model.selectedItemsForEdition.size)
     } else {
         text
     }
