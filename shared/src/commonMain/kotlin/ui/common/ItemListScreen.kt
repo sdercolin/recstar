@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
@@ -178,16 +179,11 @@ private fun <T : ListItem<T>> TitleBar(
     model: ItemListScreenModel<T>,
     title: String,
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
+    ReversedRow(
+        modifier = Modifier.fillMaxWidth().padding(end = 32.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text(
-            text = getWrappedTitleText(model, title),
-            modifier = Modifier.padding(horizontal = 32.dp, vertical = 24.dp),
-            style = MaterialTheme.typography.h5,
-        )
         val orientation = LocalScreenOrientation.current
         ReversedRow(
             modifier = Modifier.padding(start = if (orientation == ScreenOrientation.Portrait) 8.dp else 16.dp),
@@ -204,6 +200,13 @@ private fun <T : ListItem<T>> TitleBar(
                 onTextChanged = { model.searchText = it },
             )
         }
+        Text(
+            text = getWrappedTitleText(model, title),
+            modifier = Modifier.padding(vertical = 24.dp),
+            style = MaterialTheme.typography.h5,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
@@ -214,12 +217,18 @@ private fun <T : ListItem<T>> ColumnScope.ItemList(model: ItemListScreenModel<T>
         ScrollableLazyColumn {
             items(items, key = { it.name }) { item ->
                 ItemRow(model, item, model::onClick) { isSelectingForDeletion ->
-                    Text(item.name)
+                    Text(
+                        item.name,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                     if (isSelectingForDeletion.not() && model.isItemSelectable && model.isItemSelected(item.name)) {
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
                             string(Strings.SelectedLabel),
                             style = MaterialTheme.typography.caption,
+                            maxLines = 1,
+                            overflow = TextOverflow.Clip,
                         )
                     }
                 }
