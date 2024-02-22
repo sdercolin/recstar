@@ -35,6 +35,7 @@ import repository.LocalAppActionStore
 import ui.common.ActionMenu
 import ui.common.ActionMenuItem
 import ui.common.FloatingActionButtonWrapper
+import ui.common.ReversedRow
 import ui.common.ScrollableLazyColumn
 import ui.common.SearchBar
 import ui.common.SortingButton
@@ -118,19 +119,19 @@ private fun MainScreen.ScreenContent() {
                     modifier = Modifier.padding(horizontal = 32.dp, vertical = 24.dp),
                     style = MaterialTheme.typography.h5,
                 )
-                Row(
-                    modifier = Modifier.padding(end = 16.dp),
+                ReversedRow(
+                    modifier = Modifier.padding(start = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    SearchBar(
-                        text = model.searchText,
-                        onTextChanged = { model.searchText = it },
-                    )
                     SortingButton(
                         initialMethod = model.sortingMethod,
                         onMethodChanged = { model.sortingMethod = it },
                         allowedMethods = model.allowedSortingMethods,
+                    )
+                    SearchBar(
+                        text = model.searchText,
+                        onTextChanged = { model.searchText = it },
                     )
                 }
             }
