@@ -51,7 +51,7 @@ private fun MainScreen.ScreenAction() {
         appActionStore.actions.collectLatest {
             when (it) {
                 Action.NewSession -> navigator push CreateSessionReclistScreen
-                Action.EditList -> model.startSelectingForDeletion()
+                Action.EditList -> model.startEditing()
                 else -> Unit
             }
         }
@@ -63,7 +63,7 @@ private fun MainScreen.ScreenAction() {
                 icon = Icons.Default.Edit,
                 onClick = {
                     closeMenu()
-                    model.startSelectingForDeletion()
+                    model.startEditing()
                 },
             )
             ActionMenuItem(

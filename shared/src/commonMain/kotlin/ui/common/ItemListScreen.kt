@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -62,6 +63,10 @@ abstract class ItemListScreenModel<T : ListItem<T>>(
 
     abstract fun onDelete(items: List<T>)
 
+    open val isItemSelectable: Boolean = false
+
+    open fun isItemSelected(name: String): Boolean = false
+
     var totalCount: Int = 0
         private set
 
@@ -105,46 +110,46 @@ abstract class ItemListScreenModel<T : ListItem<T>>(
         }
     }
 
-    var isSelectingForDeletion: Boolean by mutableStateOf(false)
+    var isEditing: Boolean by mutableStateOf(false)
         private set
-    val selectedItems: SnapshotStateList<T> = mutableStateListOf()
+    val selectedItemsForEdition: SnapshotStateList<T> = mutableStateListOf()
 
-    fun startSelectingForDeletion() {
-        isSelectingForDeletion = true
+    fun startEditing() {
+        isEditing = true
     }
 
-    fun cancelSelectingForDeletion() {
-        isSelectingForDeletion = false
-        selectedItems.clear()
+    fun cancelEditing() {
+        isEditing = false
+        selectedItemsForEdition.clear()
     }
 
-    fun isSelectedForDeletion(item: T): Boolean = item in selectedItems
+    fun isSelectedEdition(item: T): Boolean = item in selectedItemsForEdition
 
-    private fun selectForDeletion(
+    private fun selectForEdition(
         item: T,
         isSelected: Boolean,
     ) {
         if (isSelected) {
-            selectedItems.add(item)
+            selectedItemsForEdition.add(item)
         } else {
-            selectedItems.remove(item)
+            selectedItemsForEdition.remove(item)
         }
     }
 
-    fun toggleSelectForDeletion(item: T) {
-        selectForDeletion(item, !isSelectedForDeletion(item))
+    fun toggleSelectForEdition(item: T) {
+        selectForEdition(item, !isSelectedEdition(item))
     }
 
     fun deleteSelectedItems() {
-        if (selectedItems.isEmpty()) {
+        if (selectedItemsForEdition.isEmpty()) {
             return
         }
         alertDialogController.requestConfirmCancellable(
             title = getDeleteAlertTitle(),
-            message = getDeleteAlertMessage(selectedItems.size),
+            message = getDeleteAlertMessage(selectedItemsForEdition.size),
             onConfirm = {
-                val selected = selectedItems.toList()
-                cancelSelectingForDeletion()
+                val selected = selectedItemsForEdition.toList()
+                cancelEditing()
                 onDelete(selected)
             },
         )
@@ -202,8 +207,15 @@ private fun <T : ListItem<T>> ColumnScope.ItemList(model: ItemListScreenModel<T>
         val items by model.items.collectAsState()
         ScrollableLazyColumn {
             items(items, key = { it.name }) { item ->
-                ItemRow(model, item, model::onClick) {
+                ItemRow(model, item, model::onClick) { isSelectingForDeletion ->
                     Text(item.name)
+                    if (isSelectingForDeletion.not() && model.isItemSelectable && model.isItemSelected(item.name)) {
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            string(Strings.SelectedLabel),
+                            style = MaterialTheme.typography.caption,
+                        )
+                    }
                 }
                 ItemDivider()
             }
@@ -226,9 +238,9 @@ fun <T : ListItem<T>> ActionButtonWrapper(
     model: ItemListScreenModel<T>,
     content: @Composable () -> Unit,
 ) {
-    if (model.isSelectingForDeletion) {
+    if (model.isEditing) {
         TextButton(
-            onClick = { model.cancelSelectingForDeletion() },
+            onClick = { model.cancelEditing() },
         ) {
             Text(text = string(Strings.CommonCancel))
         }
@@ -242,8 +254,8 @@ private fun <T : ListItem<T>> getWrappedTitleText(
     model: ItemListScreenModel<T>,
     text: String,
 ): String =
-    if (model.isSelectingForDeletion) {
-        string(Strings.MainScreenItemSelecting, model.selectedItems.size)
+    if (model.isEditing) {
+        string(Strings.MainScreenItemSelecting, model.selectedItemsForEdition.size)
     } else {
         text
     }
@@ -265,8 +277,8 @@ private fun <T : ListItem<T>> ItemRow(
             .fillMaxWidth()
             .padding(start = 16.dp)
             .run {
-                if (model.isSelectingForDeletion) {
-                    plainClickable { model.toggleSelectForDeletion(item) }
+                if (model.isEditing) {
+                    plainClickable { model.toggleSelectForEdition(item) }
                 } else {
                     clickable { onClick(item) }
                 }
@@ -275,8 +287,8 @@ private fun <T : ListItem<T>> ItemRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
     ) {
-        if (model.isSelectingForDeletion) {
-            val tint = if (model.isSelectedForDeletion(item)) {
+        if (model.isEditing) {
+            val tint = if (model.isSelectedEdition(item)) {
                 MaterialTheme.colors.primary
             } else {
                 MaterialTheme.colors.onSurface.alpha(0.3f)
@@ -288,7 +300,7 @@ private fun <T : ListItem<T>> ItemRow(
                 tint = tint,
             )
         }
-        content(model.isSelectingForDeletion)
+        content(model.isEditing)
     }
 }
 
@@ -298,7 +310,7 @@ fun <T : ListItem<T>> BoxScope.FloatingActionButton(
     icon: (@Composable () -> Unit)? = null,
     onClick: (() -> Unit)? = null,
 ) {
-    if (model.isSelectingForDeletion) {
+    if (model.isEditing) {
         FloatingActionButton(
             modifier = Modifier
                 .align(Alignment.BottomEnd)

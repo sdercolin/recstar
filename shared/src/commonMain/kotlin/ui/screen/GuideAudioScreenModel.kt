@@ -4,61 +4,78 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import model.GuideAudioItem
+import model.SortingMethod
+import repository.AppRecordRepository
 import repository.GuideAudioRepository
+import repository.LocalAppRecordRepository
 import repository.LocalGuideAudioRepository
 import repository.LocalSessionRepository
 import repository.SessionRepository
 import ui.common.AlertDialogController
-import ui.common.EditableListConfig
-import ui.common.EditableListScreenModel
-import ui.common.EditableListScreenModelImpl
+import ui.common.ItemListScreenModel
 import ui.common.LocalAlertDialogController
 import ui.string.*
 
 class GuideAudioScreenModel(
     private val sessionName: String,
     private val sessionRepository: SessionRepository,
+    private val appRecordRepository: AppRecordRepository,
     private val guideAudioRepository: GuideAudioRepository,
-    private val alertDialogController: AlertDialogController,
-) : ScreenModel,
-    EditableListScreenModel<String> by EditableListScreenModelImpl(
+    alertDialogController: AlertDialogController,
+) : ItemListScreenModel<GuideAudioItem>(
         alertDialogController,
-        EditableListConfig(
-            deleteAlertTitle = { stringStatic(Strings.GuideAudioScreenDeleteItemsTitle) },
-            deleteAlertMessage = { count -> stringStatic(Strings.GuideAudioScreenDeleteItemsMessage, count) },
-            onDelete = { guideAudioRepository.delete(it) },
-        ),
+        allowedSortingMethods = SortingMethod.entries.toList(),
+        initialSortingMethod = appRecordRepository.value.guideAudioSortingMethod ?: SortingMethod.NameAsc,
+        saveSortingMethod = { appRecordRepository.update { copy(guideAudioSortingMethod = it) } },
     ) {
-    val names: StateFlow<List<String>> = guideAudioRepository.items
+    private var job: Job? = null
+
     private var selected: String? by mutableStateOf(
         sessionRepository.get(sessionName).getOrNull()?.guideAudioConfig?.name,
     )
 
+    override val isItemSelectable: Boolean = true
+
+    override fun isItemSelected(name: String): Boolean = selected == name
+
     init {
-        guideAudioRepository.fetch()
+        load()
     }
 
-    fun isSelected(name: String): Boolean = selected == name
+    override fun getDeleteAlertTitle(): String = stringStatic(Strings.GuideAudioScreenDeleteItemsTitle)
 
-    private var job: Job? = null
+    override fun getDeleteAlertMessage(count: Int): String =
+        stringStatic(Strings.GuideAudioScreenDeleteItemsMessage, count)
 
-    fun select(name: String) {
+    override fun fetch() = guideAudioRepository.fetch()
+
+    override val upstream: Flow<List<GuideAudioItem>>
+        get() = guideAudioRepository.items
+
+    override fun onDelete(items: List<GuideAudioItem>) {
+        guideAudioRepository.delete(items.map { it.name })
+    }
+
+    override fun onClick(item: GuideAudioItem) {
         job?.cancel()
-        val newName = if (selected == name) null else name
+        val newName = if (selected == item.name) null else item.name
         job = screenModelScope.launch(Dispatchers.IO) {
             val session = sessionRepository.get(sessionName).getOrThrow()
             val newConfig = newName?.let { guideAudioRepository.get(it) }
             val updated = session.copy(guideAudioConfig = newConfig)
             sessionRepository.update(updated)
             selected = newName
+            if (newName != null) {
+                guideAudioRepository.updateUsedTime(newName)
+            }
         }
     }
 
@@ -70,9 +87,16 @@ class GuideAudioScreenModel(
 @Composable
 fun GuideAudioScreen.rememberGuideAudioScreenModel(): GuideAudioScreenModel {
     val sessionRepository = LocalSessionRepository.current
+    val appRecordRepository = LocalAppRecordRepository.current
     val guideAudioRepository = LocalGuideAudioRepository.current
     val alertDialogController = LocalAlertDialogController.current
     return rememberScreenModel {
-        GuideAudioScreenModel(sessionName, sessionRepository, guideAudioRepository, alertDialogController)
+        GuideAudioScreenModel(
+            sessionName,
+            sessionRepository,
+            appRecordRepository,
+            guideAudioRepository,
+            alertDialogController,
+        )
     }
 }

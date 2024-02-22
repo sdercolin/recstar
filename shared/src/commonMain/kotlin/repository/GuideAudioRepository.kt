@@ -4,9 +4,11 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import io.File
 import io.Paths
 import io.guideAudioDirectory
+import io.guideAudioRecordFile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import model.GuideAudio
+import model.GuideAudioItem
 import model.createGuideAudioConfig
 import util.DateTime
 import util.Log
@@ -16,16 +18,22 @@ import util.stringifyJson
 /**
  * A repository to manage guide audio files.
  */
-class GuideAudioRepository {
+class GuideAudioRepository(
+    private val _items: MutableStateFlow<List<GuideAudioItem>> = MutableStateFlow(emptyList()),
+) : ItemUsedTimeRepository<GuideAudioItem> by ItemUsedTimeRepositoryImpl(
+        recordFile = Paths.guideAudioRecordFile,
+        updateItems = { update ->
+            _items.value = update(_items.value)
+        },
+    ) {
     private lateinit var folder: File
 
     private val map = mutableMapOf<String, GuideAudio>()
-    private val _items = MutableStateFlow(emptyList<String>())
 
     /**
-     * The list of existing guide audio names.
+     * The list of existing guide audio references.
      */
-    val items: StateFlow<List<String>> = _items
+    val items: StateFlow<List<GuideAudioItem>> = _items
 
     init {
         init()
@@ -42,6 +50,7 @@ class GuideAudioRepository {
         }
         map.clear()
         _items.value = emptyList()
+        loadUsedTimes()
     }
 
     /**
@@ -51,8 +60,8 @@ class GuideAudioRepository {
         val items = folder.listFiles()
             .filter { it.name.endsWith(GUIDE_AUDIO_CONFIG_FILE_NAME_SUFFIX) }
             .map { it.name.removeSuffix(".$GUIDE_AUDIO_CONFIG_FILE_NAME_SUFFIX") }
+            .map { GuideAudioItem(it, getUsedTime(it)) }
         _items.value = items
-        sort()
     }
 
     /**
@@ -75,7 +84,7 @@ class GuideAudioRepository {
         } else {
             rawConfigFile
         }
-        val config = createGuideAudioConfig(audioFile, resolvedRawConfigFile)
+        val newGuideAudio = createGuideAudioConfig(audioFile, resolvedRawConfigFile)
             .onSuccess {
                 val importedWav = folder.resolve("${it.name}.$GUIDE_AUDIO_FILE_EXTENSION")
                 audioFile.copyTo(importedWav, overwrite = true)
@@ -88,9 +97,13 @@ class GuideAudioRepository {
                 Log.e("GuideAudioRepository.import: failed to import ${audioFile.absolutePath}", t)
             }
             .getOrNull() ?: return false
-        map[config.name] = config
-        _items.value = listOf(config.name) + _items.value.minus(config.name)
-        sort()
+        val newItem = GuideAudioItem(newGuideAudio.name, DateTime.getNow())
+        val items = _items.value.toMutableList()
+        items.removeAll { it.name == newItem.name }
+        items.add(newItem)
+        _items.value = items
+        map[newGuideAudio.name] = newGuideAudio
+        saveUsedTime(newGuideAudio.name, newItem.lastUsed)
         return true
     }
 
@@ -112,11 +125,7 @@ class GuideAudioRepository {
             file.delete()
             audioFile.delete()
         }
-        _items.value = _items.value.filterNot { it in names }
-    }
-
-    private fun sort() {
-        _items.value = _items.value.sortedBy { it }
+        _items.value = _items.value.filterNot { it.name in names }
     }
 
     companion object {

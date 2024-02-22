@@ -29,6 +29,11 @@ val Paths.appPreferenceFile: File
 
 val Paths.sessionUsageRecordFile: File
     get() = appRoot.resolve("session-usage-record.json")
+val Paths.guideAudioRecordFile: File
+    get() = appRoot.resolve("guide-audio-usage-record.json")
+
+val Paths.reclistRecordFile: File
+    get() = appRoot.resolve("reclist-usage-record.json")
 
 fun ensurePaths() {
     ensurePath(Paths.appRoot)
