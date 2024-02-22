@@ -101,7 +101,7 @@ abstract class ItemListScreenModel<T : ListItem<T>>(
     }
 
     private fun List<T>.mapItems(): List<T> =
-        filter { session -> searchText.isEmpty() || session.name.contains(searchText) }
+        filter { item -> searchText.isEmpty() || item.name.contains(searchText) }
             .let { sortingMethod.sort(it) }
 
     private fun updateItems() {
