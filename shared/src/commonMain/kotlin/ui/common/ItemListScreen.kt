@@ -42,6 +42,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import model.ListItem
 import model.SortingMethod
+import ui.model.LocalScreenOrientation
+import ui.model.ScreenOrientation
 import ui.string.*
 import util.alpha
 
@@ -183,8 +185,9 @@ private fun <T : ListItem<T>> TitleBar(
             modifier = Modifier.padding(horizontal = 32.dp, vertical = 24.dp),
             style = MaterialTheme.typography.h5,
         )
+        val orientation = LocalScreenOrientation.current
         ReversedRow(
-            modifier = Modifier.padding(start = 16.dp),
+            modifier = Modifier.padding(start = if (orientation == ScreenOrientation.Portrait) 8.dp else 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {

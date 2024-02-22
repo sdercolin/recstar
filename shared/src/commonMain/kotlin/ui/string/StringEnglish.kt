@@ -45,7 +45,7 @@ fun Strings.en(): String =
         AlertUnexpectedErrorCopyLogToClipboard ->
             "An error occurred. Please report to the developer with the error info."
         AlertUnexpectedErrorCopyLogToClipboardButton -> "Copy Error Info"
-        MainScreenAllSessions -> "All Sessions"
+        MainScreenAllSessions -> "Sessions"
         MainScreenItemSelecting -> "Selecting {0} items"
         MainScreenNewSession -> "Start New Session"
         MainScreenEmpty -> "No sessions yet."
@@ -68,7 +68,7 @@ fun Strings.en(): String =
         CreateSessionReclistScreenActionImport -> "Import Reclist"
         CreateSessionReclistScreenActionImportCommentAlertMessage ->
             "Do you want to import the corresponding comment file (-comment.txt)?"
-        CreateSessionReclistScreenAllReclists -> "All Reclists"
+        CreateSessionReclistScreenAllReclists -> "Reclists"
         CreateSessionReclistScreenEmpty -> "Please import a reclist first."
         CreateSessionReclistScreenContinue -> "Finish"
         CreateSessionReclistScreenFailure -> "Failed to create session."
@@ -78,7 +78,7 @@ fun Strings.en(): String =
         GuideAudioScreenActionImport -> "Import Guide BGM"
         GuideAudioScreenActionImportConfigAlertMessage ->
             "Do you want to import the corresponding guide BGM config file (.txt)?"
-        GuideAudioScreenAllGuideAudios -> "All Guide BGMs"
+        GuideAudioScreenAllGuideAudios -> "Guide BGMs"
         GuideAudioScreenEmpty -> "Please import a guide BGM first."
         GuideAudioScreenDeleteItemsTitle -> "Delete Guide BGMs"
         GuideAudioScreenDeleteItemsMessage -> "Are you sure you want to delete {0} guide BGM(s)?"
