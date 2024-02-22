@@ -1,7 +1,8 @@
 package model
 
-import model.sorting.Sortable
-
-interface ListItem<T : Any> : Sortable<T> {
+interface ListItem<T : Any> {
     val name: String
+    val lastUsed: Long
+
+    fun usedTimeUpdated(usedTime: Long): T
 }

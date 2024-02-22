@@ -16,7 +16,6 @@ import model.SessionItem
 import model.SessionParams
 import model.toParams
 import util.DateTime
-import util.Log
 import util.isValidFileName
 import util.parseJson
 import util.stringifyJson
@@ -27,27 +26,16 @@ import util.stringifyJson
 class SessionRepository(
     private val reclistRepository: ReclistRepository,
     private val guideAudioRepository: GuideAudioRepository,
-) {
+    private val _items: MutableStateFlow<List<SessionItem>> = MutableStateFlow(emptyList()),
+) : ItemUsedTimeRepository<SessionItem> by ItemUsedTimeRepositoryImpl(
+        recordFile = Paths.sessionUsageRecordFile,
+        updateItems = { update ->
+            _items.value = update(_items.value)
+        },
+    ) {
     private lateinit var folder: File
 
-    private val usedTimeMap: MutableMap<String, Long> = mutableMapOf()
-
-    private fun getUsedTime(name: String): Long = usedTimeMap[name] ?: 0L
-
-    private fun saveUsedTime(
-        name: String,
-        time: Long,
-    ) {
-        usedTimeMap[name] = time
-        runCatching {
-            Paths.sessionUsageRecordFile.writeText(usedTimeMap.stringifyJson())
-        }.onFailure {
-            Log.w(it)
-        }
-    }
-
     private val map = mutableMapOf<String, Session>()
-    private val _items = MutableStateFlow(emptyList<SessionItem>())
 
     /**
      * The list of existing session references.
@@ -76,15 +64,7 @@ class SessionRepository(
         }
         map.clear()
         _items.value = emptyList()
-        runCatching {
-            Paths.sessionUsageRecordFile.takeIf { it.exists() }?.readText()?.parseJson<Map<String, Long>>()
-                ?.toMutableMap() ?: mutableMapOf()
-        }.onSuccess { map ->
-            usedTimeMap.clear()
-            usedTimeMap.putAll(map)
-        }.onFailure {
-            Log.w(it)
-        }
+        loadUsedTimes()
     }
 
     /**
@@ -156,20 +136,6 @@ class SessionRepository(
         }.onSuccess {
             map[name] = it
         }
-
-    /**
-     * Updates the used time of the session with the given name to the current time.
-     */
-    fun updateUsedTime(name: String) {
-        _items.value = _items.value.map {
-            if (it.name == name) {
-                SessionItem(name, DateTime.getNow())
-            } else {
-                it
-            }
-        }
-        saveUsedTime(name, DateTime.getNow())
-    }
 
     /**
      * Rename the session from [oldName] to [newName]. This will cause the session folder to be renamed as well.

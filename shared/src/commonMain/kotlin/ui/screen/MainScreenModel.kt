@@ -7,7 +7,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.flow.Flow
 import model.SessionItem
-import model.sorting.SortingMethod
+import model.SortingMethod
 import repository.AppRecordRepository
 import repository.LocalAppRecordRepository
 import repository.LocalSessionRepository

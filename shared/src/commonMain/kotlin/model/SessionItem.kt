@@ -6,13 +6,9 @@ import kotlinx.serialization.Serializable
 
 @Immutable
 @Serializable
-data class SessionItem(
+class SessionItem(
     override val name: String,
-    val lastUsed: Long,
+    override val lastUsed: Long,
 ) : ListItem<SessionItem>, JavaSerializable {
-    override val sortableName: String
-        get() = name
-
-    override val sortableUsedTime: Long
-        get() = lastUsed
+    override fun usedTimeUpdated(usedTime: Long): SessionItem = SessionItem(name, usedTime)
 }

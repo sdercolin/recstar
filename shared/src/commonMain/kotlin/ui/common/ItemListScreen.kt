@@ -40,7 +40,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import model.ListItem
-import model.sorting.SortingMethod
+import model.SortingMethod
 import ui.string.*
 import util.alpha
 
