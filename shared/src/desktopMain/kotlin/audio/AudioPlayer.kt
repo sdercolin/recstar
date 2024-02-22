@@ -59,7 +59,7 @@ class AudioPlayerImpl(
                     AudioSystem.getClip()
                 }.also {
                     it.addLineListener { ev ->
-                        Log.d("AudioPlayerImpl.initClip: ${ev.type} at ${it.microsecondPosition}")
+                        Log.d("AudioPlayerImpl.initClip: ${ev.type} at ${it.microsecondPosition / 1000} ms")
                         when (ev.type) {
                             LineEvent.Type.START -> {
                                 startCounting()
@@ -104,7 +104,7 @@ class AudioPlayerImpl(
                         val audioInputStream = AudioSystem.getAudioInputStream(file.toJavaFile())
                         clip.open(audioInputStream)
                     }
-                    clip.microsecondPosition = positionMs
+                    clip.microsecondPosition = positionMs * 1000
                     clip.start()
                     lastLoadedFile = file
                     lastLoadedFileModified = file.lastModified
