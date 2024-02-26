@@ -18,7 +18,7 @@ data class AppPreference(
     val orientation: ScreenOrientation = ScreenOrientation.Auto,
     val customContentRootPath: String? = null,
     val recording: Recording = Recording(),
-    val titleBarStyle: TitleBarStyle = TitleBarStyle.FileName,
+    val titleBarStyle: TitleBarStyle = TitleBarStyle.FileNameWithComment,
     val desiredInputName: String? = null,
     val desiredOutputName: String? = null,
     val sampleRate: SampleRateOption = SampleRateOption.Hz44100,
