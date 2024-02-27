@@ -1,6 +1,7 @@
 package repository
 
 import androidx.compose.runtime.staticCompositionLocalOf
+import exception.ReclistNotFoundException
 import exception.SessionRenameExistingException
 import exception.SessionRenameInvalidException
 import io.File
@@ -112,7 +113,8 @@ class SessionRepository(
         directory: File,
         params: SessionParams,
     ): Session {
-        val reclist = reclistRepository.get(params.reclistName)
+        val reclist = reclistRepository.get(params.reclistName).getOrNull()
+            ?: throw ReclistNotFoundException(params.reclistName)
         val guideAudioConfig = params.guideAudioName?.let { guideAudioRepository.get(it) }
         return Session(
             name = name,

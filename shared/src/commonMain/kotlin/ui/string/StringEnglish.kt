@@ -28,6 +28,9 @@ fun Strings.en(): String =
         ExceptionUnsupportedAudioFormat ->
             "Could not find any audio device that supports the current audio format: {0}, " +
                 "please check and adjust the audio settings, especially the sample rate and bit depth."
+        ExceptionReclistNotFound ->
+            "Could not open the session because the reclist ({0}) or its comment file used in this session " +
+                "is not found. Please reimport them to use this session."
         AlertExportTips ->
             "Your reclist contains sentences with Japanese voice marked characters " +
                 "which will be saved in a special encoding, " +

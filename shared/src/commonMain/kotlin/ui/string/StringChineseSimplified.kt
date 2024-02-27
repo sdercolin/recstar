@@ -27,6 +27,7 @@ fun Strings.zhHans(): String? =
         ExceptionRenameSessionUnexpected -> "重命名会话失败。"
         ExceptionUnsupportedAudioFormat ->
             "无法找到任何有效的设备以支持当前的音频格式：{0}，请检查并调整音频设置，尤其是采样率与位深度选项。"
+        ExceptionReclistNotFound -> "无法打开会话，因为该会话所使用的录音表（{0}）或其注释文件未找到。请重新导入以使用该会话。"
         AlertExportTips ->
             "您的录音表中包含带有日语浊音标记字符的行。由于MacOS/iOS的规范，这些行将以特殊编码被保存，导致在其他平台上可能无法正确被识别。" +
                 "在 Windows 等其他平台上使用其他软件读取这些文件之前，请将文件名规范化为 NFC 格式。" +

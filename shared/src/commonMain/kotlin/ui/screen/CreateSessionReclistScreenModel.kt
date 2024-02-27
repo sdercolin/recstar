@@ -57,15 +57,20 @@ class CreateSessionReclistScreenModel(
     override fun onClick(item: ReclistItem) {
         if (finished) return
         finished = true
+
+        fun onFailure(t: Throwable) {
+            Log.e(t)
+            alertDialogController.requestConfirm(
+                message = stringStatic(Strings.CreateSessionReclistScreenFailure),
+            )
+            finished = false
+        }
+
         val reclist = reclistRepository.get(item.name)
+            .onFailure { onFailure(it) }
+            .getOrNull() ?: return
         val session = sessionRepository.create(reclist)
-            .onFailure {
-                Log.e(it)
-                alertDialogController.requestConfirm(
-                    message = stringStatic(Strings.CreateSessionReclistScreenFailure),
-                )
-                finished = false
-            }
+            .onFailure { onFailure(it) }
             .getOrNull() ?: return
         reclistRepository.updateUsedTime(item.name)
         navigator.replace(SessionScreen(session))

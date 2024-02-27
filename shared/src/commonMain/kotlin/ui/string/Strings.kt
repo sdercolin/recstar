@@ -23,6 +23,7 @@ enum class Strings {
     ExceptionRenameSessionInvalid,
     ExceptionRenameSessionUnexpected,
     ExceptionUnsupportedAudioFormat,
+    ExceptionReclistNotFound,
     AlertExportTips,
     ToastExportDataSuccess,
     ToastExportDataCancel,

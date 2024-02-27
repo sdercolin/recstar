@@ -96,11 +96,13 @@ class ReclistRepository(
     /**
      * Gets the reclist with the given name.
      */
-    fun get(name: String): Reclist =
-        map[name] ?: parseReclist(
+    fun get(name: String): Result<Reclist> =
+        map[name]?.let { Result.success(it) } ?: parseReclist(
             file = getFile(name),
             commentFile = getCommentFile(name).takeIf { it.exists() },
-        ).getOrThrow()
+        ).onSuccess {
+            map[name] = it
+        }
 
     /**
      * Deletes the reclists with the given names.
