@@ -90,6 +90,6 @@ See the [README of the project template](README-compose.md) for instructions on 
 
 </details>
 
-### Contributors
+## Credits
 
 Logo designed by InochiPM.
