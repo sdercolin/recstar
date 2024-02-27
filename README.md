@@ -2,7 +2,7 @@
 
 A UTAU style reclist recorder application for Desktop/iOS/Android.
 
-If you have any feedback, please join our [Discord Server](https://discord.gg/TyEcQ6P73y) and find the #recstar channel.
+![platforms.png](readme_images/platforms.png)
 
 ## Download
 
@@ -29,8 +29,28 @@ Get the latest version via Play Store with the following public test link:
 https://play.google.com/store/apps/details?id=com.sdercolin.recstar
 
 ### iOS
+
 Get the latest version via TestFlight with the following link:
 https://testflight.apple.com/join/jBfhclHr
+
+## Features
+
+- [x] Manage recording sessions with individual settings (reclist, guide BGM, etc.)
+- [x] Manage reclists with corresponding comment files
+- [x] Continuous recording with a guide BGM
+- [x] Automation actions (e.g. auto listen back after recording)
+- [x] Configurable sample rate and bit depth
+- [x] (only on Desktop) Selectable audio input/output devices
+- [x] Auto encoding detection when loading text files
+- [x] Adaptive UI layout for landscape and portrait mode
+- [x] Light and dark theme
+- [x] Multi-language support (English, Japanese, Chinese)
+
+## Feedback
+
+If you have any feedback, please join our [Discord Server](https://discord.gg/TyEcQ6P73y) and find the #recstar channel,
+or open an issue in this repository.
+Please provide the info from "Settings" -> "About" -> "Copy Device Info" and relevant screenshots when reporting issues.
 
 ## Getting started with development
 
