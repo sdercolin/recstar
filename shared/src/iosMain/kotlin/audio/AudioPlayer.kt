@@ -10,11 +10,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import platform.AVFAudio.AVAudioPlayer
-import platform.AVFAudio.AVAudioSession
-import platform.AVFAudio.AVAudioSessionCategoryOptionAllowBluetooth
-import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
-import platform.AVFAudio.AVAudioSessionModeDefault
-import platform.AVFAudio.setActive
 import repository.AppPreferenceRepository
 import ui.common.ErrorNotifier
 import ui.model.AppContext
@@ -55,7 +50,7 @@ class AudioPlayerImpl(
         }
         job = scope.launch(Dispatchers.IO) {
             runCatchingCancellable {
-                setupAudioSession()
+                AudioSession.initialize()
                 val lastModified = file.lastModified
                 if (lastLoadedFile != file || lastLoadedFileModified != lastModified) {
                     val url = file.toNSURL()
@@ -147,20 +142,6 @@ class AudioPlayerImpl(
 
     private fun stopCounting() {
         countingJob?.cancel()
-    }
-
-    private fun setupAudioSession() {
-        withNSError { e ->
-            AVAudioSession.sharedInstance().setCategory(
-                AVAudioSessionCategoryPlayAndRecord,
-                mode = AVAudioSessionModeDefault,
-                options = AVAudioSessionCategoryOptionAllowBluetooth,
-                error = e,
-            )
-        }
-        withNSError { e ->
-            AVAudioSession.sharedInstance().setActive(true, error = e)
-        }
     }
 }
 
