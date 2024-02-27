@@ -4,6 +4,19 @@ A UTAU style reclist recorder application for Desktop/iOS/Android.
 
 ![platforms.png](readme_images/platforms.png)
 
+## Features
+
+- Manage recording sessions with individual settings (reclist, guide BGM, etc.)
+- Manage reclists with corresponding comment files
+- Continuous recording with a guide BGM
+- Automation actions (e.g. auto listen back after recording)
+- Configurable sample rate and bit depth
+- (only on Desktop) Selectable audio input/output devices
+- Auto encoding detection when loading text files
+- Adaptive UI layout for landscape and portrait modes
+- Light and dark themes
+- Multi-language support (English, Japanese, Chinese)
+
 ## Download
 
 See the [releases page](https://github.com/sdercolin/recstar/releases) for the latest version.
@@ -33,18 +46,20 @@ https://play.google.com/store/apps/details?id=com.sdercolin.recstar
 Get the latest version via TestFlight with the following link:
 https://testflight.apple.com/join/jBfhclHr
 
-## Features
+## Getting started
 
-- Manage recording sessions with individual settings (reclist, guide BGM, etc.)
-- Manage reclists with corresponding comment files
-- Continuous recording with a guide BGM
-- Automation actions (e.g. auto listen back after recording)
-- Configurable sample rate and bit depth
-- (only on Desktop) Selectable audio input/output devices
-- Auto encoding detection when loading text files
-- Adaptive UI layout for landscape and portrait mode
-- Light and dark theme
-- Multi-language support (English, Japanese, Chinese)
+1. Prepare UTAU reclists that fit your needs. The reclists used in the screenshots are
+   from [巽式連続音録音リスト](https://tatsu3.hateblo.jp/entry/ar426004).
+2. Click the "+" button to create a new session.
+3. Click the "..." button to import a reclist.
+4. Click the imported item, and the session will be created.
+5. (Optional) If you want to use a guide BGM, click the music note button to import and select a BGM file. An
+   OREMO-style BGM config file can be imported as well for continuous recording and trimming.
+   Note: On Desktop, the config file should be in the same directory as the BGM file, and named
+   as `<same_name_with_the_guide_bgm_file>.txt`, to be automatically detected.
+6. Click the "Record" button to start recording.
+7. Click the audio graph to listen back to the recorded files.
+8. After recording, click the "..." button and select "Export" or "Open Directory" to access the recorded files.
 
 ## Feedback
 
