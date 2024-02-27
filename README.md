@@ -35,16 +35,16 @@ https://testflight.apple.com/join/jBfhclHr
 
 ## Features
 
-- [x] Manage recording sessions with individual settings (reclist, guide BGM, etc.)
-- [x] Manage reclists with corresponding comment files
-- [x] Continuous recording with a guide BGM
-- [x] Automation actions (e.g. auto listen back after recording)
-- [x] Configurable sample rate and bit depth
-- [x] (only on Desktop) Selectable audio input/output devices
-- [x] Auto encoding detection when loading text files
-- [x] Adaptive UI layout for landscape and portrait mode
-- [x] Light and dark theme
-- [x] Multi-language support (English, Japanese, Chinese)
+- Manage recording sessions with individual settings (reclist, guide BGM, etc.)
+- Manage reclists with corresponding comment files
+- Continuous recording with a guide BGM
+- Automation actions (e.g. auto listen back after recording)
+- Configurable sample rate and bit depth
+- (only on Desktop) Selectable audio input/output devices
+- Auto encoding detection when loading text files
+- Adaptive UI layout for landscape and portrait mode
+- Light and dark theme
+- Multi-language support (English, Japanese, Chinese)
 
 ## Feedback
 
@@ -58,7 +58,8 @@ RecStar is built with [Compose Multiplatform](https://github.com/JetBrains/compo
 
 See the [README of the project template](README-compose.md) for instructions on how to get started.
 
-### Other recommended settings
+<details>
+<summary>Other recommended settings</summary>
 
 1. Install the `Kotlin KDoc Formatter` plugin, and use the following settings:
    [![KDoc Formatter settings](readme_images/kdoc_settings.png)](readme_images/kdoc_settings.png)
@@ -67,6 +68,8 @@ See the [README of the project template](README-compose.md) for instructions on 
 3. If in string definition files (e.g. [StringsEnglish.kt](shared/src/commonMain/kotlin/ui/string/StringEnglish.kt)), if
    the formatter of your Android Studio is always turning the wildcard imports into single imports, adjust the settings
    to allow wildcard imports on package `ui.string`.
+
+</details>
 
 ### Contributors
 
