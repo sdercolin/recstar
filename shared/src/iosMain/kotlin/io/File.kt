@@ -17,8 +17,11 @@ import platform.Foundation.NSFileManager
 import platform.Foundation.NSFileModificationDate
 import platform.Foundation.NSInputStream
 import platform.Foundation.NSMutableData
+import platform.Foundation.NSShiftJISStringEncoding
 import platform.Foundation.NSString
 import platform.Foundation.NSStringEncoding
+import platform.Foundation.NSStringEncodingDetectionAllowLossyKey
+import platform.Foundation.NSStringEncodingDetectionSuggestedEncodingsKey
 import platform.Foundation.NSURL
 import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.appendData
@@ -127,7 +130,9 @@ actual class File actual constructor(private val path: String) {
 
     actual fun readTextDetectEncoding(): String =
         readTextWith {
-            detectEncoding(it)
+            detectEncoding(it).also { encoding ->
+                Log.d("Detected encoding: $encoding")
+            }
         }
 
     private fun readTextWith(encoding: (NSData) -> NSStringEncoding): String {
@@ -153,7 +158,13 @@ actual class File actual constructor(private val path: String) {
             val string = alloc<ObjCObjectVar<String?>>()
             return NSString.stringEncodingForData(
                 data = data,
-                encodingOptions = null,
+                encodingOptions = mapOf(
+                    NSStringEncodingDetectionSuggestedEncodingsKey to listOf(
+                        NSUTF8StringEncoding,
+                        NSShiftJISStringEncoding,
+                    ),
+                    NSStringEncodingDetectionAllowLossyKey to false,
+                ),
                 convertedString = string.ptr,
                 usedLossyConversion = null,
             ).takeUnless { it == 0.toULong() } ?: NSUTF8StringEncoding
