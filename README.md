@@ -65,7 +65,11 @@ https://testflight.apple.com/join/jBfhclHr
 
 If you have any feedback, please join our [Discord Server](https://discord.gg/TyEcQ6P73y) and find the #recstar channel,
 or open an issue in this repository.
+
 Please provide the info from "Settings" -> "About" -> "Copy Device Info" and relevant screenshots when reporting issues.
+
+If you are using the desktop version, please also provide the log files located in the `logs` directory under the app
+directory (you can open it with window menu "Help" -> "Open App Directory" in the app).
 
 ## Getting started with development
 
