@@ -38,7 +38,7 @@ Attached in the release page.
 
 #### Play Store
 
-Get the latest version via Play Store with the following public test link:
+Search "RecStar" in the Play Store, or use the following link:
 https://play.google.com/store/apps/details?id=com.sdercolin.recstar
 
 ### iOS
