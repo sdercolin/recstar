@@ -38,13 +38,12 @@ Attached in the release page.
 
 #### Play Store
 
-Search "RecStar" in the Play Store, or use the following link:
+Search `RecStar` in the Play Store, or use the following link:
 https://play.google.com/store/apps/details?id=com.sdercolin.recstar
 
 ### iOS
 
-Get the latest version via TestFlight with the following link:
-https://testflight.apple.com/join/jBfhclHr
+Search `RecStar` in the App Store.
 
 ## Getting started
 
