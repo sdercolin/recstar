@@ -50,7 +50,8 @@ Search `RecStar` in the App Store.
 1. Prepare UTAU reclists that fit your needs. The reclists used in the screenshots are
    from [巽式連続音録音リスト](https://tatsu3.hateblo.jp/entry/ar426004).
 2. Click the "+" button to create a new session.
-3. Click the "..." button to import a reclist.
+3. Click the "..." button to import a reclist. If you need to import an OREMO-style comment file, please import it
+   together with the reclist (a dialog will pop up to ask you to select the comment file).
 4. Click the imported item, and the session will be created.
 5. (Optional) If you want to use a guide BGM, click the music note button to import and select a BGM file. An
    OREMO-style BGM config file can be imported as well for continuous recording and trimming.
