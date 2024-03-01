@@ -36,7 +36,7 @@ fun Strings.en(): String =
                 "which will be saved in a special encoding, " +
                 "making it unable to be recognized correctly on other platforms, " +
                 "due to the specification of MacOS/iOS. " +
-                "Before using them on other platforms with other software," +
+                "Before using them on other platforms with other software, " +
                 "please normalize the file names to NFC form. " +
                 "You can use the \"File Name Normalizer\" tool in the \"Tools\" menu of \"vLabeler\" app to do this."
         ToastExportDataSuccess -> "Exported successfully"
