@@ -39,6 +39,7 @@ fun Strings.en(): String =
                 "Before using them on other platforms with other software, " +
                 "please normalize the file names to NFC form. " +
                 "You can use the \"File Name Normalizer\" tool in the \"Tools\" menu of \"vLabeler\" app to do this."
+        AlertExportNoData -> "No data to export"
         ToastExportDataSuccess -> "Exported successfully"
         ToastExportDataCancel -> "Export cancelled"
         ToastImportReclistSuccess -> "Imported successfully"

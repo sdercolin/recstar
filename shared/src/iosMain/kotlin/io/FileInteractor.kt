@@ -17,6 +17,7 @@ import platform.UIKit.UIApplication
 import platform.UIKit.UIDocumentPickerViewController
 import ui.common.AlertDialogController
 import ui.common.ToastController
+import ui.common.requestConfirm
 import ui.common.requestConfirmError
 import ui.common.show
 import ui.model.AppContext
@@ -104,6 +105,11 @@ actual class FileInteractor actual constructor(
             }
         } catch (t: Throwable) {
             onError(RuntimeException("Failed to list files", t))
+            return
+        }
+
+        if (fileURLs.isEmpty()) {
+            alertDialogController.requestConfirm(message = stringStatic(Strings.AlertExportNoData))
             return
         }
 

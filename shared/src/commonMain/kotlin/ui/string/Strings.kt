@@ -25,6 +25,7 @@ enum class Strings {
     ExceptionUnsupportedAudioFormat,
     ExceptionReclistNotFound,
     AlertExportTips,
+    AlertExportNoData,
     ToastExportDataSuccess,
     ToastExportDataCancel,
     ToastImportReclistSuccess,

@@ -37,6 +37,7 @@ fun Strings.ja(): String? =
                 "他の OS では正しく認識されない可能性があります。" +
                 "Windows や他の OS 上の他のソフトウェアでこれらのファイルを使用する前に、ファイル名を NFC 形式に正規化してください。" +
                 "これは、`vLabeler` アプリの「ツール」メニューの「ファイル名を正規化」ツールで実行できます。"
+        AlertExportNoData -> "エクスポートするデータがありません"
         ToastExportDataSuccess -> "成功しました"
         ToastExportDataCancel -> "キャンセルされました"
         ToastImportReclistSuccess -> "インポートに成功しました"
