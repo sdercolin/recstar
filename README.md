@@ -59,7 +59,7 @@ Search `RecStar` in the App Store.
    OREMO-style BGM config file can be imported as well for continuous recording and trimming.
    Note: On Desktop, the config file should be in the same directory as the BGM file, and named
    as `<same_name_with_the_guide_bgm_file>.txt`, to be automatically detected.
-6. Click the "Record" button to start recording.
+6. Click the record button to start recording.
 7. Click the audio graph to listen back to the recorded files.
 8. After recording, click the "..." button and select "Export" or "Open Directory" to access the recorded files.
 

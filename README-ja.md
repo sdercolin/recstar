@@ -1,8 +1,10 @@
 # RecStar
 
-言語を選択: [English](README.md) | [简体中文](README-zhCN.md) | [日本語](README-ja.md)
+言語を選択：[English](README.md) | [简体中文](README-zhCN.md) | [日本語](README-ja.md)
 
-UTAUスタイルの録音リストを扱う録音アプリケーション。デスクトップ/iOS/Androidに対応しています。
+UTAU スタイルの録音リストを扱う録音アプリケーション。デスクトップ/iOS/Androidに対応しています。
+
+**（このページは ChatGPT の翻訳をベースとしています。）**
 
 ![platforms.png](readme_images/platforms.png)
 
@@ -85,11 +87,11 @@ RecStarは[Compose Multiplatform](https://github.com/JetBrains/compose-jb)で構
 
 1. `Kotlin KDoc Formatter`プラグインをインストールし、以下の設定を使用してください。
    ![KDoc Formatter設定](readme_images/kdoc_settings.png)
-2. コードをコミットする前に自動的にフォーマットするプリコミットフックを追加するために、
+2. コードをコミットする前に自動的にフォーマットする pre-commit hook を追加するために、
 一度`./gradlew addKtlintFormatGitPreCommitHook`を実行してください。
 3. 文字列定義ファイル（例：[StringsEnglish.kt](shared/src/commonMain/kotlin/ui/string/StringEnglish.kt)）で、Android
-Studioのフォーマッターがワイルドカードインポートを単一インポートに常に変更してしまう場合は、
-`ui.string`パッケージのワイルドカードインポートを許可するように設定を調整してください。
+Studio のフォーマッターがワイルドカードインポートを単一インポートに常に変更してしまう場合は、
+`ui.string` パッケージのワイルドカードインポートを許可するように設定を調整してください。
 
 </details>
 
