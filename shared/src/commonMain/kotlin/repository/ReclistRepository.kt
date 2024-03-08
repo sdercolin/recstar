@@ -52,20 +52,18 @@ class ReclistRepository(
 
     /**
      * Imports a reclist from the given file.
-     *
-     * @return true if the import was successful, false otherwise.
      */
     fun import(
         file: File,
         commentFile: File?,
-    ): Boolean {
+    ): Result<Unit> {
         val name = file.nameWithoutExtension
         Log.i("ReclistRepository.import: ${file.absolutePath}, commentFile: ${commentFile?.absolutePath}")
         val reclist = parseReclist(file, commentFile)
-            .onFailure {
-                Log.e("ReclistRepository.import: failed to parse ${file.absolutePath}", it)
+            .getOrElse {
+                Log.e(it)
+                return Result.failure(it)
             }
-            .getOrNull() ?: return false
         if (map.containsKey(name)) {
             Log.w("ReclistRepository.import: $name already exists, overwriting...")
         }
@@ -78,7 +76,7 @@ class ReclistRepository(
         _items.value = items
         map[name] = reclist
         saveUsedTime(name, newItem.lastUsed)
-        return true
+        return Result.success(Unit)
     }
 
     /**

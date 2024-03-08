@@ -31,6 +31,8 @@ fun Strings.ja(): String? =
         ExceptionReclistNotFound ->
             "このセッションで使用されている録音リスト（{0}）またはそのコメントファイルが見つからないため、" +
                 "セッションを開くことができません。再インポートしてからセッションを使用してください。"
+        ExceptionReclistNoValidLine ->
+            "録音リストに有効な行が含まれていません。行にファイル名に使用できない無効な文字が含まれていないことを確認してください。"
         AlertExportTips ->
             "録音リストには日本語の濁点記号を含む行があります。" +
                 "MacOS/iOS の仕様により、これらのファイル名は特殊なエンコーディングで保存され、" +
@@ -40,8 +42,8 @@ fun Strings.ja(): String? =
         AlertExportNoData -> "エクスポートするデータがありません"
         ToastExportDataSuccess -> "成功しました"
         ToastExportDataCancel -> "キャンセルされました"
-        ToastImportReclistSuccess -> "インポートに成功しました"
-        ToastImportReclistFailure -> "インポートに失敗しました"
+        ToastImportSuccess -> "インポートに成功しました"
+        ToastImportFailure -> "インポートに失敗しました"
         AlertUnexpectedErrorOpenLog -> "エラーが発生しました。エラーログファイルを添付し、開発者に報告してください。"
         AlertUnexpectedErrorOpenLogButton -> "ログフォルダを開く"
         AlertUnexpectedErrorCopyLogToClipboard -> "エラーが発生しました。エラー情報を添付し、開発者に報告してください。"

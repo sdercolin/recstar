@@ -2,15 +2,22 @@ package model
 
 import io.File
 import io.FileInteractor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import repository.GuideAudioRepository
 import repository.ReclistRepository
 import ui.common.AlertDialogController
 import ui.common.ToastController
+import ui.common.requestConfirmError
 import ui.common.requestInput
 import ui.common.requestYesNo
 import ui.common.show
 import ui.screen.SessionScreenModel
 import ui.string.*
+import util.Log
 import util.isDesktop
 
 /**
@@ -40,21 +47,25 @@ enum class Action {
  */
 object Actions {
     fun importReclist(
+        scope: CoroutineScope,
         fileInteractor: FileInteractor,
         repository: ReclistRepository,
         alertDialogController: AlertDialogController,
         toastController: ToastController,
     ) {
-        fun import(
+        suspend fun import(
             file: File,
             commentFile: File?,
         ) {
-            val imported = repository.import(file, commentFile)
-            if (imported) {
-                toastController.show(stringStatic(Strings.ToastImportReclistSuccess))
-            } else {
-                toastController.show(stringStatic(Strings.ToastImportReclistFailure))
-            }
+            withContext(Dispatchers.IO) { repository.import(file, commentFile) }
+                .onSuccess {
+                    toastController.show(stringStatic(Strings.ToastImportSuccess))
+                }.onFailure {
+                    Log.e(it)
+                    alertDialogController.requestConfirmError(
+                        message = it.message ?: stringStatic(Strings.ToastImportFailure),
+                    )
+                }
         }
 
         fileInteractor.pickFile(
@@ -71,13 +82,17 @@ object Actions {
                             onFinish = inner@{ commentFile ->
                                 // cancel the import if `Yes` is clicked but no comment file is selected
                                 commentFile ?: return@inner
-                                import(file, commentFile)
+                                scope.launch {
+                                    import(file, commentFile)
+                                }
                             },
                         )
                     },
                     onDismiss = {
-                        // import only the reclist file without comments if `No` is clicked
-                        import(file, null)
+                        scope.launch {
+                            // import only the reclist file without comments if `No` is clicked
+                            import(file, null)
+                        }
                     },
                 )
             },
@@ -85,22 +100,26 @@ object Actions {
     }
 
     fun importGuideAudio(
+        scope: CoroutineScope,
         fileInteractor: FileInteractor,
         repository: GuideAudioRepository,
         alertDialogController: AlertDialogController,
         toastController: ToastController,
     ) {
-        fun import(
+        suspend fun import(
             audioFile: File,
             configFile: File?,
             findConfig: Boolean = false,
         ) {
-            val imported = repository.import(audioFile, configFile, findConfig)
-            if (imported) {
-                toastController.show(stringStatic(Strings.ToastImportReclistSuccess))
-            } else {
-                toastController.show(stringStatic(Strings.ToastImportReclistFailure))
-            }
+            withContext(Dispatchers.IO) { repository.import(audioFile, configFile, findConfig) }
+                .onSuccess {
+                    toastController.show(stringStatic(Strings.ToastImportSuccess))
+                }.onFailure {
+                    Log.e(it)
+                    alertDialogController.requestConfirmError(
+                        message = it.message ?: stringStatic(Strings.ToastImportFailure),
+                    )
+                }
         }
 
         fileInteractor.pickFile(
@@ -109,9 +128,11 @@ object Actions {
             onFinish = { audioFile ->
                 audioFile ?: return@pickFile
                 if (isDesktop) {
-                    // We can directly access the file system on Desktop,
-                    // so we can get the config file without further user interaction.
-                    import(audioFile, null, findConfig = true)
+                    scope.launch {
+                        // We can directly access the file system on Desktop,
+                        // so we can get the config file without further user interaction.
+                        import(audioFile, null, findConfig = true)
+                    }
                     return@pickFile
                 }
                 alertDialogController.requestYesNo(
@@ -123,13 +144,17 @@ object Actions {
                             onFinish = inner@{ configFile ->
                                 // cancel the import if `Yes` is clicked but no config file is selected
                                 configFile ?: return@inner
-                                import(audioFile, configFile)
+                                scope.launch {
+                                    import(audioFile, configFile)
+                                }
                             },
                         )
                     },
                     onDismiss = {
                         // import only the audio file if `No` is clicked
-                        import(audioFile, null)
+                        scope.launch {
+                            import(audioFile, null)
+                        }
                     },
                 )
             },

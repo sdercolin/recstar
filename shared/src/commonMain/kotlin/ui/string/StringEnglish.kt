@@ -31,6 +31,9 @@ fun Strings.en(): String =
         ExceptionReclistNotFound ->
             "Could not open the session because the reclist ({0}) or its comment file used in this session " +
                 "is not found. Please reimport them to use this session."
+        ExceptionReclistNoValidLine ->
+            "The reclist file does not contain any valid line. " +
+                "Please ensure the lines do not contain any invalid characters that cannot be used in file names."
         AlertExportTips ->
             "Your reclist contains sentences with Japanese voice marked characters " +
                 "which will be saved in a special encoding, " +
@@ -42,8 +45,8 @@ fun Strings.en(): String =
         AlertExportNoData -> "No data to export"
         ToastExportDataSuccess -> "Exported successfully"
         ToastExportDataCancel -> "Export cancelled"
-        ToastImportReclistSuccess -> "Imported successfully"
-        ToastImportReclistFailure -> "Failed to import"
+        ToastImportSuccess -> "Imported successfully"
+        ToastImportFailure -> "Failed to import"
         AlertUnexpectedErrorOpenLog -> "An error occurred. Please report to the developer with the error log file."
         AlertUnexpectedErrorOpenLogButton -> "Open Log Folder"
         AlertUnexpectedErrorCopyLogToClipboard ->

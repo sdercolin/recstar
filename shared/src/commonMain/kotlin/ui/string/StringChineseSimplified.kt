@@ -28,6 +28,7 @@ fun Strings.zhHans(): String? =
         ExceptionUnsupportedAudioFormat ->
             "无法找到任何有效的设备以支持当前的音频格式：{0}，请检查并调整音频设置，尤其是采样率与位深度选项。"
         ExceptionReclistNotFound -> "无法打开会话，因为该会话所使用的录音表（{0}）或其注释文件未找到。请重新导入以使用该会话。"
+        ExceptionReclistNoValidLine -> "该录音表文件中不包含任何有效的行。请确保行中不包含任何无法用于文件名的无效字符。"
         AlertExportTips ->
             "您的录音表中包含带有日语浊音标记字符的行。由于MacOS/iOS的规范，这些行将以特殊编码被保存，导致在其他平台上可能无法正确被识别。" +
                 "在 Windows 等其他平台上使用其他软件读取这些文件之前，请将文件名规范化为 NFC 格式。" +
@@ -35,8 +36,8 @@ fun Strings.zhHans(): String? =
         AlertExportNoData -> "没有可导出的数据"
         ToastExportDataSuccess -> "导出成功"
         ToastExportDataCancel -> "导出已被取消"
-        ToastImportReclistSuccess -> "导入成功"
-        ToastImportReclistFailure -> "导入失败"
+        ToastImportSuccess -> "导入成功"
+        ToastImportFailure -> "导入失败"
         AlertUnexpectedErrorOpenLog -> "发生错误。请将错误日志文件提交给开发者。"
         AlertUnexpectedErrorOpenLogButton -> "打开日志目录"
         AlertUnexpectedErrorCopyLogToClipboard -> "发生错误。请将错误信息提交给开发者。"

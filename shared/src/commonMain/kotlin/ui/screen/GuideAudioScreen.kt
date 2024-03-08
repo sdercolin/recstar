@@ -26,6 +26,7 @@ import ui.common.FloatingActionButton
 import ui.common.ItemListScreenContent
 import ui.common.LocalAlertDialogController
 import ui.common.LocalToastController
+import ui.model.LocalAppContext
 import ui.model.LocalSafeAreaInsets
 import ui.model.Screen
 import ui.string.*
@@ -50,12 +51,19 @@ private fun GuideAudioScreen.ScreenActions() {
             val repository = LocalGuideAudioRepository.current
             val alertDialogController = LocalAlertDialogController.current
             val toastController = LocalToastController.current
+            val context = LocalAppContext.current
             ActionMenuItem(
                 text = string(Strings.CommonImport),
                 icon = Icons.Default.Add,
                 onClick = {
                     closeMenu()
-                    Actions.importGuideAudio(fileInteractor, repository, alertDialogController, toastController)
+                    Actions.importGuideAudio(
+                        context.coroutineScope,
+                        fileInteractor,
+                        repository,
+                        alertDialogController,
+                        toastController,
+                    )
                 },
             )
             ActionMenuItem(

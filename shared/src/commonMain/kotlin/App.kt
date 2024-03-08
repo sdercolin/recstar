@@ -38,6 +38,7 @@ import ui.common.LocalAlertDialogController
 import ui.common.LocalProgressController
 import ui.common.LocalToastController
 import ui.common.requestYesNo
+import ui.model.LocalAppContext
 import ui.model.LocalSafeAreaInsets
 import ui.model.Screen
 import ui.screen.AboutScreen
@@ -73,6 +74,7 @@ private fun MainScaffold(navigator: Navigator) {
     val guideAudioRepository = LocalGuideAudioRepository.current
     val alertDialogController = LocalAlertDialogController.current
     val toastController = LocalToastController.current
+    val context = LocalAppContext.current
     LaunchedEffect(navigator.lastItem) {
         appActionStore.onScreenChange(navigator.lastItem as Screen)
     }
@@ -80,12 +82,14 @@ private fun MainScaffold(navigator: Navigator) {
         appActionStore.actions.collectLatest {
             when (it) {
                 Action.ImportReclist -> Actions.importReclist(
+                    context.coroutineScope,
                     fileInteractor,
                     reclistRepository,
                     alertDialogController,
                     toastController,
                 )
                 Action.ImportGuideAudio -> Actions.importGuideAudio(
+                    context.coroutineScope,
                     fileInteractor,
                     guideAudioRepository,
                     alertDialogController,

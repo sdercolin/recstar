@@ -66,17 +66,16 @@ class GuideAudioRepository(
 
     /**
      * Imports a guide audio from the given files.
-     *
-     * @return true if the import was successful, false otherwise.
      */
     fun import(
         audioFile: File,
         rawConfigFile: File?,
         findConfig: Boolean,
-    ): Boolean {
+    ): Result<Unit> {
         if (audioFile.isFile.not() || audioFile.extension != GUIDE_AUDIO_FILE_EXTENSION) {
-            Log.e("GuideAudioRepository.import: invalid audio file ${audioFile.absolutePath}")
-            return false
+            return Result.failure(
+                IllegalArgumentException("Could not find a valid audio file at ${audioFile.absolutePath}"),
+            )
         }
         val resolvedRawConfigFile = if (rawConfigFile == null && findConfig) {
             val configFileName = "${audioFile.nameWithoutExtension}.$GUIDE_AUDIO_RAW_CONFIG_FILE_EXTENSION"
@@ -93,10 +92,9 @@ class GuideAudioRepository(
                 importedConfigFile.writeText(it.stringifyJson())
                 Log.i("GuideAudioRepository.import: saved to ${importedWav.absolutePath}")
             }
-            .onFailure { t ->
-                Log.e("GuideAudioRepository.import: failed to import ${audioFile.absolutePath}", t)
+            .getOrElse { t ->
+                return Result.failure(t)
             }
-            .getOrNull() ?: return false
         val newItem = GuideAudioItem(newGuideAudio.name, DateTime.getNow())
         val items = _items.value.toMutableList()
         items.removeAll { it.name == newItem.name }
@@ -104,7 +102,7 @@ class GuideAudioRepository(
         _items.value = items
         map[newGuideAudio.name] = newGuideAudio
         saveUsedTime(newGuideAudio.name, newItem.lastUsed)
-        return true
+        return Result.success(Unit)
     }
 
     /**
