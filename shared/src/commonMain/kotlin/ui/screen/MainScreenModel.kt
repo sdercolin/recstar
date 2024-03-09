@@ -5,7 +5,6 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import exception.ReclistNotFoundException
 import kotlinx.coroutines.flow.Flow
 import model.SessionItem
 import model.SortingMethod
@@ -49,11 +48,8 @@ class MainScreenModel(
     override fun onClick(item: SessionItem) {
         val session = sessionRepository.get(item.name)
             .getOrElse {
-                if (it is ReclistNotFoundException) {
-                    alertDialogController.requestConfirmError(message = it.message)
-                } else {
-                    Log.e("Failed to get session ${item.name}", it)
-                }
+                Log.e(it)
+                alertDialogController.requestConfirmError(message = it.message)
                 return
             }
         navigator push SessionScreen(session)
