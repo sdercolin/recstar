@@ -28,3 +28,5 @@ val isIos: Boolean = Platform.target == PlatformTarget.Ios
 val isMobile: Boolean = isAndroid || isIos
 val useIosStyle: Boolean = isIos || (isDesktop && Platform.os.toLowerCase(Locale.current).contains("mac"))
 val isMacOrIos: Boolean = isIos || Platform.os.toLowerCase(Locale.current).contains("mac")
+
+expect val isMacIntel: Boolean

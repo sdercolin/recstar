@@ -6,3 +6,5 @@ actual object Platform {
     actual val target: PlatformTarget = PlatformTarget.Ios
     actual val os: String = UIDevice.currentDevice.run { "$systemName $systemVersion" }
 }
+
+actual val isMacIntel: Boolean = false

@@ -59,6 +59,7 @@ import ui.string.*
 import util.Log
 import util.appVersion
 import util.isDesktop
+import util.isMacIntel
 import util.runIf
 import util.runIfHave
 import util.useIosStyle
@@ -146,7 +147,8 @@ private fun ScreenContent() {
             )
         }
         Group(title = string(Strings.PreferenceGroupAudio)) {
-            if (isDesktop) {
+            if (isDesktop && !isMacIntel) {
+                // Disable audio device selection on Intel Macs due to a bug in the audio library
                 val allInputDeviceInfo = produceState<AudioDeviceInfoList?>(
                     null,
                     value.desiredInputName,
