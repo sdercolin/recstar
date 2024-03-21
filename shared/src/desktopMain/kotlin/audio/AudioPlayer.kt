@@ -1,5 +1,6 @@
 package audio
 
+import exception.UnsupportedAudioDeviceException
 import exception.UnsupportedAudioFormatException
 import io.File
 import kotlinx.coroutines.Dispatchers
@@ -54,7 +55,11 @@ class AudioPlayerImpl(
                 clip?.close()
                 val selectedMixerInfo = getSelectedMixerInfo()
                 clip = if (selectedMixerInfo != null) {
-                    AudioSystem.getClip(selectedMixerInfo)
+                    try {
+                        AudioSystem.getClip(selectedMixerInfo)
+                    } catch (e: Exception) {
+                        throw UnsupportedAudioDeviceException()
+                    }
                 } else {
                     AudioSystem.getClip()
                 }.also {
