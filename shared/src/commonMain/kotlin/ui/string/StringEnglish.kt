@@ -127,6 +127,10 @@ fun Strings.en(): String =
         PreferenceAutoNext -> "Auto Go to Next After Recording"
         PreferenceAutoNextDescription -> "Unavailable in continuous mode"
         PreferenceGroupAudio -> "Audio"
+        PreferenceGroupAudioDescription ->
+            "It is recommended to always use the system default audio devices, and " +
+                "select your desired audio devices in the system settings, " +
+                "rather than modifying the audio device settings here."
         PreferenceInputDeviceName -> "Input Device"
         PreferenceOutputDeviceName -> "Output Device"
         PreferenceSampleRate -> "Sample Rate"

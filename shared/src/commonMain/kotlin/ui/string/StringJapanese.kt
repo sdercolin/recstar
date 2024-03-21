@@ -120,6 +120,8 @@ fun Strings.ja(): String? =
         PreferenceAutoNext -> "録音後に自動で次の行に移動"
         PreferenceAutoNextDescription -> "連続録音モードでは無効"
         PreferenceGroupAudio -> "音声"
+        PreferenceGroupAudioDescription ->
+            "こちらのデバイス設定を変更する代わりに、システム設定で使用するデバイスを選択することをおすすめします。"
         PreferenceInputDeviceName -> "入力デバイス"
         PreferenceOutputDeviceName -> "出力デバイス"
         PreferenceSampleRate -> "サンプリングレート"

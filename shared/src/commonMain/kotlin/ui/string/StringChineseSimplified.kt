@@ -112,6 +112,7 @@ fun Strings.zhHans(): String? =
         PreferenceAutoNext -> "录音后自动跳转到下一句"
         PreferenceAutoNextDescription -> "连续录音模式下无效"
         PreferenceGroupAudio -> "音频"
+        PreferenceGroupAudioDescription -> "请尽可能地在系统设置处选择您所需要的音频设备，而不是修改此处的音频设备设置。"
         PreferenceInputDeviceName -> "输入设备"
         PreferenceOutputDeviceName -> "输出设备"
         PreferenceSampleRate -> "采样率"

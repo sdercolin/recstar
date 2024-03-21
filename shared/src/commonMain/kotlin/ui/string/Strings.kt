@@ -103,6 +103,7 @@ enum class Strings {
     PreferenceAutoNext,
     PreferenceAutoNextDescription,
     PreferenceGroupAudio,
+    PreferenceGroupAudioDescription,
     PreferenceInputDeviceName,
     PreferenceOutputDeviceName,
     PreferenceSampleRate,

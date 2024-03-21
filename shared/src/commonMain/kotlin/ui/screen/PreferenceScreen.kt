@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import audio.AudioDeviceInfoList
@@ -146,9 +147,13 @@ private fun ScreenContent() {
                 onValueChanged = { repository.update { copy(recording = recording.copy(autoNext = it)) } },
             )
         }
-        Group(title = string(Strings.PreferenceGroupAudio)) {
-            if (isDesktop && !isMacIntel) {
-                // Disable audio device selection on Intel Macs due to a bug in the audio library
+        // Disable audio device selection on Intel Macs due to a bug in the audio library
+        val enableDeviceSettings = isDesktop && !isMacIntel
+        Group(
+            title = string(Strings.PreferenceGroupAudio),
+            description = string(Strings.PreferenceGroupAudioDescription).takeIf { enableDeviceSettings },
+        ) {
+            if (enableDeviceSettings) {
                 val allInputDeviceInfo = produceState<AudioDeviceInfoList?>(
                     null,
                     value.desiredInputName,
@@ -250,16 +255,32 @@ private fun ScreenContent() {
 @Composable
 private fun Group(
     title: String,
+    description: String? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)) {
         Text(
-            modifier = Modifier.padding(start = 40.dp, end = 40.dp, top = 8.dp, bottom = 16.dp),
+            modifier = Modifier.padding(
+                start = 40.dp,
+                end = 40.dp,
+                top = 8.dp,
+                bottom = if (description != null) 8.dp else 16.dp,
+            ),
             text = title,
             style = MaterialTheme.typography.subtitle2,
             color = MaterialTheme.colors.primary,
             maxLines = 1,
         )
+        description?.let {
+            Text(
+                modifier = Modifier.padding(start = 40.dp, end = 80.dp, bottom = 16.dp),
+                text = it,
+                style = MaterialTheme.typography.caption,
+                color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
+                maxLines = 8,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
         content()
         Divider(modifier = Modifier.padding(start = 24.dp))
     }
