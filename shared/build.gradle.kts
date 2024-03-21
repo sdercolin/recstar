@@ -160,6 +160,7 @@ buildkonfig {
     defaultConfigs {
         buildConfigField(FieldSpec.Type.BOOLEAN, "isDebug", "true")
         buildConfigField(FieldSpec.Type.STRING, "version", findProperty("app.versionName").toString())
+        buildConfigField(FieldSpec.Type.INT, "versionCode", findProperty("app.versionCode").toString())
     }
 
     defaultConfigs("release") {

@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -33,6 +34,7 @@ import model.Action
 import model.Actions
 import repository.LocalAppActionStore
 import repository.LocalAppPreferenceRepository
+import repository.LocalAppRecordRepository
 import repository.LocalGuideAudioRepository
 import repository.LocalReclistRepository
 import ui.common.LocalAlertDialogController
@@ -55,6 +57,9 @@ fun App() {
     val toastController = LocalToastController.current
     val alertDialogController = LocalAlertDialogController.current
     val progressController = LocalProgressController.current
+    val recordRepository = LocalAppRecordRepository.current
+    val preferenceRepository = LocalAppPreferenceRepository.current
+    remember { Migrations.run(recordRepository, preferenceRepository) }
     AppTheme(isDarkMode = LocalThemeIsDarkMode.current) {
         Navigator(MainScreen) { navigator ->
             MainScaffold(navigator)
