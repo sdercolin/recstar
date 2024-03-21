@@ -27,6 +27,9 @@ fun Strings.zhHans(): String? =
         ExceptionRenameSessionUnexpected -> "重命名会话失败。"
         ExceptionUnsupportedAudioFormat ->
             "无法找到任何有效的设备以支持当前的音频格式：{0}，请检查并调整音频设置，尤其是采样率与位深度选项。"
+        ExceptionUnsupportedAudioDevice ->
+            "所选的音频设备无法使用，请检查您的系统音频设置。如果此错误持续发生，请尝试在 RecStar 的设置中选择系统默认的音频设备，" +
+                "并在系统设置中选择您所需的音频设备。"
         ExceptionReclistNotFound -> "无法打开会话，因为该会话所使用的录音表（{0}）或其注释文件未找到。请重新导入以使用该会话。"
         ExceptionReclistNoValidLine -> "该录音表文件中不包含任何有效的行。请确保行中不包含任何无法用于文件名的无效字符。"
         AlertExportTips ->

@@ -28,6 +28,10 @@ fun Strings.en(): String =
         ExceptionUnsupportedAudioFormat ->
             "Could not find any audio device that supports the current audio format: {0}, " +
                 "please check and adjust the audio settings, especially the sample rate and bit depth."
+        ExceptionUnsupportedAudioDevice ->
+            "The selected audio device is not usable, please check audio settings on your " +
+                "system side. If this error keeps happening, please try selecting the system default audio devices " +
+                "in the settings of RecStar, and select your desired audio devices in the system settings."
         ExceptionReclistNotFound ->
             "Could not open the session because the reclist ({0}) or its comment file used in this session " +
                 "is not found. Please reimport them to use this session."

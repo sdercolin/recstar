@@ -1,6 +1,7 @@
 package audio
 
 import androidx.compose.runtime.Stable
+import exception.UnsupportedAudioDeviceException
 import exception.UnsupportedAudioFormatException
 import io.File
 import kotlinx.coroutines.CoroutineScope
@@ -87,7 +88,11 @@ class AudioRecorderImpl(
         }
         val selectedMixerInfo = selectMixer(mixerInfos, deviceInfos)
         val selectedMixer = AudioSystem.getMixer(selectedMixerInfo)
-        return selectedMixer.getLine(dataLineInfo) as TargetDataLine
+        return try {
+            selectedMixer.getLine(dataLineInfo) as TargetDataLine
+        } catch (e: Exception) {
+            throw UnsupportedAudioDeviceException()
+        }
     }
 
     private fun selectMixer(
