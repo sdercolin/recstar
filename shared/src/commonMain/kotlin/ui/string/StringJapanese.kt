@@ -159,9 +159,12 @@ fun Strings.ja(): String? =
         MenuActionToggleRecordingHoldingMode -> "録音/停止（ショートカットのみ有効）"
         MenuSettings -> "設定"
         MenuSettingsOpenSettings -> "設定を開く"
-        MenuSettingsClearSettings -> "設定をクリア"
-        MenuSettingsClearSettingsAlertMessage ->
-            "すべての設定をクリアしますか？セッションデータやインポートしたリソースファイル（録音リストやガイド BGM など）は削除されません。" +
+        MenuSettingsClearSettings -> "設定をリセット"
+        MenuSettingsClearSettingsAlertMessage -> "すべての設定をリセットしますか？"
+        MenuSettingsClearAppData -> "アプリデータをクリア"
+        MenuSettingsClearAppDataAlertMessage ->
+            "すべてのアプリデータ（設定や使用履歴など）をクリアしますか？" +
+                "セッションデータやインポートしたリソースファイル（録音リストやガイド BGM など）は削除されません。" +
                 "アプリはこの操作後に終了します。"
         MenuHelp -> "ヘルプ"
         MenuHelpOpenContentDirectory -> "コンテンツディレクトリを開く"

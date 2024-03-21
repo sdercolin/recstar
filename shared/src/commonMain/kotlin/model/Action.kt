@@ -2,11 +2,13 @@ package model
 
 import io.File
 import io.FileInteractor
+import io.Paths
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import repository.AppPreferenceRepository
 import repository.GuideAudioRepository
 import repository.ReclistRepository
 import ui.common.AlertDialogController
@@ -19,6 +21,7 @@ import ui.screen.SessionScreenModel
 import ui.string.*
 import util.Log
 import util.isDesktop
+import util.quitApp
 
 /**
  * Defines an action that can be performed by the user. Typically by a global menu or a shortcut on Desktop.
@@ -37,6 +40,7 @@ enum class Action {
     ToggleRecording,
     OpenSettings,
     ClearSettings,
+    ClearAppData,
     OpenAppDirectory,
     OpenContentDirectory,
     OpenAbout,
@@ -177,6 +181,30 @@ object Actions {
             initialValue = model.name,
             selected = true,
             onConfirmInput = model::renameSession,
+        )
+    }
+
+    fun clearAppData(alertDialogController: AlertDialogController) {
+        alertDialogController.requestYesNo(
+            title = stringStatic(Strings.MenuSettingsClearAppData),
+            message = stringStatic(Strings.MenuSettingsClearAppDataAlertMessage),
+            onConfirm = {
+                Paths.appRoot.delete()
+                quitApp()
+            },
+        )
+    }
+
+    fun clearSettings(
+        alertDialogController: AlertDialogController,
+        appPreferenceRepository: AppPreferenceRepository,
+    ) {
+        alertDialogController.requestYesNo(
+            title = stringStatic(Strings.MenuSettingsClearSettings),
+            message = stringStatic(Strings.MenuSettingsClearSettingsAlertMessage),
+            onConfirm = {
+                appPreferenceRepository.update { AppPreference() }
+            },
         )
     }
 }

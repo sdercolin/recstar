@@ -150,9 +150,12 @@ fun Strings.zhHans(): String? =
         MenuActionToggleRecordingHoldingMode -> "录制/停止（仅快捷键可用）"
         MenuSettings -> "设置"
         MenuSettingsOpenSettings -> "打开设置"
-        MenuSettingsClearSettings -> "清除设置"
-        MenuSettingsClearSettingsAlertMessage ->
-            "确定要清除所有设置吗？您的会话数据和已导入的资源文件（如录音表和 BGM）将不会被删除。应用将在该操作后关闭。"
+        MenuSettingsClearSettings -> "重设设置"
+        MenuSettingsClearSettingsAlertMessage -> "确定要重设全部设置吗？"
+        MenuSettingsClearAppData -> "清除应用数据"
+        MenuSettingsClearAppDataAlertMessage ->
+            "确定要清除所有应用数据（包括设置和使用记录等）吗？您的会话数据和已导入的资源文件（如录音表和 BGM）将不会被删除。" +
+                "应用将在该操作后关闭。"
         MenuHelp -> "帮助"
         MenuHelpOpenContentDirectory -> "打开内容目录"
         MenuHelpOpenAppDirectory -> "打开应用目录"

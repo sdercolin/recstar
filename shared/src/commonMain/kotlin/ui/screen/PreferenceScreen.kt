@@ -21,6 +21,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -52,7 +54,10 @@ import repository.LocalAppPreferenceRepository
 import repository.LocalGuideAudioRepository
 import repository.LocalReclistRepository
 import repository.LocalSessionRepository
+import ui.common.ActionMenu
+import ui.common.ActionMenuItem
 import ui.common.DisabledMutableInteractionSource
+import ui.common.LocalAlertDialogController
 import ui.common.ScrollableColumn
 import ui.model.LocalSafeAreaInsets
 import ui.model.Screen
@@ -70,7 +75,36 @@ object PreferenceScreen : Screen {
     override fun getTitle(): String = string(Strings.PreferenceScreenTitle)
 
     @Composable
+    override fun Actions() = ScreenActions()
+
+    @Composable
     override fun Content() = ScreenContent()
+}
+
+@Composable
+private fun ScreenActions() {
+    ActionMenu { closeMenu ->
+        val alertDialogController = LocalAlertDialogController.current
+        val repository = LocalAppPreferenceRepository.current
+        ActionMenuItem(
+            text = string(Strings.MenuSettingsClearSettings),
+            icon = Icons.Default.Refresh,
+            onClick = {
+                closeMenu()
+                model.Actions.clearSettings(alertDialogController, repository)
+            },
+        )
+        if (isDesktop) {
+            ActionMenuItem(
+                text = string(Strings.MenuSettingsClearAppData),
+                icon = Icons.Default.RestartAlt,
+                onClick = {
+                    closeMenu()
+                    model.Actions.clearAppData(alertDialogController)
+                },
+            )
+        }
+    }
 }
 
 @Composable

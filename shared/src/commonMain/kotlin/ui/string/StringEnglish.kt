@@ -168,9 +168,12 @@ fun Strings.en(): String =
         MenuActionToggleRecordingHoldingMode -> "Toggle Recording (Only shortcut is available)"
         MenuSettings -> "Settings"
         MenuSettingsOpenSettings -> "Open Settings"
-        MenuSettingsClearSettings -> "Clear Settings"
-        MenuSettingsClearSettingsAlertMessage ->
-            "Are you sure you want to clear all settings? This will not delete your sessions and imported resources. " +
+        MenuSettingsClearSettings -> "Reset All Settings"
+        MenuSettingsClearSettingsAlertMessage -> "Are you sure you want to reset all settings?"
+        MenuSettingsClearAppData -> "Clear App Data"
+        MenuSettingsClearAppDataAlertMessage ->
+            "Are you sure you want to clear all app data (including settings and usage records)? " +
+                "This will not delete your sessions and imported resources. " +
                 "The App will be closed after clearing."
         MenuHelp -> "Help"
         MenuHelpOpenContentDirectory -> "Open Content Directory"

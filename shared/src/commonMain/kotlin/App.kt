@@ -32,12 +32,12 @@ import kotlinx.coroutines.flow.collectLatest
 import model.Action
 import model.Actions
 import repository.LocalAppActionStore
+import repository.LocalAppPreferenceRepository
 import repository.LocalGuideAudioRepository
 import repository.LocalReclistRepository
 import ui.common.LocalAlertDialogController
 import ui.common.LocalProgressController
 import ui.common.LocalToastController
-import ui.common.requestYesNo
 import ui.model.LocalAppContext
 import ui.model.LocalSafeAreaInsets
 import ui.model.Screen
@@ -48,7 +48,6 @@ import ui.string.*
 import ui.style.AppTheme
 import ui.style.LocalThemeIsDarkMode
 import util.isIos
-import util.quitApp
 import util.useIosStyle
 
 @Composable
@@ -72,6 +71,7 @@ private fun MainScaffold(navigator: Navigator) {
     val fileInteractor = LocalFileInteractor.current
     val reclistRepository = LocalReclistRepository.current
     val guideAudioRepository = LocalGuideAudioRepository.current
+    val appPreferenceRepository = LocalAppPreferenceRepository.current
     val alertDialogController = LocalAlertDialogController.current
     val toastController = LocalToastController.current
     val context = LocalAppContext.current
@@ -99,15 +99,8 @@ private fun MainScaffold(navigator: Navigator) {
                 Action.OpenAppDirectory -> fileInteractor.requestOpenFolder(Paths.appRoot)
                 Action.OpenAbout -> navigator push AboutScreen
                 Action.OpenSettings -> navigator push PreferenceScreen
-                Action.ClearSettings -> {
-                    alertDialogController.requestYesNo(
-                        message = stringStatic(Strings.MenuSettingsClearSettingsAlertMessage),
-                        onConfirm = {
-                            Paths.appRoot.delete()
-                            quitApp()
-                        },
-                    )
-                }
+                Action.ClearSettings -> Actions.clearSettings(alertDialogController, appPreferenceRepository)
+                Action.ClearAppData -> Actions.clearAppData(alertDialogController)
                 else -> Unit
             }
         }

@@ -143,6 +143,8 @@ enum class Strings {
     MenuSettingsOpenSettings,
     MenuSettingsClearSettings,
     MenuSettingsClearSettingsAlertMessage,
+    MenuSettingsClearAppData,
+    MenuSettingsClearAppDataAlertMessage,
     MenuHelp,
     MenuHelpOpenContentDirectory,
     MenuHelpOpenAppDirectory,

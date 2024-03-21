@@ -48,6 +48,7 @@ class AppActionStore(
             }
             Action.OpenSettings -> currentScreen is MainScreen || currentScreen is SessionScreen
             Action.ClearSettings -> true
+            Action.ClearAppData -> true
             Action.OpenAppDirectory -> true
             Action.OpenContentDirectory -> true
             Action.OpenAbout -> true

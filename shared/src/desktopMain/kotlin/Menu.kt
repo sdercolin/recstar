@@ -88,6 +88,10 @@ fun FrameWindowScope.Menu() {
                 Action.ClearSettings,
                 string(Strings.MenuSettingsClearSettings),
             )
+            ActionItem(
+                Action.ClearAppData,
+                string(Strings.MenuSettingsClearAppData),
+            )
         }
         Menu(string(Strings.MenuHelp), mnemonic = 'H') {
             ActionItem(
