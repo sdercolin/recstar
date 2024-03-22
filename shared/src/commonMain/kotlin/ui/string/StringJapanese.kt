@@ -37,6 +37,8 @@ fun Strings.ja(): String? =
                 "セッションを開くことができません。再インポートしてからセッションを使用してください。"
         ExceptionReclistNoValidLine ->
             "録音リストに有効な行が含まれていません。行にファイル名に使用できない無効な文字が含まれていないことを確認してください。"
+        ExceptionTextDecodeFailure ->
+            "テキストファイルのデコードに失敗しました。設定の「エンコーディングを確認」を有効にしてから再度試してください。"
         AlertExportTips ->
             "録音リストには日本語の濁点記号を含む行があります。" +
                 "MacOS/iOS の仕様により、これらのファイル名は特殊なエンコーディングで保存され、" +
@@ -134,6 +136,7 @@ fun Strings.ja(): String? =
         PreferenceTitleBarStyleCommentWithFileName -> "コメント + ファイル名（小）"
         PreferenceTitleBarStyleComment -> "コメントのみ"
         PreferenceGroupMisc -> "その他"
+        PreferenceAlwaysConfirmTextEncoding -> "エンコーディングを確認"
         PreferenceContentRootLocation -> "コンテンツディレクトリのローケーション"
         AboutScreenPrivacyPolicy -> "プライバシーポリシー"
         PreferenceAbout -> "$APP_NAME について"
@@ -170,5 +173,9 @@ fun Strings.ja(): String? =
         MenuHelpOpenContentDirectory -> "コンテンツディレクトリを開く"
         MenuHelpOpenAppDirectory -> "アプリディレクトリを開く"
         MenuHelpAbout -> "$APP_NAME について"
+        TextEncodingDialogTitle -> "エンコーディング設定"
+        TextEncodingDialogEncodingLabel -> "エンコーディング"
+        TextEncodingDialogEncodingAuto -> "自動"
+        TextEncodingDialogEncodingError -> "デコードに失敗しました"
         else -> null
     }

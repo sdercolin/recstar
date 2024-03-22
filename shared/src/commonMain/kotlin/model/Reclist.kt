@@ -3,8 +3,11 @@ package model
 import androidx.compose.runtime.Immutable
 import cafe.adriel.voyager.core.lifecycle.JavaSerializable
 import exception.ReclistNoValidLineException
+import exception.TextDecodeFailureException
 import io.File
+import io.readTextWithEncodingOrNull
 import kotlinx.serialization.Serializable
+import util.Encoding
 import util.isValidFileName
 
 /**
@@ -31,12 +34,22 @@ data class Reclist(
 
 fun parseReclist(
     file: File,
+    fileEncoding: Encoding?,
     commentFile: File?,
+    commentFileEncoding: Encoding?,
 ): Result<Reclist> =
     runCatching {
-        val lines = file.readTextDetectEncoding().split(*lineSeparators).filter { it.isValidFileName() }
+        val lines = runCatching { file.readTextWithEncodingOrNull(fileEncoding) }
+            .getOrElse {
+                if (file.exists() && file.isFile) {
+                    throw TextDecodeFailureException()
+                } else {
+                    throw it
+                }
+            }
+            .split(*lineSeparators).filter { it.isValidFileName() }
         if (lines.isEmpty()) throw ReclistNoValidLineException()
-        val comments = commentFile?.readTextDetectEncoding()?.split(*commentLineSeparators)
+        val comments = commentFile?.readTextWithEncodingOrNull(commentFileEncoding)?.split(*commentLineSeparators)
             ?.filterNot { it.startsWith("#") }
             ?.mapNotNull { line ->
                 val sections = line.split(*commentKeyValueSeparators, limit = 2)

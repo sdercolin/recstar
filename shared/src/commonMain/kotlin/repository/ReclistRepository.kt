@@ -3,6 +3,8 @@ package repository
 import androidx.compose.runtime.staticCompositionLocalOf
 import io.File
 import io.Paths
+import io.reclistCommentEncodingRecordFile
+import io.reclistEncodingRecordFile
 import io.reclistRecordFile
 import io.reclistsDirectory
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +13,7 @@ import model.Reclist
 import model.ReclistItem
 import model.parseReclist
 import util.DateTime
+import util.Encoding
 import util.Log
 
 /**
@@ -23,6 +26,12 @@ class ReclistRepository(
         updateItems = { update ->
             _items.value = update(_items.value)
         },
+    ),
+    ItemEncodingRepository by ItemEncodingRepositoryImpl(
+        categoryMapFileMap = mapOf(
+            ENCODING_CATEGORY_RECLIST to Paths.reclistEncodingRecordFile,
+            ENCODING_CATEGORY_COMMENT to Paths.reclistCommentEncodingRecordFile,
+        ),
     ) {
     private lateinit var folder: File
     private val map = mutableMapOf<String, Reclist>()
@@ -55,11 +64,16 @@ class ReclistRepository(
      */
     fun import(
         file: File,
+        fileEncoding: Encoding?,
         commentFile: File?,
+        commentFileEncoding: Encoding?,
     ): Result<Unit> {
         val name = file.nameWithoutExtension
-        Log.i("ReclistRepository.import: ${file.absolutePath}, commentFile: ${commentFile?.absolutePath}")
-        val reclist = parseReclist(file, commentFile)
+        Log.i(
+            "ReclistRepository.import: ${file.absolutePath}, commentFile: ${commentFile?.absolutePath}" +
+                ", fileEncoding: $fileEncoding, commentFileEncoding: $commentFileEncoding",
+        )
+        val reclist = parseReclist(file, fileEncoding, commentFile, commentFileEncoding)
             .getOrElse {
                 Log.e(it)
                 return Result.failure(it)
@@ -76,6 +90,10 @@ class ReclistRepository(
         _items.value = items
         map[name] = reclist
         saveUsedTime(name, newItem.lastUsed)
+        putItemEncoding(ENCODING_CATEGORY_RECLIST, name, fileEncoding)
+        if (commentFile != null) {
+            putItemEncoding(ENCODING_CATEGORY_COMMENT, name, commentFileEncoding)
+        }
         return Result.success(Unit)
     }
 
@@ -97,7 +115,9 @@ class ReclistRepository(
     fun get(name: String): Result<Reclist> =
         map[name]?.let { Result.success(it) } ?: parseReclist(
             file = getFile(name),
+            fileEncoding = getItemEncoding(ENCODING_CATEGORY_RECLIST, name),
             commentFile = getCommentFile(name).takeIf { it.exists() },
+            commentFileEncoding = getItemEncoding(ENCODING_CATEGORY_COMMENT, name),
         ).onSuccess {
             map[name] = it
         }
@@ -122,3 +142,6 @@ class ReclistRepository(
 }
 
 val LocalReclistRepository = staticCompositionLocalOf<ReclistRepository> { error("No ReclistRepository provided") }
+
+private const val ENCODING_CATEGORY_RECLIST = "reclist"
+private const val ENCODING_CATEGORY_COMMENT = "comment"

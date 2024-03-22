@@ -38,6 +38,8 @@ fun Strings.en(): String =
         ExceptionReclistNoValidLine ->
             "The reclist file does not contain any valid line. " +
                 "Please ensure the lines do not contain any invalid characters that cannot be used in file names."
+        ExceptionTextDecodeFailure ->
+            "Failed to decode text. Please turn on `Ask Text Encoding` in settings and try again with correct encoding."
         AlertExportTips ->
             "Your reclist contains sentences with Japanese voice marked characters " +
                 "which will be saved in a special encoding, " +
@@ -143,6 +145,7 @@ fun Strings.en(): String =
         PreferenceTitleBarStyleCommentWithFileName -> "Comment with File Name (small)"
         PreferenceTitleBarStyleComment -> "Only Comment"
         PreferenceGroupMisc -> "Misc"
+        PreferenceAlwaysConfirmTextEncoding -> "Ask Text Encoding"
         PreferenceContentRootLocation -> "Location of Content Directory"
         PreferenceAbout -> "About $APP_NAME"
         AboutScreenPrivacyPolicy -> "Privacy Policy"
@@ -179,4 +182,8 @@ fun Strings.en(): String =
         MenuHelpOpenContentDirectory -> "Open Content Directory"
         MenuHelpOpenAppDirectory -> "Open App Directory"
         MenuHelpAbout -> "About"
+        TextEncodingDialogTitle -> "Encoding Setting"
+        TextEncodingDialogEncodingLabel -> "Encoding"
+        TextEncodingDialogEncodingAuto -> "Auto"
+        TextEncodingDialogEncodingError -> "Decode Error"
     }

@@ -250,6 +250,12 @@ private fun ScreenContent() {
             )
         }
         Group(title = string(Strings.PreferenceGroupMisc)) {
+            SwitchItem(
+                title = string(Strings.PreferenceAlwaysConfirmTextEncoding),
+                info = null,
+                value = value.alwaysConfirmTextEncoding,
+                onValueChanged = { repository.update { copy(alwaysConfirmTextEncoding = it) } },
+            )
             if (isDesktop) {
                 val guideAudioRepository = LocalGuideAudioRepository.current
                 val sessionRepository = LocalSessionRepository.current

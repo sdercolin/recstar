@@ -32,6 +32,7 @@ fun Strings.zhHans(): String? =
                 "并在系统设置中选择您所需的音频设备。"
         ExceptionReclistNotFound -> "无法打开会话，因为该会话所使用的录音表（{0}）或其注释文件未找到。请重新导入以使用该会话。"
         ExceptionReclistNoValidLine -> "该录音表文件中不包含任何有效的行。请确保行中不包含任何无法用于文件名的无效字符。"
+        ExceptionTextDecodeFailure -> "文本解码失败。请在设置中启用「显示文本编码设置」，然后重试。"
         AlertExportTips ->
             "您的录音表中包含带有日语浊音标记字符的行。由于MacOS/iOS的规范，这些行将以特殊编码被保存，导致在其他平台上可能无法正确被识别。" +
                 "在 Windows 等其他平台上使用其他软件读取这些文件之前，请将文件名规范化为 NFC 格式。" +
@@ -125,6 +126,7 @@ fun Strings.zhHans(): String? =
         PreferenceTitleBarStyleCommentWithFileName -> "注释 + 文件名（小）"
         PreferenceTitleBarStyleComment -> "仅注释"
         PreferenceGroupMisc -> "其他"
+        PreferenceAlwaysConfirmTextEncoding -> "显示文本编码设置"
         PreferenceContentRootLocation -> "内容目录所在位置"
         PreferenceAbout -> "关于 $APP_NAME"
         AboutScreenPrivacyPolicy -> "隐私政策"
@@ -160,5 +162,9 @@ fun Strings.zhHans(): String? =
         MenuHelpOpenContentDirectory -> "打开内容目录"
         MenuHelpOpenAppDirectory -> "打开应用目录"
         MenuHelpAbout -> "关于"
+        TextEncodingDialogTitle -> "选择文本编码"
+        TextEncodingDialogEncodingLabel -> "编码"
+        TextEncodingDialogEncodingAuto -> "自动"
+        TextEncodingDialogEncodingError -> "解码失败"
         else -> null
     }

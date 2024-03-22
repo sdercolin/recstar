@@ -50,7 +50,7 @@ actual class File actual constructor(path: String) {
         }
 
     actual fun readText(encoding: Encoding): String {
-        return internalFile.readText(Charset.forName(encoding.name))
+        return internalFile.readText(Charset.forName(encoding.value))
     }
 
     actual fun readTextDetectEncoding(): String {

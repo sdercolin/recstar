@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import repository.AppPreferenceRepository
 import repository.GuideAudioRepository
@@ -17,11 +18,15 @@ import ui.common.requestConfirmError
 import ui.common.requestInput
 import ui.common.requestYesNo
 import ui.common.show
+import ui.encoding.TextEncodingDialogController
+import ui.encoding.TextEncodingDialogRequest
+import ui.encoding.TextEncodingDialogResult
 import ui.screen.SessionScreenModel
 import ui.string.*
 import util.Log
 import util.isDesktop
 import util.quitApp
+import kotlin.coroutines.resume
 
 /**
  * Defines an action that can be performed by the user. Typically by a global menu or a shortcut on Desktop.
@@ -56,27 +61,16 @@ object Actions {
         repository: ReclistRepository,
         alertDialogController: AlertDialogController,
         toastController: ToastController,
+        textEncodingDialogController: TextEncodingDialogController,
+        appPreferenceRepository: AppPreferenceRepository,
     ) {
-        suspend fun import(
-            file: File,
-            commentFile: File?,
-        ) {
-            withContext(Dispatchers.IO) { repository.import(file, commentFile) }
-                .onSuccess {
-                    toastController.show(stringStatic(Strings.ToastImportSuccess))
-                }.onFailure {
-                    Log.e(it)
-                    alertDialogController.requestConfirmError(
-                        message = it.message ?: stringStatic(Strings.ToastImportFailure),
-                    )
-                }
-        }
+        suspend fun askForEncoding(file: File): TextEncodingDialogResult? =
+            textEncodingDialogController.await(
+                TextEncodingDialogRequest(file = file, currentEncoding = null),
+            )
 
-        fileInteractor.pickFile(
-            title = stringStatic(Strings.CreateSessionReclistScreenActionImport),
-            allowedExtensions = listOf(Reclist.FILE_EXTENSION),
-            onFinish = { file ->
-                file ?: return@pickFile
+        suspend fun askForCommentFile(): (() -> File?)? =
+            suspendCancellableCoroutine { continuation ->
                 alertDialogController.requestYesNo(
                     message = stringStatic(Strings.CreateSessionReclistScreenActionImportCommentAlertMessage),
                     onConfirm = {
@@ -85,20 +79,57 @@ object Actions {
                             allowedExtensions = listOf(Reclist.FILE_EXTENSION),
                             onFinish = inner@{ commentFile ->
                                 // cancel the import if `Yes` is clicked but no comment file is selected
-                                commentFile ?: return@inner
-                                scope.launch {
-                                    import(file, commentFile)
+                                if (commentFile == null) {
+                                    continuation.resume(null)
+                                } else {
+                                    continuation.resume { commentFile }
                                 }
                             },
                         )
                     },
                     onDismiss = {
-                        scope.launch {
-                            // import only the reclist file without comments if `No` is clicked
-                            import(file, null)
-                        }
+                        // import only the reclist file without comments if `No` is clicked
+                        continuation.resume { null }
                     },
                 )
+            }
+
+        fileInteractor.pickFile(
+            title = stringStatic(Strings.CreateSessionReclistScreenActionImport),
+            allowedExtensions = listOf(Reclist.FILE_EXTENSION),
+            onFinish = { file ->
+                file ?: return@pickFile
+                scope.launch {
+                    val needsConfirmEncoding = appPreferenceRepository.value.alwaysConfirmTextEncoding
+                    val fileEncoding = if (needsConfirmEncoding) {
+                        val result = askForEncoding(file) ?: return@launch
+                        result.encoding
+                    } else {
+                        null
+                    }
+                    val commentFileResult = askForCommentFile() ?: return@launch
+                    val commentFile = commentFileResult.invoke()
+                    val commentFileEncoding = if (commentFile != null) {
+                        if (needsConfirmEncoding) {
+                            val result = askForEncoding(commentFile) ?: return@launch
+                            result.encoding
+                        } else {
+                            null
+                        }
+                    } else {
+                        null
+                    }
+                    withContext(Dispatchers.IO) {
+                        repository.import(file, fileEncoding, commentFile, commentFileEncoding)
+                    }.onSuccess {
+                        toastController.show(stringStatic(Strings.ToastImportSuccess))
+                    }.onFailure {
+                        Log.e(it)
+                        alertDialogController.requestConfirmError(
+                            message = it.message ?: stringStatic(Strings.ToastImportFailure),
+                        )
+                    }
+                }
             },
         )
     }

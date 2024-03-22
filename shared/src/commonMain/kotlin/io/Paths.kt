@@ -35,6 +35,12 @@ val Paths.guideAudioRecordFile: File
 val Paths.reclistRecordFile: File
     get() = appRoot.resolve("reclist-usage-record.json")
 
+val Paths.reclistEncodingRecordFile: File
+    get() = appRoot.resolve("reclist-encoding-record.json")
+
+val Paths.reclistCommentEncodingRecordFile: File
+    get() = appRoot.resolve("reclist-comment-encoding-record.json")
+
 fun ensurePaths() {
     ensurePath(Paths.appRoot)
     ensurePath(Paths.contentRoot)

@@ -31,6 +31,8 @@ import ui.common.LocalProgressController
 import ui.common.LocalToastController
 import ui.common.ProgressController
 import ui.common.ToastController
+import ui.encoding.LocalTextEncodingDialogController
+import ui.encoding.TextEncodingDialogController
 import ui.model.AppContext
 import ui.model.LocalAppContext
 import ui.string.*
@@ -53,6 +55,7 @@ class AppDependencies(
     val reclistRepository: ReclistRepository = ReclistRepository(),
     val guideAudioRepository: GuideAudioRepository = GuideAudioRepository(),
     val sessionRepository: SessionRepository = SessionRepository(reclistRepository, guideAudioRepository),
+    val textEncodingDialogController: TextEncodingDialogController = TextEncodingDialogController(),
 )
 
 @Composable
@@ -89,6 +92,7 @@ fun ProvideAppDependencies(
         LocalReclistRepository provides dependencies.reclistRepository,
         LocalSessionRepository provides dependencies.sessionRepository,
         LocalGuideAudioRepository provides dependencies.guideAudioRepository,
+        LocalTextEncodingDialogController provides dependencies.textEncodingDialogController,
     ) {
         content()
     }

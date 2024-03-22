@@ -40,6 +40,7 @@ import repository.LocalReclistRepository
 import ui.common.LocalAlertDialogController
 import ui.common.LocalProgressController
 import ui.common.LocalToastController
+import ui.encoding.LocalTextEncodingDialogController
 import ui.model.LocalAppContext
 import ui.model.LocalSafeAreaInsets
 import ui.model.Screen
@@ -59,11 +60,13 @@ fun App() {
     val progressController = LocalProgressController.current
     val recordRepository = LocalAppRecordRepository.current
     val preferenceRepository = LocalAppPreferenceRepository.current
+    val textEncodingDialogController = LocalTextEncodingDialogController.current
     remember { Migrations.run(recordRepository, preferenceRepository) }
     AppTheme(isDarkMode = LocalThemeIsDarkMode.current) {
         Navigator(MainScreen) { navigator ->
             MainScaffold(navigator)
         }
+        textEncodingDialogController.Compose()
         alertDialogController.Compose()
         toastController.Compose()
         progressController.Compose()
@@ -79,6 +82,7 @@ private fun MainScaffold(navigator: Navigator) {
     val appPreferenceRepository = LocalAppPreferenceRepository.current
     val alertDialogController = LocalAlertDialogController.current
     val toastController = LocalToastController.current
+    val textEncodingDialogController = LocalTextEncodingDialogController.current
     val context = LocalAppContext.current
     LaunchedEffect(navigator.lastItem) {
         appActionStore.onScreenChange(navigator.lastItem as Screen)
@@ -92,6 +96,8 @@ private fun MainScaffold(navigator: Navigator) {
                     reclistRepository,
                     alertDialogController,
                     toastController,
+                    textEncodingDialogController,
+                    appPreferenceRepository,
                 )
                 Action.ImportGuideAudio -> Actions.importGuideAudio(
                     context.coroutineScope,

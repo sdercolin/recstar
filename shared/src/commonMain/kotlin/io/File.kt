@@ -105,3 +105,13 @@ expect class File(path: String) {
      */
     fun source(): Source
 }
+
+/**
+ * Reads the entire file as a String with the given [encoding], or detects the encoding if [encoding] is null.
+ */
+fun File.readTextWithEncodingOrNull(encoding: Encoding?): String =
+    if (encoding != null) {
+        readText(encoding)
+    } else {
+        readTextDetectEncoding()
+    }

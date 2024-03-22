@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.collectLatest
 import model.Action
 import model.Actions
 import repository.LocalAppActionStore
+import repository.LocalAppPreferenceRepository
 import repository.LocalReclistRepository
 import ui.common.ActionButtonWrapper
 import ui.common.ActionMenu
@@ -26,6 +27,7 @@ import ui.common.FloatingActionButton
 import ui.common.ItemListScreenContent
 import ui.common.LocalAlertDialogController
 import ui.common.LocalToastController
+import ui.encoding.LocalTextEncodingDialogController
 import ui.model.LocalAppContext
 import ui.model.LocalSafeAreaInsets
 import ui.model.Screen
@@ -52,6 +54,8 @@ private fun CreateSessionReclistScreen.ScreenActions() {
             val repository = LocalReclistRepository.current
             val alertDialogController = LocalAlertDialogController.current
             val toastController = LocalToastController.current
+            val textEncodingDialogController = LocalTextEncodingDialogController.current
+            val appPreferenceRepository = LocalAppPreferenceRepository.current
             ActionMenuItem(
                 text = string(Strings.CommonImport),
                 icon = Icons.Default.Add,
@@ -63,6 +67,8 @@ private fun CreateSessionReclistScreen.ScreenActions() {
                         repository,
                         alertDialogController,
                         toastController,
+                        textEncodingDialogController,
+                        appPreferenceRepository,
                     )
                 },
             )

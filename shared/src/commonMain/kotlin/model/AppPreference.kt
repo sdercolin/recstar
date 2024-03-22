@@ -23,6 +23,7 @@ data class AppPreference(
     val desiredOutputName: String? = null,
     val sampleRate: SampleRateOption = SampleRateOption.Hz44100,
     val bitDepth: BitDepthOption = BitDepthOption.BitDepth16,
+    val alwaysConfirmTextEncoding: Boolean = false,
 ) : JavaSerializable {
     enum class Language(private val language: StringLanguage?) : LocalizedText {
         Auto(null),

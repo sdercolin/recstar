@@ -26,6 +26,7 @@ enum class Strings {
     ExceptionUnsupportedAudioDevice,
     ExceptionReclistNotFound,
     ExceptionReclistNoValidLine,
+    ExceptionTextDecodeFailure,
     AlertExportTips,
     AlertExportNoData,
     ToastExportDataSuccess,
@@ -116,6 +117,7 @@ enum class Strings {
     PreferenceTitleBarStyleCommentWithFileName,
     PreferenceTitleBarStyleComment,
     PreferenceGroupMisc,
+    PreferenceAlwaysConfirmTextEncoding,
     PreferenceContentRootLocation,
     PreferenceAbout,
     AboutScreenPrivacyPolicy,
@@ -149,6 +151,10 @@ enum class Strings {
     MenuHelpOpenContentDirectory,
     MenuHelpOpenAppDirectory,
     MenuHelpAbout,
+    TextEncodingDialogTitle,
+    TextEncodingDialogEncodingLabel,
+    TextEncodingDialogEncodingAuto,
+    TextEncodingDialogEncodingError,
     ;
 
     fun get(language: Language): String =
