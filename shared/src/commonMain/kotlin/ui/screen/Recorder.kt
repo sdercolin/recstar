@@ -48,6 +48,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
@@ -83,6 +84,7 @@ fun Recorder(
         MaterialTheme.colors.background
     }
     LaunchRecordingKeyPress(model)
+    LaunchSwitchSentenceKeyPress(model)
     Column(modifier = Modifier.fillMaxWidth().background(color = backgroundColor)) {
         RecorderTitleBar(model)
         Column(
@@ -507,6 +509,30 @@ private fun LaunchRecordingKeyPress(model: SessionScreenModel) {
                 if (ev.type == KeyEventType.KeyUp) {
                     model.toggleRecording()
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LaunchSwitchSentenceKeyPress(model: SessionScreenModel) {
+    val keyEventFlow = LocalKeyEventStore.current.flow
+    LaunchedEffect(keyEventFlow) {
+        keyEventFlow.collectLatest { ev ->
+            val isUp = when (ev.key) {
+                Key.DirectionUp -> true
+                Key.DirectionDown -> false
+                else -> return@collectLatest
+            }
+            when (ev.type) {
+                KeyEventType.KeyUp -> {
+                    if (isUp) {
+                        model.previous()
+                    } else {
+                        model.next()
+                    }
+                }
+                else -> return@collectLatest
             }
         }
     }

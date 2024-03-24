@@ -29,6 +29,8 @@ class KeyEventStore(
                 appPreferenceRepository.flow.collectLatest {
                     keys.clear()
                     keys.add(it.recording.recordingShortKey.getKey())
+                    keys.add(Key.DirectionUp)
+                    keys.add(Key.DirectionDown)
                 }
             }
         }
