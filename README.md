@@ -1,6 +1,6 @@
 # RecStar
 
-Select Language: [English](README.md) | [简体中文](README-zhCN.md) | [日本語](README-ja.md)
+Select Language: [English](README.md) | [简体中文](README-zhCN.md) | [日本語](README-ja.md) | [한국어](README-ko.md)
 
 An UTAU style reclist (recording list) recorder application for Desktop/iOS/Android.
 
@@ -17,7 +17,7 @@ An UTAU style reclist (recording list) recorder application for Desktop/iOS/Andr
 - Auto encoding detection when loading text files
 - Adaptive UI layout for landscape and portrait modes
 - Light and dark themes
-- Multi-language support (English, Japanese, Chinese)
+- Multi-language support (English, Japanese, Chinese, Korean)
 
 ## Download
 

@@ -30,6 +30,7 @@ data class AppPreference(
         English(StringLanguage.English),
         SimplifiedChinese(StringLanguage.ChineseSimplified),
         Japanese(StringLanguage.Japanese),
+        Korean(StringLanguage.Korean),
         ;
 
         fun getLanguage(): StringLanguage = language ?: findBestMatchedLanguage()
