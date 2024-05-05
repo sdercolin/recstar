@@ -162,6 +162,7 @@ enum class Strings {
             Language.English -> en()
             Language.ChineseSimplified -> zhHans()
             Language.Japanese -> ja()
+            Language.Korean -> ko()
         } ?: en()
 }
 

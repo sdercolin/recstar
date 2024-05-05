@@ -1,6 +1,6 @@
 # RecStar
 
-选择语言：[English](README.md) | [简体中文](README-zhCN.md) | [日本語](README-ja.md)
+选择语言：[English](README.md) | [简体中文](README-zhCN.md) | [日本語](README-ja.md) | [한국어](README-ko.md)
 
 基于 UTAU 式录音表的音频录制工具，支持桌面/iOS/Android平台。
 
@@ -19,7 +19,7 @@
 - 加载文本文件时自动编码检测
 - 横屏和竖屏模式下的自适应UI布局
 - 浅色和深色主题
-- 多语言支持（英语、日语、中文）
+- 多语言支持（英语、日语、中文, 韩国）
 
 ## 下载
 
