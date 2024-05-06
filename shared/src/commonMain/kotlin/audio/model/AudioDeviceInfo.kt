@@ -1,4 +1,4 @@
-package audio
+package audio.model
 
 import androidx.compose.runtime.Composable
 import ui.string.*

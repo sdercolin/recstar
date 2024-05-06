@@ -1,5 +1,6 @@
 package audio
 
+import audio.model.WavData
 import const.WavFormat
 import io.File
 import kotlinx.io.Source

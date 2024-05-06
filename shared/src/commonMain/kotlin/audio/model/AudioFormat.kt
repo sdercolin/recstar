@@ -1,4 +1,4 @@
-package audio
+package audio.model
 
 import model.AppPreference
 import model.AppPreference.BitDepthOption

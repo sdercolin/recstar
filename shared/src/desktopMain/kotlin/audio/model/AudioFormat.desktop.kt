@@ -1,4 +1,4 @@
-package audio
+package audio.model
 
 import model.AppPreference
 import javax.sound.sampled.AudioFormat.Encoding

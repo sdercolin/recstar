@@ -1,6 +1,6 @@
 package exception
 
-import audio.AudioFormat
+import audio.model.AudioFormat
 import ui.string.*
 
 class UnsupportedAudioFormatException(val format: AudioFormat) :

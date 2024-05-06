@@ -1,5 +1,7 @@
 package audio
 
+import audio.model.getAudioFormat
+import audio.model.getAudioOutputDeviceInfos
 import exception.UnsupportedAudioDeviceException
 import exception.UnsupportedAudioFormatException
 import io.File

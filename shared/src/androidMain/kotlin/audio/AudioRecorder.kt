@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
+import audio.model.WavData
+import audio.model.getAudioFormat
 import const.WavFormat
 import exception.UnsupportedAudioFormatException
 import io.File

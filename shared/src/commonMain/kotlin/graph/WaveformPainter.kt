@@ -1,7 +1,7 @@
 package graph
 
-import audio.WavData
 import audio.WavReader
+import audio.model.WavData
 import io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

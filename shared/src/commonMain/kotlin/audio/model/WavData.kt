@@ -1,4 +1,4 @@
-package audio
+package audio.model
 
 /**
  * Layers: frame -> channel

@@ -39,11 +39,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import audio.AudioDeviceInfoList
-import audio.getAudioFormat
-import audio.getAudioInputDeviceInfos
-import audio.getAudioOutputDeviceInfos
-import audio.isSupported
+import audio.model.AudioDeviceInfoList
+import audio.model.getAudioFormat
+import audio.model.getAudioInputDeviceInfos
+import audio.model.getAudioOutputDeviceInfos
+import audio.model.isSupported
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import const.APP_NAME

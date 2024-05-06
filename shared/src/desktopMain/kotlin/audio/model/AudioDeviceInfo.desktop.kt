@@ -1,4 +1,4 @@
-package audio
+package audio.model
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
