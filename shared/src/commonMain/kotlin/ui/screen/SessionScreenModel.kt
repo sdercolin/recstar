@@ -17,7 +17,8 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import exception.SessionRenameExistingException
 import exception.SessionRenameInvalidException
-import graph.WaveformPainter
+import graph.GraphPainter
+import graph.PitchPainter
 import io.File
 import io.FileInteractor
 import io.LocalFileInteractor
@@ -133,7 +134,7 @@ class SessionScreenModel(
         sessionRepository.updateUsedTime(session.name)
     }
 
-    var currentIndex: Int by savedMutableStateOf(0) { waveformPainter.switch(currentFile) }
+    var currentIndex: Int by savedMutableStateOf(0) { graphPainter.switch(currentFile) }
         private set
 
     private var isRequestedRecording: Boolean by mutableStateOf(false)
@@ -205,7 +206,7 @@ class SessionScreenModel(
     }
 
     private val recorderListener = object : AudioRecorder.Listener {
-        var waveformPainter: WaveformPainter? = null
+        var graphPainter: GraphPainter? = null
         var lastSentenceIndex: Int? = null
 
         override fun onStarted() {
@@ -218,7 +219,7 @@ class SessionScreenModel(
             Log.d("AudioRecorderListener onStopped, state: $state")
             val isSwitching = state == RecordingScheduler.State.Switching
             if (state != RecordingScheduler.State.RecordingStandby) {
-                waveformPainter?.onStopRecording(isSwitching)
+                graphPainter?.onStopRecording(isSwitching)
             }
             if (isSwitching) {
                 switchScheduled()
@@ -237,7 +238,7 @@ class SessionScreenModel(
         override fun onStarted() {
             if (scheduler.state == RecordingScheduler.State.Switching || !isRecording) {
                 startRecordingSchedule()
-                waveformPainter.clear()
+                graphPainter.clear()
                 isRecording = true
             }
         }
@@ -275,16 +276,17 @@ class SessionScreenModel(
         errorNotifier,
         appPreferenceRepository,
     ).get()
-    private val waveformPainter = WaveformPainter(
+    private val graphPainter = GraphPainter(
         recorder.waveDataFlow,
         screenModelScope,
         errorNotifier,
     ).apply {
         switch(currentFile)
-        recorderListener.waveformPainter = this
+        recorderListener.graphPainter = this
     }
 
-    val waveformFlow: Flow<Array<Array<FloatArray>>> = waveformPainter.flow
+    val waveformFlow: Flow<Array<Array<FloatArray>>> = graphPainter.waveform
+    val pitchFlow: Flow<PitchPainter.PitchGraphData> = graphPainter.pitch
 
     private val guidePlayer = AudioPlayerProvider(
         guidePlayerListener,
@@ -379,7 +381,7 @@ class SessionScreenModel(
             return
         }
         recorder.start(currentFile)
-        waveformPainter.onStartRecording()
+        graphPainter.onStartRecording()
     }
 
     private fun prepareOutputFile() {
@@ -398,7 +400,7 @@ class SessionScreenModel(
         } else {
             updateCurrentSentence()
             isRecording = false
-            waveformPainter.onStopRecording(false)
+            graphPainter.onStopRecording(false)
             postScheduler.onFinishRecording(guideAudioConfig)
         }
         if (guidePlayer.isPlaying()) {
@@ -550,7 +552,7 @@ class SessionScreenModel(
         recorder.dispose()
         player.dispose()
         guidePlayer.dispose()
-        waveformPainter.dispose()
+        graphPainter.dispose()
         super.onDispose()
     }
 }

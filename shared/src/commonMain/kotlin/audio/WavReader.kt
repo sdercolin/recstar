@@ -1,5 +1,6 @@
 package audio
 
+import androidx.compose.runtime.Immutable
 import audio.model.WavData
 import const.WavFormat
 import io.File
@@ -13,11 +14,17 @@ import util.Log
 
 @Suppress("UNUSED_VARIABLE")
 class WavReader {
+    @Immutable
+    class Wav(
+        val sampleRate: Int,
+        val data: WavData,
+    )
+
     /**
-     * Reads the given [file] and returns the audio data as [WavData] (value in float -1~1). If the file has multiple
-     * channels, the data will be merged into a single channel.
+     * Reads the given [file] and returns the audio data as [WavData] (value in float -1~1) with some other info. If the
+     * file has multiple channels, the data will be merged into a single channel.
      */
-    fun read(file: File): WavData {
+    fun read(file: File): Wav {
         val source = file.source()
         val chunkId = source.readString(4)
         val chunkSize = source.readIntLe()
@@ -125,7 +132,8 @@ class WavReader {
         }
 
         source.close()
-        return data.toTypedArray()
+        val wavData = data.toTypedArray()
+        return Wav(sampleRate, wavData)
     }
 
     private fun readPcmSample(

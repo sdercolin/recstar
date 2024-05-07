@@ -15,7 +15,11 @@ import kotlin.math.pow
 data class PitchData(
     val freq: List<Float>,
     val corr: List<Float>,
-)
+) {
+    companion object {
+        val EMPTY = PitchData(listOf(), listOf())
+    }
+}
 
 /**
  * Convert wave data to pitch data.

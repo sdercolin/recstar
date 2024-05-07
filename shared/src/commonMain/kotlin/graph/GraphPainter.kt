@@ -1,6 +1,7 @@
 package graph
 
 import audio.WavReader
+import audio.model.FundamentalConfigs
 import audio.model.WavData
 import io.File
 import kotlinx.coroutines.CoroutineScope
@@ -12,16 +13,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import ui.common.ErrorNotifier
 
-class WaveformPainter(
+class GraphPainter(
     private val recordingFlow: Flow<WavData>,
     private val coroutineScope: CoroutineScope,
     private val errorNotifier: ErrorNotifier,
 ) {
     private var pointPerPixel = 60
 
-    // Layers: [channel][point][max/min]
-    private val _flow = MutableStateFlow(emptyArray<Array<FloatArray>>())
-    val flow: Flow<Array<Array<FloatArray>>> = _flow
+    // Layers: [channel][point][max/min], value range: [-1, 1]
+    private val _waveform = MutableStateFlow(emptyArray<Array<FloatArray>>())
+    val waveform: Flow<Array<Array<FloatArray>>> = _waveform
+
+    private val pitchPainter = PitchPainter(pointPerPixel)
+
+    val pitch: Flow<PitchPainter.PitchGraphData> get() = pitchPainter.pitch
 
     private val wavReader = WavReader()
 
@@ -29,7 +34,7 @@ class WaveformPainter(
 
     fun switch(file: File) {
         pendingFile = file
-        if (job?.isActive == true) return
+        if (recordingFlowCollectionJob?.isActive == true) return
         consumePendingFile()
     }
 
@@ -41,28 +46,35 @@ class WaveformPainter(
             }.onFailure {
                 errorNotifier.notify(it)
             }.onSuccess {
-                _flow.value = getSampledData(it)
+                _waveform.value = getSampledData(it.data)
+                pendingFilePitchCalculationJob?.cancel()
+                pendingFilePitchCalculationJob = coroutineScope.launch {
+                    pitchPainter.putData(it.data, it.sampleRate, FundamentalConfigs())
+                }
             }
         } else {
-            _flow.value = emptyArray()
+            _waveform.value = emptyArray()
         }
     }
 
-    private var job: Job? = null
+    private var recordingFlowCollectionJob: Job? = null
+    private var pendingFilePitchCalculationJob: Job? = null
 
     fun onStartRecording() {
-        job?.cancel()
-        job = coroutineScope.launch(Dispatchers.Default) {
+        recordingFlowCollectionJob?.cancel()
+        recordingFlowCollectionJob = coroutineScope.launch(Dispatchers.Default) {
             recordingFlow.collect { data ->
-                _flow.value = getSampledData(data)
+                _waveform.value = getSampledData(data)
             }
         }
     }
 
     fun clear() {
-        job?.cancel()
-        job = null
-        _flow.value = emptyArray()
+        recordingFlowCollectionJob?.cancel()
+        recordingFlowCollectionJob = null
+        pendingFilePitchCalculationJob?.cancel()
+        pendingFilePitchCalculationJob = null
+        _waveform.value = emptyArray()
     }
 
     private fun getSampledData(data: WavData): Array<Array<FloatArray>> {
@@ -91,8 +103,8 @@ class WaveformPainter(
 
     fun onStopRecording(isSwitchingScheduled: Boolean) {
         coroutineScope.launch {
-            job?.cancelAndJoin()
-            job = null
+            recordingFlowCollectionJob?.cancelAndJoin()
+            recordingFlowCollectionJob = null
             if (!isSwitchingScheduled) {
                 consumePendingFile()
             }
@@ -100,8 +112,8 @@ class WaveformPainter(
     }
 
     fun dispose() {
-        job?.cancel()
-        job = null
+        recordingFlowCollectionJob?.cancel()
+        recordingFlowCollectionJob = null
         pendingFile = null
     }
 }

@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import graph.PitchPainter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import repository.LocalAppPreferenceRepository
@@ -109,6 +110,11 @@ fun Recorder(
                 onTogglePlaying = model::togglePlaying,
                 guideAudioName = model.guideAudioConfig?.name,
                 onClickGuideAudioName = { navigator push GuideAudioScreen(model.name) },
+            )
+            RecorderPitchGraph(
+                isRecording = model.isRecording,
+                pitchFlow = model.pitchFlow,
+                playingProgress = model.playingProgress,
             )
             if (LocalThemeIsDarkMode.current.not()) {
                 Divider(color = MaterialTheme.colors.surface)
@@ -335,6 +341,57 @@ private fun ColumnScope.RecorderWaveform(
                 contentDescription = string(Strings.SessionScreenActionConfigureGuideAudio),
                 tint = iconTint,
             )
+        }
+    }
+}
+
+@Composable
+private fun ColumnScope.RecorderPitchGraph(
+    isRecording: Boolean,
+    pitchFlow: Flow<PitchPainter.PitchGraphData>,
+    playingProgress: Float?,
+) {
+    val isDarkMode = LocalThemeIsDarkMode.current
+    val paperColor = if (isDarkMode) Color.Black else Color.White
+    Box(modifier = Modifier.weight(1f).fillMaxWidth().background(color = paperColor)) {
+        val pitchData by pitchFlow.collectAsState(initial = PitchPainter.PitchGraphData(0, emptyArray()))
+        val color = if (isDarkMode) {
+            if (isRecording) MaterialTheme.colors.secondary else MaterialTheme.colors.primary
+        } else {
+            if (isRecording) MaterialTheme.colors.primaryVariant else MaterialTheme.colors.onBackground
+        }
+        val playerCursorColor = if (isDarkMode) MaterialTheme.colors.secondary else MaterialTheme.colors.primaryVariant
+
+        Canvas(modifier = Modifier.fillMaxSize().padding(bottom = 8.dp)) {
+            val width = size.width.toInt()
+            val height = size.height.toInt()
+            val paddedLength = (width - pitchData.wavPixelLength).coerceAtLeast(0)
+            val paddedLengthRelative = paddedLength.toFloat() / pitchData.wavPixelLength
+            var lastPoint: Offset? = null
+            for (element in pitchData.pitch) {
+                val (x, y, corr) = element
+                val xInCanvas = (x * (1f - paddedLengthRelative) + paddedLengthRelative) * width
+                val yInCanvas = y * height
+                val colorWithCorr = color.copy(alpha = corr.coerceIn(0f, 1f))
+                if (lastPoint != null) {
+                    drawLine(
+                        color = colorWithCorr,
+                        start = lastPoint,
+                        end = Offset(xInCanvas, yInCanvas),
+                        strokeWidth = 1f,
+                    )
+                }
+                lastPoint = Offset(xInCanvas, yInCanvas)
+            }
+            if (playingProgress != null && playingProgress in 0f..1f) {
+                val x = playingProgress * width
+                drawLine(
+                    color = playerCursorColor,
+                    start = Offset(x, 0f),
+                    end = Offset(x, height.toFloat()),
+                    strokeWidth = 2f,
+                )
+            }
         }
     }
 }

@@ -186,7 +186,7 @@ fun WavData.toFundamentalSwipePrime(
 ): PitchData {
     // Calculate kernel of each candidateFreq.
     val kernelData = SwipeKernel.getKernel(conf, sampleRate)
-        ?: return PitchData(listOf(0f), listOf(0f))
+        ?: return PitchData.EMPTY
 
     // Calculate the window size according to the 3.7.
     // Always use the Hanning window which has k=2. So T = 4k/f = 8/f.
@@ -328,7 +328,7 @@ private fun WavData.fastFourierTransformSwipe(
     maxHarmonicFrequency: Float,
 ): List<DoubleArray> {
     // Sum all channels.
-    val data = this.map { it.sum() }
+    val data = this.map { it.average() }
 
     // According to 3.10.1.1, the hop size is half of the window size.
     val maxFrequencyRate = maxHarmonicFrequency / sampleRate * 2
@@ -338,7 +338,7 @@ private fun WavData.fastFourierTransformSwipe(
     // Pad the data and apply window.
     val paddedData = List(windowSize / 2) { 0.0 } + data.toList() + List(windowSize / 2) { 0.0 }
     val frames = paddedData.windowed(windowSize, hopSize) { frame ->
-        frame.mapIndexed { index, point -> point.toDouble() * window[index] }.toDoubleArray()
+        frame.mapIndexed { index, point -> point * window[index] }.toDoubleArray()
     }
 
     // FFT
