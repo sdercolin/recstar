@@ -127,7 +127,7 @@ class FastFourier(signal: DoubleArray) {
     }
 
     fun getMagnitude(): DoubleArray {
-        return output.map { it.getAbs() }.toDoubleArray()
+        return output.map { it.getAbs() }.take(output.size / 2 + 1).toDoubleArray()
     }
 }
 

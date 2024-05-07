@@ -52,7 +52,6 @@ object Semitone {
 @Immutable
 data class FundamentalConfigs(
     val enabled: Boolean = DEFAULT_ENABLED,
-    val semitoneResolution: Int = DEFAULT_SEMITONE_RESOLUTION,
     val centerSemitone: Int = DEFAULT_CENTER_SEMITONE,
     val radiusSemitone: Int = DEFAULT_RADIUS_SEMITONE,
     val semitoneSampleNum: Int = DEFAULT_SEMITONE_SAMPLE_NUM,
@@ -62,7 +61,6 @@ data class FundamentalConfigs(
     val maxDisplayCorr: Float = DEFAULT_MAX_DISPLAY_CORR,
 ) {
     fun validate() {
-        require(semitoneResolution > 0) { "semitoneResolution must be positive" }
         require(radiusSemitone >= 0) { "radiusSemitone must be non-negative" }
         require(semitoneSampleNum > 0) { "semitoneSampleNum must be positive" }
         require(maxHarmonicFrequency > 0) { "maxHarmonicFrequency must be positive" }
@@ -74,10 +72,9 @@ data class FundamentalConfigs(
 
     companion object {
         const val DEFAULT_ENABLED = false
-        const val DEFAULT_SEMITONE_RESOLUTION = 8
         const val DEFAULT_CENTER_SEMITONE = 60
         const val DEFAULT_RADIUS_SEMITONE = 1
-        const val DEFAULT_SEMITONE_SAMPLE_NUM = 8
+        const val DEFAULT_SEMITONE_SAMPLE_NUM = 16
         const val DEFAULT_MAX_HARMONIC_FREQUENCY = 5000.0f
         const val DEFAULT_ERBS_STEP = 0.1f
         const val DEFAULT_MIN_DISPLAY_CORR = 0.0f

@@ -353,7 +353,7 @@ private fun ColumnScope.RecorderPitchGraph(
 ) {
     val isDarkMode = LocalThemeIsDarkMode.current
     val paperColor = if (isDarkMode) Color.Black else Color.White
-    Box(modifier = Modifier.weight(1f).fillMaxWidth().background(color = paperColor)) {
+    Box(modifier = Modifier.weight(0.5f).fillMaxWidth().background(color = paperColor)) {
         val pitchData by pitchFlow.collectAsState(initial = PitchPainter.PitchGraphData(0, emptyArray()))
         val color = if (isDarkMode) {
             if (isRecording) MaterialTheme.colors.secondary else MaterialTheme.colors.primary
@@ -371,7 +371,7 @@ private fun ColumnScope.RecorderPitchGraph(
             for (element in pitchData.pitch) {
                 val (x, y, corr) = element
                 val xInCanvas = (x * (1f - paddedLengthRelative) + paddedLengthRelative) * width
-                val yInCanvas = y * height
+                val yInCanvas = height - y * height
                 val colorWithCorr = color.copy(alpha = corr.coerceIn(0f, 1f))
                 if (lastPoint != null) {
                     drawLine(

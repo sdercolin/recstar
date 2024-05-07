@@ -49,7 +49,7 @@ private class GeneralCosineWindow(
 
     private fun generateWindow(): DoubleArray {
         val tempLen: Int = extend(len, sym)
-        val tempArr: DoubleArray = linspace(PI, PI, tempLen, true)
+        val tempArr: DoubleArray = linspace(-PI, PI, tempLen, true)
         val window = DoubleArray(tempLen)
         window.fill(0.0)
         for (i in weights.indices) {

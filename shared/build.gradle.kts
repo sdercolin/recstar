@@ -103,6 +103,11 @@ kotlin {
                 implementation("androidx.documentfile:documentfile:1.0.1")
             }
         }
+        val desktopTest by getting {
+            dependencies {
+                implementation("com.github.psambit9791:jdsp:1.0.0")
+            }
+        }
         if (includeIos) {
             val iosX64Main by getting
             val iosArm64Main by getting
