@@ -110,6 +110,7 @@ actual class FileInteractor actual constructor(
 
         if (fileURLs.isEmpty()) {
             alertDialogController.requestConfirm(message = stringStatic(Strings.AlertExportNoData))
+            request.onCancel?.invoke()
             return
         }
 
