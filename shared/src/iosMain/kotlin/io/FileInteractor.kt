@@ -1,8 +1,10 @@
 package io
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.useContents
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import platform.CoreGraphics.CGRectMake
 import platform.Foundation.NSDirectoryEnumerationSkipsHiddenFiles
 import platform.Foundation.NSError
 import platform.Foundation.NSFileManager
@@ -14,7 +16,11 @@ import platform.UIKit.UIActivityTypeAssignToContact
 import platform.UIKit.UIActivityTypeSaveToCameraRoll
 import platform.UIKit.UIActivityViewController
 import platform.UIKit.UIApplication
+import platform.UIKit.UIDevice
 import platform.UIKit.UIDocumentPickerViewController
+import platform.UIKit.UIPopoverArrowDirectionAny
+import platform.UIKit.UIUserInterfaceIdiomPad
+import platform.UIKit.popoverPresentationController
 import ui.common.AlertDialogController
 import ui.common.ToastController
 import ui.common.requestConfirm
@@ -148,6 +154,17 @@ actual class FileInteractor actual constructor(
                 }
 
             context.coroutineScope.launch(Dispatchers.Main) {
+                if (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+                    popoverPresentationController?.sourceView = uiViewController.view
+                    popoverPresentationController?.sourceRect = CGRectMake(
+                        uiViewController.view.bounds.useContents { this.origin.x + this.size.width / 2 },
+                        uiViewController.view.bounds.useContents { this.origin.y + this.size.height / 2 },
+                        0.0,
+                        0.0,
+                    )
+                    popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirectionAny
+                }
+
                 uiViewController.presentModalViewController(this@apply, true)
             }
         }
