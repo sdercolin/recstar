@@ -126,6 +126,7 @@ fun Strings.ja(): String? =
             "こちらのデバイス設定を変更する代わりに、システム設定で使用するデバイスを選択することをおすすめします。"
         PreferenceInputDeviceName -> "入力デバイス"
         PreferenceOutputDeviceName -> "出力デバイス"
+        PreferencePreferBuiltInMicrophone -> "内蔵マイクを優先"
         PreferenceSampleRate -> "サンプリングレート"
         PreferenceBitDepth -> "ビット深度"
         PreferenceDeviceNameNotFoundTemplate -> "{0}（不明）"

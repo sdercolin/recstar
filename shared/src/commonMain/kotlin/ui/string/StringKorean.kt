@@ -135,6 +135,7 @@ fun Strings.ko(): String =
                 "시스템 설정에서 장치를 변경해주세요."
         PreferenceInputDeviceName -> "입력 기기"
         PreferenceOutputDeviceName -> "출력 기기"
+        PreferencePreferBuiltInMicrophone -> "내장 마이크 우선 사용"
         PreferenceSampleRate -> "샘플 레이트"
         PreferenceBitDepth -> "Bit Depth"
         PreferenceDeviceNameNotFoundTemplate -> "{0} (찾지 못함)"

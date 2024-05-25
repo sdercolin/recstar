@@ -65,7 +65,7 @@ class AudioRecorderImpl(
         _waveDataFlow.value = arrayOf(FloatArray(0))
         job = scope.launch(Dispatchers.IO) {
             runCatchingCancellable {
-                AudioSession.initialize()
+                AudioSession.initialize(appPreferenceRepository)
                 withNSError { e ->
                     val desiredFormat = this@AudioRecorderImpl.format
                     val settings = mapOf<Any?, Any>(

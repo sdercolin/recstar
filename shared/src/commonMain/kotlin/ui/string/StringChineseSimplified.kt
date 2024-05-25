@@ -116,6 +116,7 @@ fun Strings.zhHans(): String? =
         PreferenceGroupAudioDescription -> "请尽可能地在系统设置处选择您所需要的音频设备，而不是修改此处的音频设备设置。"
         PreferenceInputDeviceName -> "输入设备"
         PreferenceOutputDeviceName -> "输出设备"
+        PreferencePreferBuiltInMicrophone -> "优先使用内置麦克风"
         PreferenceSampleRate -> "采样率"
         PreferenceBitDepth -> "位深度"
         PreferenceDeviceNameNotFoundTemplate -> "{0}（未知）"

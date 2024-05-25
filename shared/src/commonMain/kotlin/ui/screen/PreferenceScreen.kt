@@ -65,6 +65,7 @@ import ui.string.*
 import util.Log
 import util.appVersion
 import util.isDesktop
+import util.isIos
 import util.isMacIntel
 import util.runIf
 import util.runIfHave
@@ -220,6 +221,14 @@ private fun ScreenContent() {
                         options = info.deviceInfos.filterNot { it.notFound },
                     )
                 }
+            }
+            if (isIos) {
+                SwitchItem(
+                    title = string(Strings.PreferencePreferBuiltInMicrophone),
+                    info = null,
+                    value = value.preferBuiltInMic,
+                    onValueChanged = { repository.update { copy(preferBuiltInMic = it) } },
+                )
             }
             SelectionItem(
                 title = string(Strings.PreferenceSampleRate),

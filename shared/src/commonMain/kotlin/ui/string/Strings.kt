@@ -107,6 +107,7 @@ enum class Strings {
     PreferenceGroupAudioDescription,
     PreferenceInputDeviceName,
     PreferenceOutputDeviceName,
+    PreferencePreferBuiltInMicrophone,
     PreferenceSampleRate,
     PreferenceBitDepth,
     PreferenceDeviceNameNotFoundTemplate,

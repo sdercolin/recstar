@@ -21,6 +21,7 @@ data class AppPreference(
     val titleBarStyle: TitleBarStyle = TitleBarStyle.FileNameWithComment,
     val desiredInputName: String? = null,
     val desiredOutputName: String? = null,
+    val preferBuiltInMic: Boolean = false,
     val sampleRate: SampleRateOption = SampleRateOption.Hz44100,
     val bitDepth: BitDepthOption = BitDepthOption.BitDepth16,
     val alwaysConfirmTextEncoding: Boolean = false,

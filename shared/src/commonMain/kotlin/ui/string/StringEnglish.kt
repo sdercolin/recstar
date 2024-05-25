@@ -135,6 +135,7 @@ fun Strings.en(): String =
                 "rather than modifying the audio device settings here."
         PreferenceInputDeviceName -> "Input Device"
         PreferenceOutputDeviceName -> "Output Device"
+        PreferencePreferBuiltInMicrophone -> "Prefer Built-in Microphone"
         PreferenceSampleRate -> "Sample Rate"
         PreferenceBitDepth -> "Bit Depth"
         PreferenceDeviceNameNotFoundTemplate -> "{0} (Not Found)"

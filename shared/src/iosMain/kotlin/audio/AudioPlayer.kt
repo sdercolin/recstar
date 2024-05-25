@@ -50,7 +50,7 @@ class AudioPlayerImpl(
         }
         job = scope.launch(Dispatchers.IO) {
             runCatchingCancellable {
-                AudioSession.initialize()
+                AudioSession.initialize(appPreferenceRepository)
                 val lastModified = file.lastModified
                 if (lastLoadedFile != file || lastLoadedFileModified != lastModified) {
                     val url = file.toNSURL()
