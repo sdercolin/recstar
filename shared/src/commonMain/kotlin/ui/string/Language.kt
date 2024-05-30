@@ -13,6 +13,7 @@ enum class Language(val code: String, val displayName: String) {
     ChineseSimplified("zh-Hans", "简体中文"),
     Japanese("ja", "日本語"),
     Korean("ko", "한국어"),
+    Russian("ru", "Русский"),
     ;
 
     companion object {
