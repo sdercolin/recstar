@@ -1,6 +1,6 @@
 # RecStar
 
-言語を選択：[English](README.md) | [简体中文](README-zhCN.md) | [日本語](README-ja.md) | [한국어](README-ko.md)
+言語を選択：[English](README.md) | [简体中文](README-zhCN.md) | [日本語](README-ja.md) | [한국어](README-ko.md) | [Русский](README-ru.md)
 
 UTAU スタイルの録音リストを扱う録音アプリケーション。デスクトップ/iOS/Androidに対応しています。
 
