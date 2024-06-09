@@ -1,6 +1,6 @@
 # RecStar
 
-언어 선택: [English](README.md) | [简体中文](README-zhCN.md) | [日本語](README-ja.md) | [한국어](README-ko.md)
+언어 선택: [English](README.md) | [简体中文](README-zhCN.md) | [日本語](README-ja.md) | [한국어](README-ko.md) | [Русский](README-ru.md)
 
 컴퓨터 / iOS / Android용 UTAU 형식 reclist (녹음 리스트) 녹음 프로그램
 
