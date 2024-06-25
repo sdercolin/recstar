@@ -28,7 +28,8 @@ class ItemUsedTimeRepositoryImpl<T : ListItem<T>>(
 
     override fun loadUsedTimes() {
         runCatching {
-            recordFile.takeIf { it.exists() }?.readText()?.parseJson<Map<String, Long>>()
+            recordFile.takeIf { it.exists() }?.readText()?.runCatching { parseJson<Map<String, Long>>() }
+                ?.getOrNull()
                 ?.toMutableMap() ?: mutableMapOf()
         }.onSuccess { map ->
             usedTimeMap.clear()

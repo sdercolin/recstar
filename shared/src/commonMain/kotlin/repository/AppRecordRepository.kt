@@ -56,7 +56,9 @@ class AppRecordRepository(appRecord: AppRecord, private val scope: CoroutineScop
 
 fun createAppRecordRepository(scope: CoroutineScope): AppRecordRepository {
     val recordText = Paths.appRecordFile.takeIf { it.exists() }?.readText()
-    val appRecord = recordText?.parseJson() ?: AppRecord()
+    val appRecord = recordText?.runCatching { parseJson<AppRecord>() }?.getOrNull() ?: AppRecord().also {
+        Paths.appRecordFile.writeText(it.stringifyJson())
+    }
     return AppRecordRepository(appRecord, scope)
 }
 

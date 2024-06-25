@@ -26,9 +26,10 @@ class AppPreferenceRepository(appPreference: AppPreference) {
 
 fun createAppPreferenceRepository(): AppPreferenceRepository {
     val preferenceText = Paths.appPreferenceFile.takeIf { it.exists() }?.readText()
-    val appPreference = preferenceText?.parseJson() ?: AppPreference().also {
-        Paths.appPreferenceFile.writeText(it.stringifyJson())
-    }
+    val appPreference = preferenceText?.runCatching { parseJson<AppPreference>() }?.getOrNull()
+        ?: AppPreference().also {
+            Paths.appPreferenceFile.writeText(it.stringifyJson())
+        }
     return AppPreferenceRepository(appPreference)
 }
 
