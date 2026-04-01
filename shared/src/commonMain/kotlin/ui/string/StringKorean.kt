@@ -83,7 +83,7 @@ fun Strings.ko(): String =
         CreateSessionReclistScreenActionImportCommentAlertMessage ->
             "녹음 리스트의 코멘트 파일도 불러오시겠습니까? (-comment.txt)"
         CreateSessionReclistScreenActionImportCommentFileWarningMessage ->
-            "선택한 파일이 코멘트 파일인 것 같습니다. 대신 해당 녹음 리스트 파일을 선택해 주세요."
+            "선택한 파일은 부속 코멘트 파일일 수 있습니다. 녹음 리스트 본체를 다시 선택하려면 이 대화상자를 닫아 주세요."
         CreateSessionReclistScreenAllReclists -> "녹음 리스트"
         CreateSessionReclistScreenEmpty -> "녹음 리스트를 먼저 불러와 주세요."
         CreateSessionReclistScreenContinue -> "완료"

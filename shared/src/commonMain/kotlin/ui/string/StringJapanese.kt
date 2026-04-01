@@ -77,7 +77,7 @@ fun Strings.ja(): String? =
         CreateSessionReclistScreenActionImportCommentAlertMessage ->
             "続いてコメントファイル（-comment.txt）をインポートしますか？"
         CreateSessionReclistScreenActionImportCommentFileWarningMessage ->
-            "選択されたファイルはコメントファイルのようです。代わりに対応する録音リストファイルを選択してください。"
+            "選択されたファイルは付属のコメントファイルである可能性があります。録音リスト本体を選択し直す場合はこのダイアログを閉じてください。"
         CreateSessionReclistScreenAllReclists -> "録音リスト"
         CreateSessionReclistScreenEmpty -> "録音リストをインポートしてください。"
         CreateSessionReclistScreenContinue -> "完了"

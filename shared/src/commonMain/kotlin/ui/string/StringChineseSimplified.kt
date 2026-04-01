@@ -68,7 +68,7 @@ fun Strings.zhHans(): String? =
         CreateSessionReclistScreenActionImport -> "导入录音表"
         CreateSessionReclistScreenActionImportCommentAlertMessage -> "是否要继续导入对应的注释文件（-comment.txt）？"
         CreateSessionReclistScreenActionImportCommentFileWarningMessage ->
-            "所选文件似乎是注释文件，请改为选择对应的录音表文件。"
+            "所选文件可能是附属的注释文件。如需重新选择录音表本体，请关闭此对话框。"
         CreateSessionReclistScreenAllReclists -> "录音表"
         CreateSessionReclistScreenEmpty -> "请先导入录音表。"
         CreateSessionReclistScreenContinue -> "完成"

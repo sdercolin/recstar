@@ -88,7 +88,8 @@ fun Strings.ru(): String =
         CreateSessionReclistScreenActionImportCommentAlertMessage ->
             "Хотите ли вы импортировать соответствующий файл комментариев (-comment.txt)?"
         CreateSessionReclistScreenActionImportCommentFileWarningMessage ->
-            "Выбранный файл похож на файл комментариев. Пожалуйста, выберите соответствующий файл реклиста."
+            "Выбранный файл может являться прилагаемым файлом комментариев. " +
+                "Если вы хотите выбрать сам реклист, пожалуйста, закройте этот диалог."
         CreateSessionReclistScreenAllReclists -> "Реклисты"
         CreateSessionReclistScreenEmpty -> "Пожалуйста, сначала импортируйте реклист."
         CreateSessionReclistScreenContinue -> "Закончить"

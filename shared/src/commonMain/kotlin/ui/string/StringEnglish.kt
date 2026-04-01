@@ -83,7 +83,8 @@ fun Strings.en(): String =
         CreateSessionReclistScreenActionImportCommentAlertMessage ->
             "Do you want to import the corresponding comment file (-comment.txt)?"
         CreateSessionReclistScreenActionImportCommentFileWarningMessage ->
-            "The selected file appears to be a comment file. Please select the corresponding reclist file instead."
+            "The selected file may be an accompanying comment file. " +
+                "If you want to select the reclist itself, please close this dialog."
         CreateSessionReclistScreenAllReclists -> "Reclists"
         CreateSessionReclistScreenEmpty -> "Please import a reclist first."
         CreateSessionReclistScreenContinue -> "Finish"
