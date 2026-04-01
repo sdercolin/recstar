@@ -33,6 +33,7 @@ class AudioPlayerImpl(
     private var countingJob: Job? = null
     private var lastLoadedFile: File? = null
     private var lastLoadedFileModified: Long? = null
+    private var volume: Float = 1.0f
 
     private val delegate = AVAudioPlayerDelegate {
         scope.launch(Dispatchers.Main) {
@@ -57,6 +58,7 @@ class AudioPlayerImpl(
                     withNSError { e ->
                         audioPlayer = AVAudioPlayer(contentsOfURL = url, error = e).apply {
                             delegate = this@AudioPlayerImpl.delegate
+                            this.volume = this@AudioPlayerImpl.volume
                             prepareToPlay()
                             setCurrentTime(positionMs / 1000.0)
                             play()
@@ -111,6 +113,11 @@ class AudioPlayerImpl(
     }
 
     override fun isPlaying(): Boolean = audioPlayer?.isPlaying() ?: false
+
+    override fun setVolume(volume: Float) {
+        this.volume = volume
+        audioPlayer?.volume = volume
+    }
 
     override fun dispose() {
         runCatching {

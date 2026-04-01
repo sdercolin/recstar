@@ -44,6 +44,11 @@ interface AudioPlayer {
     fun isPlaying(): Boolean
 
     /**
+     * Sets the playback volume. [volume] should be in the range [0.0, 1.0].
+     */
+    fun setVolume(volume: Float)
+
+    /**
      * Disposes of the resources used by the player.
      */
     fun dispose()

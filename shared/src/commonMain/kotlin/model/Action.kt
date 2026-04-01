@@ -13,6 +13,7 @@ import repository.AppPreferenceRepository
 import repository.GuideAudioRepository
 import repository.ReclistRepository
 import ui.common.AlertDialogController
+import ui.common.AlertDialogRequest
 import ui.common.ToastController
 import ui.common.requestConfirmError
 import ui.common.requestInput
@@ -69,6 +70,23 @@ object Actions {
                 TextEncodingDialogRequest(file = file, currentEncoding = null),
             )
 
+        suspend fun warnCommentFile(): Boolean =
+            suspendCancellableCoroutine { continuation ->
+                alertDialogController.show(
+                    AlertDialogRequest(
+                        message = stringStatic(
+                            Strings.CreateSessionReclistScreenActionImportCommentFileWarningMessage,
+                        ),
+                        confirmButton = stringStatic(Strings.CommonClose),
+                        dismissButton = stringStatic(Strings.CommonStillLoad),
+                        dismissButtonDestructive = true,
+                        onConfirm = { continuation.resume(false) },
+                        onDismiss = { continuation.resume(true) },
+                        cancelOnClickOutside = false,
+                    ),
+                )
+            }
+
         suspend fun askForCommentFile(): (() -> File?)? =
             suspendCancellableCoroutine { continuation ->
                 alertDialogController.requestYesNo(
@@ -100,6 +118,10 @@ object Actions {
             onFinish = { file ->
                 file ?: return@pickFile
                 scope.launch {
+                    if (file.name.endsWith(Reclist.COMMENT_FILE_NAME_SUFFIX_EXTENSION)) {
+                        val proceed = warnCommentFile()
+                        if (!proceed) return@launch
+                    }
                     val needsConfirmEncoding = appPreferenceRepository.value.alwaysConfirmTextEncoding
                     val fileEncoding = if (needsConfirmEncoding) {
                         val result = askForEncoding(file) ?: return@launch

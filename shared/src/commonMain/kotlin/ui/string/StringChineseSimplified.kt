@@ -8,6 +8,7 @@ fun Strings.zhHans(): String? =
     when (this) {
         CommonOkay -> "确定"
         CommonCancel -> "取消"
+        CommonClose -> "关闭"
         CommonYes -> "是"
         CommonNo -> "否"
         CommonBack -> "返回"
@@ -18,6 +19,7 @@ fun Strings.zhHans(): String? =
         CommonImport -> "导入"
         CommonDoNotShowAgain -> "不再显示"
         CommonNoMatch -> "无匹配项。"
+        CommonStillLoad -> "仍然加载"
         AlertNeedManualPermissionGrantTitle -> "无权限"
         AlertNeedManualPermissionGrantMessage -> "应用需要您的录音权限，请在系统设置中授予。"
         ErrorReadFileFailedMessage -> "无法读取文件。"
@@ -65,6 +67,8 @@ fun Strings.zhHans(): String? =
         CreateSessionReclistScreenTitle -> "选择录音表"
         CreateSessionReclistScreenActionImport -> "导入录音表"
         CreateSessionReclistScreenActionImportCommentAlertMessage -> "是否要继续导入对应的注释文件（-comment.txt）？"
+        CreateSessionReclistScreenActionImportCommentFileWarningMessage ->
+            "所选文件似乎是注释文件，请改为选择对应的录音表文件。"
         CreateSessionReclistScreenAllReclists -> "录音表"
         CreateSessionReclistScreenEmpty -> "请先导入录音表。"
         CreateSessionReclistScreenContinue -> "完成"
@@ -112,6 +116,8 @@ fun Strings.zhHans(): String? =
         PreferenceAutoListenBackDescription -> "连续录音模式下无效"
         PreferenceAutoNext -> "录音后自动跳转到下一句"
         PreferenceAutoNextDescription -> "连续录音模式下无效"
+        PreferenceGuideAudioVolume -> "BGM 音量"
+        PreferencePlaybackVolume -> "录音回放音量"
         PreferenceGroupAudio -> "音频"
         PreferenceGroupAudioDescription -> "请尽可能地在系统设置处选择您所需要的音频设备，而不是修改此处的音频设备设置。"
         PreferenceInputDeviceName -> "输入设备"

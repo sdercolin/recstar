@@ -28,6 +28,8 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import model.AppPreference
@@ -294,6 +296,19 @@ class SessionScreenModel(
     ).get()
 
     private var isPermissionGranted = permissionChecker.checkAndRequestRecordingPermission()
+
+    init {
+        screenModelScope.launch {
+            appPreferenceRepository.flow.map { it.guideAudioVolume }.distinctUntilChanged().collect {
+                guidePlayer.setVolume(it)
+            }
+        }
+        screenModelScope.launch {
+            appPreferenceRepository.flow.map { it.playbackVolume }.distinctUntilChanged().collect {
+                player.setVolume(it)
+            }
+        }
+    }
 
     private val _requestScrollToCurrentSentenceFlow = MutableSharedFlow<Unit>()
     val requestScrollToCurrentSentenceFlow: Flow<Unit> = _requestScrollToCurrentSentenceFlow

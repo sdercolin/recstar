@@ -8,6 +8,7 @@ fun Strings.ja(): String? =
     when (this) {
         CommonOkay -> "OK"
         CommonCancel -> "キャンセル"
+        CommonClose -> "閉じる"
         CommonYes -> "はい"
         CommonNo -> "いいえ"
         CommonBack -> "戻る"
@@ -18,6 +19,7 @@ fun Strings.ja(): String? =
         CommonImport -> "インポート"
         CommonDoNotShowAgain -> "次回から表示しない"
         CommonNoMatch -> "一致する項目がありません。"
+        CommonStillLoad -> "このまま読み込む"
         AlertNeedManualPermissionGrantTitle -> "権限が必要です"
         AlertNeedManualPermissionGrantMessage -> "アプリは音声を録音するために権限が必要です。システム設定で権限を許可してください。"
         ErrorReadFileFailedMessage -> "ファイルの読み込みに失敗しました。"
@@ -74,6 +76,8 @@ fun Strings.ja(): String? =
         CreateSessionReclistScreenActionImport -> "録音リストをインポート"
         CreateSessionReclistScreenActionImportCommentAlertMessage ->
             "続いてコメントファイル（-comment.txt）をインポートしますか？"
+        CreateSessionReclistScreenActionImportCommentFileWarningMessage ->
+            "選択されたファイルはコメントファイルのようです。代わりに対応する録音リストファイルを選択してください。"
         CreateSessionReclistScreenAllReclists -> "録音リスト"
         CreateSessionReclistScreenEmpty -> "録音リストをインポートしてください。"
         CreateSessionReclistScreenContinue -> "完了"
@@ -121,6 +125,8 @@ fun Strings.ja(): String? =
         PreferenceAutoListenBackDescription -> "連続録音モードでは無効"
         PreferenceAutoNext -> "録音後に自動で次の行に移動"
         PreferenceAutoNextDescription -> "連続録音モードでは無効"
+        PreferenceGuideAudioVolume -> "ガイドBGMの音量"
+        PreferencePlaybackVolume -> "録音ファイルの再生音量"
         PreferenceGroupAudio -> "音声"
         PreferenceGroupAudioDescription ->
             "こちらのデバイス設定を変更する代わりに、システム設定で使用するデバイスを選択することをおすすめします。"

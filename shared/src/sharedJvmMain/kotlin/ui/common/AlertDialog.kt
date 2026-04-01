@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
@@ -110,6 +112,11 @@ actual class AlertDialogController actual constructor(context: AppContext) {
                     @Composable {
                         TextButton(
                             onClick = onDismiss,
+                            colors = if (request.dismissButtonDestructive) {
+                                ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colors.error)
+                            } else {
+                                ButtonDefaults.textButtonColors()
+                            },
                         ) {
                             Text(request.dismissButton)
                         }

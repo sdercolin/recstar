@@ -38,6 +38,7 @@ class AlertDialogRequest(
     val message: String? = null,
     val confirmButton: String,
     val dismissButton: String? = null,
+    val dismissButtonDestructive: Boolean = false,
     val onConfirm: (() -> Unit)? = null,
     val onDismiss: (() -> Unit)? = null,
     val cancelOnClickOutside: Boolean = true,
