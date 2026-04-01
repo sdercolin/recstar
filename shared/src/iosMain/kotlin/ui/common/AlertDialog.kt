@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import platform.UIKit.UIAlertAction
 import platform.UIKit.UIAlertActionStyleCancel
 import platform.UIKit.UIAlertActionStyleDefault
+import platform.UIKit.UIAlertActionStyleDestructive
 import platform.UIKit.UIAlertController
 import platform.UIKit.UIAlertControllerStyleAlert
 import platform.UIKit.UITextField
@@ -51,7 +52,7 @@ actual class AlertDialogController actual constructor(private val context: AppCo
             alertController.addAction(
                 UIAlertAction.actionWithTitle(
                     request.dismissButton,
-                    UIAlertActionStyleCancel,
+                    if (request.dismissButtonDestructive) UIAlertActionStyleDestructive else UIAlertActionStyleCancel,
                 ) { _ ->
                     request.onDismiss?.invoke()
                 },

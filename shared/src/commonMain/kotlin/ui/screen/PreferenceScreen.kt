@@ -15,6 +15,8 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Slider
+import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
@@ -70,6 +72,7 @@ import util.isMacIntel
 import util.runIf
 import util.runIfHave
 import util.useIosStyle
+import kotlin.math.roundToInt
 
 object PreferenceScreen : Screen {
     @Composable
@@ -249,6 +252,16 @@ private fun ScreenContent() {
                     options = bitDepthOptions.value.toList(),
                 )
             }
+            SliderItem(
+                title = string(Strings.PreferenceGuideAudioVolume),
+                value = value.guideAudioVolume,
+                onValueChanged = { repository.update { copy(guideAudioVolume = it) } },
+            )
+            SliderItem(
+                title = string(Strings.PreferencePlaybackVolume),
+                value = value.playbackVolume,
+                onValueChanged = { repository.update { copy(playbackVolume = it) } },
+            )
         }
         Group(title = string(Strings.PreferenceGroupView)) {
             SelectionItem(
@@ -415,6 +428,45 @@ private fun SwitchItem(
         },
         onClick = { onValueChanged(!value) },
     )
+}
+
+@Composable
+private fun SliderItem(
+    title: String,
+    value: Float,
+    onValueChanged: (Float) -> Unit,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+            .padding(start = 40.dp, end = if (isDesktop) 40.dp else 16.dp)
+            .padding(top = 8.dp, bottom = 4.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.body1,
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+            )
+            Text(
+                text = "${(value * 100).roundToInt()}%",
+                style = MaterialTheme.typography.caption,
+                color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
+            )
+        }
+        Slider(
+            value = value,
+            onValueChange = onValueChanged,
+            modifier = Modifier.fillMaxWidth(),
+            colors = SliderDefaults.colors(
+                thumbColor = MaterialTheme.colors.primary,
+                activeTrackColor = MaterialTheme.colors.primary,
+            ),
+        )
+    }
 }
 
 @Composable

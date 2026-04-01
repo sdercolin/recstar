@@ -5,6 +5,7 @@ import kotlinx.io.asSource
 import kotlinx.io.buffered
 import util.Encoding
 import util.JavaFile
+import util.Log
 import util.detectEncoding
 import util.toFile
 import java.nio.charset.Charset
@@ -56,7 +57,13 @@ actual class File actual constructor(path: String) {
     actual fun readTextDetectEncoding(): String {
         val bytes = internalFile.readBytes()
         val detectedEncoding = bytes.detectEncoding()
-        return internalFile.readText(Charset.forName(detectedEncoding))
+        val charset = try {
+            Charset.forName(detectedEncoding)
+        } catch (e: Exception) {
+            Log.w("readTextDetectEncoding: Unsupported encoding detected: $detectedEncoding, fallback to UTF-8")
+            Charset.forName(Encoding.UTF8.value)
+        }
+        return internalFile.readText(charset)
     }
 
     actual fun writeText(text: String) = internalFile.writeText(text)

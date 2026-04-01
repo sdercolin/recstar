@@ -28,6 +28,7 @@ class AudioPlayerImpl(
     private var job: Job? = null
     private var countingJob: Job? = null
     private var startTime: Long = 0
+    private var volume: Float = 1.0f
 
     override fun play(
         file: File,
@@ -52,6 +53,7 @@ class AudioPlayerImpl(
                 dispose()
                 mediaPlayer = MediaPlayer().apply {
                     setDataSource(file.absolutePath)
+                    setVolume(volume, volume)
                     prepareAsync()
                     setOnPreparedListener {
                         seekTo(positionMs.toInt())
@@ -99,6 +101,11 @@ class AudioPlayerImpl(
     }
 
     override fun isPlaying(): Boolean = mediaPlayer?.isPlaying ?: false
+
+    override fun setVolume(volume: Float) {
+        this.volume = volume
+        mediaPlayer?.setVolume(volume, volume)
+    }
 
     override fun dispose() {
         runCatching {

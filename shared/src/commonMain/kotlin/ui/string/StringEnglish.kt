@@ -7,6 +7,7 @@ fun Strings.en(): String =
     when (this) {
         CommonOkay -> "OK"
         CommonCancel -> "Cancel"
+        CommonClose -> "Close"
         CommonYes -> "Yes"
         CommonNo -> "No"
         CommonBack -> "Back"
@@ -17,6 +18,7 @@ fun Strings.en(): String =
         CommonImport -> "Import"
         CommonDoNotShowAgain -> "Do not show again"
         CommonNoMatch -> "No match."
+        CommonStillLoad -> "Still load"
         AlertNeedManualPermissionGrantTitle -> "Permission Required"
         AlertNeedManualPermissionGrantMessage ->
             "The app needs your permission to record audio. Please grant the permission in system settings."
@@ -80,6 +82,9 @@ fun Strings.en(): String =
         CreateSessionReclistScreenActionImport -> "Import Reclist"
         CreateSessionReclistScreenActionImportCommentAlertMessage ->
             "Do you want to import the corresponding comment file (-comment.txt)?"
+        CreateSessionReclistScreenActionImportCommentFileWarningMessage ->
+            "The selected file may be an accompanying comment file. " +
+                "If you want to select the reclist itself, please close this dialog."
         CreateSessionReclistScreenAllReclists -> "Reclists"
         CreateSessionReclistScreenEmpty -> "Please import a reclist first."
         CreateSessionReclistScreenContinue -> "Finish"
@@ -128,6 +133,8 @@ fun Strings.en(): String =
         PreferenceAutoListenBackDescription -> "Unavailable in continuous mode"
         PreferenceAutoNext -> "Auto Go to Next After Recording"
         PreferenceAutoNextDescription -> "Unavailable in continuous mode"
+        PreferenceGuideAudioVolume -> "Guide BGM Volume"
+        PreferencePlaybackVolume -> "Recorded Audio Playback Volume"
         PreferenceGroupAudio -> "Audio"
         PreferenceGroupAudioDescription ->
             "It is recommended to always use the system default audio devices, and " +
