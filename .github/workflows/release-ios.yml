@@ -77,6 +77,7 @@ jobs:
             -archivePath "build/ios.xcarchive" \
             -sdk iphoneos \
             DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" \
+            CODE_SIGN_STYLE="Manual" \
             PROVISIONING_PROFILE_SPECIFIER="RecStar App Store"
 
           mkdir -p build/ipa
