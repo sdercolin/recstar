@@ -7,6 +7,7 @@ fun Strings.ko(): String =
     when (this) {
         CommonOkay -> "확인"
         CommonCancel -> "취소"
+        CommonClose -> "닫기"
         CommonYes -> "예"
         CommonNo -> "아니요"
         CommonBack -> "뒤로가기"
@@ -17,6 +18,7 @@ fun Strings.ko(): String =
         CommonImport -> "불러오기"
         CommonDoNotShowAgain -> "다시 보지 않기"
         CommonNoMatch -> "검색 결과 없음"
+        CommonStillLoad -> "계속 불러오기"
         AlertNeedManualPermissionGrantTitle -> "권한이 필요합니다."
         AlertNeedManualPermissionGrantMessage ->
             "녹음 권한이 필요합니다. 시스템 설정에서 녹음 권한을 활성화 해주세요."
@@ -80,6 +82,8 @@ fun Strings.ko(): String =
         CreateSessionReclistScreenActionImport -> "리스트 불러오기"
         CreateSessionReclistScreenActionImportCommentAlertMessage ->
             "녹음 리스트의 코멘트 파일도 불러오시겠습니까? (-comment.txt)"
+        CreateSessionReclistScreenActionImportCommentFileWarningMessage ->
+            "선택한 파일은 부속 코멘트 파일일 수 있습니다. 녹음 리스트 본체를 다시 선택하려면 이 대화상자를 닫아 주세요."
         CreateSessionReclistScreenAllReclists -> "녹음 리스트"
         CreateSessionReclistScreenEmpty -> "녹음 리스트를 먼저 불러와 주세요."
         CreateSessionReclistScreenContinue -> "완료"
@@ -128,6 +132,8 @@ fun Strings.ko(): String =
         PreferenceAutoListenBackDescription -> "연속 모드에서는 사용할 수 없습니다."
         PreferenceAutoNext -> "녹음 후, 자동으로 다음 문장으로 넘어가기"
         PreferenceAutoNextDescription -> "연속 모드에서는 사용할 수 없습니다."
+        PreferenceGuideAudioVolume -> "가이드 BGM 볼륨"
+        PreferencePlaybackVolume -> "녹음 파일 재생 볼륨"
         PreferenceGroupAudio -> "오디오"
         PreferenceGroupAudioDescription ->
             "시스템 기본 오디오 장치를 사용하는 것을 추천드립니다. " +

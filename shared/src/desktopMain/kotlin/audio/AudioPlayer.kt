@@ -20,8 +20,10 @@ import util.runCatchingCancellable
 import util.toJavaFile
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.Clip
+import javax.sound.sampled.FloatControl
 import javax.sound.sampled.LineEvent
 import javax.sound.sampled.Mixer
+import kotlin.math.log10
 
 class AudioPlayerImpl(
     private val listener: AudioPlayer.Listener,
@@ -38,6 +40,7 @@ class AudioPlayerImpl(
     private var cleanupJob: Job? = null
     private var countingJob: Job? = null
     private var isPlaying = false
+    private var volume: Float = 1.0f
     private var initJob: Job = initClip()
 
     init {
@@ -109,6 +112,7 @@ class AudioPlayerImpl(
                         val audioInputStream = AudioSystem.getAudioInputStream(file.toJavaFile())
                         clip.open(audioInputStream)
                     }
+                    applyVolume()
                     clip.microsecondPosition = positionMs * 1000
                     clip.start()
                     lastLoadedFile = file
@@ -154,6 +158,25 @@ class AudioPlayerImpl(
     }
 
     override fun isPlaying(): Boolean = isPlaying
+
+    override fun setVolume(volume: Float) {
+        this.volume = volume
+        applyVolume()
+    }
+
+    private fun applyVolume() {
+        val clip = clip ?: return
+        if (!clip.isOpen) return
+        runCatching {
+            val control = clip.getControl(FloatControl.Type.MASTER_GAIN) as FloatControl
+            val dB = if (volume <= 0f) {
+                control.minimum
+            } else {
+                (20f * log10(volume)).coerceIn(control.minimum, control.maximum)
+            }
+            control.value = dB
+        }
+    }
 
     private fun startCounting() {
         val clip = clip ?: return
