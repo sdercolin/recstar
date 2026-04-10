@@ -42,9 +42,6 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Update iOS version
-        run: ./gradlew updateProjectVersions
-
       - name: Install Distribution Certificate
         uses: apple-actions/import-codesign-certs@v3
         with:
