@@ -24,14 +24,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Check version
+      - name: Get version
         run: |
-          TAG=${{ github.ref_name }}
-          PROPERTIES_PATH=gradle.properties
-          APP_VERSION=$(awk -F'=' '/^app.versionName/ {print $2}' $PROPERTIES_PATH)
-          if [ "$TAG" != "$APP_VERSION" ]; then
-            echo "Tag $TAG does not match app version $APP_VERSION"
-            exit 1
+          APP_VERSION=$(awk -F'=' '/^app.versionName/ {print $2}' gradle.properties)
+          echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
+          if [ "${{ github.event_name }}" = "push" ]; then
+            TAG=${{ env.APP_VERSION }}
+            if [ "$TAG" != "$APP_VERSION" ]; then
+              echo "Tag $TAG does not match app version $APP_VERSION"
+              exit 1
+            fi
           fi
 
       - name: Set Flavor
@@ -50,7 +52,7 @@ jobs:
 
       - name: Rename
         run: |
-          VERSION=${{ github.ref_name }}
+          VERSION=${{ env.APP_VERSION }}
           echo $VERSION
           mv ./desktopApp/build/compose/binaries/main/deb/recstar_1.0.0-1_amd64.deb ./recstar-$VERSION-amd64.deb
 
@@ -58,4 +60,4 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
-          files: recstar-${{ github.ref_name }}-amd64.deb
+          files: recstar-${{ env.APP_VERSION }}-amd64.deb

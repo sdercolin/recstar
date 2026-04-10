@@ -24,14 +24,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Check version
+      - name: Get version
         run: |
-          $TAG = "${{ github.ref_name }}"
           $PROPERTIES_PATH = "gradle.properties"
           $APP_VERSION = (Select-String -Path $PROPERTIES_PATH -Pattern "^app\.versionName=" | ForEach-Object { $_.ToString().Split("=")[1] }).Trim()
-          if ($TAG -ne $APP_VERSION) {
-            Write-Output "Tag $TAG does not match app version $APP_VERSION"
-            exit 1
+          echo "APP_VERSION=$APP_VERSION" >> $env:GITHUB_ENV
+          if ("${{ github.event_name }}" -eq "push") {
+            $TAG = "${{ env.APP_VERSION }}"
+            if ($TAG -ne $APP_VERSION) {
+              Write-Output "Tag $TAG does not match app version $APP_VERSION"
+              exit 1
+            }
           }
 
       - name: Set Flavor
@@ -50,7 +53,7 @@ jobs:
 
       - name: Zip
         run: |
-          $VERSION="${{ github.ref_name }}"
+          $VERSION="${{ env.APP_VERSION }}"
           echo $VERSION
           Compress-Archive ./desktopApp/build/compose/binaries/main/app/RecStar/* ./recstar-$VERSION-win64.zip
 
@@ -58,4 +61,4 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
-          files: recstar-${{ github.ref_name }}-win64.zip
+          files: recstar-${{ env.APP_VERSION }}-win64.zip

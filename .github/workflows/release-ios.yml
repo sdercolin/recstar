@@ -17,14 +17,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check version
+      - name: Get version
+        id: version
         run: |
-          TAG=${{ github.ref_name }}
-          PROPERTIES_PATH=gradle.properties
-          APP_VERSION=$(awk -F'=' '/^app.versionName/ {print $2}' $PROPERTIES_PATH)
-          if [ "$TAG" != "$APP_VERSION" ]; then
-            echo "Tag $TAG does not match app version $APP_VERSION"
-            exit 1
+          APP_VERSION=$(awk -F'=' '/^app.versionName/ {print $2}' gradle.properties)
+          echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
+          if [ "${{ github.event_name }}" = "push" ]; then
+            TAG=${{ env.APP_VERSION }}
+            if [ "$TAG" != "$APP_VERSION" ]; then
+              echo "Tag $TAG does not match app version $APP_VERSION"
+              exit 1
+            fi
           fi
 
       - name: Set Flavor
@@ -83,13 +86,13 @@ jobs:
             -authenticationKeyID "${{ secrets.PRIVATE_API_KEY_ID }}" \
             -authenticationKeyIssuerID "${{ secrets.PRIVATE_API_KEY_ISSUER_ID }}"
 
-          mv build/ipa/*.ipa build/recstar-${{ github.ref_name }}.ipa
+          mv build/ipa/*.ipa build/recstar-${{ env.APP_VERSION }}.ipa
         working-directory: iosApp
 
       - name: Upload app to TestFlight
         uses: apple-actions/upload-testflight-build@v1
         with:
-          app-path: iosApp/build/recstar-${{ github.ref_name }}.ipa
+          app-path: iosApp/build/recstar-${{ env.APP_VERSION }}.ipa
           issuer-id: ${{ secrets.PRIVATE_API_KEY_ISSUER_ID }}
           api-key-id: ${{ secrets.PRIVATE_API_KEY_ID }}
           api-private-key: ${{ secrets.PRIVATE_API_KEY }}
