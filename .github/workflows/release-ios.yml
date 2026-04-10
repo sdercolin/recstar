@@ -54,10 +54,14 @@ jobs:
           p12-file-base64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE }}
           p12-password: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
 
-      - name: Set up App Store Connect API key
-        run: |
-          mkdir -p ~/private_keys
-          echo "${{ secrets.PRIVATE_API_KEY }}" > ~/private_keys/AuthKey_${{ secrets.PRIVATE_API_KEY_ID }}.p8
+      - name: Download Provisioning Profiles
+        uses: apple-actions/download-provisioning-profiles@v1
+        with:
+          bundle-id: 'com.sdercolin.recstar'
+          profile-type: 'IOS_APP_STORE'
+          issuer-id: ${{ secrets.PRIVATE_API_KEY_ISSUER_ID }}
+          api-key-id: ${{ secrets.PRIVATE_API_KEY_ID }}
+          api-private-key: ${{ secrets.PRIVATE_API_KEY }}
 
       - name: Set Team ID
         run: |
@@ -72,22 +76,14 @@ jobs:
             -configuration Release \
             -archivePath "build/ios.xcarchive" \
             -sdk iphoneos \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath ~/private_keys/AuthKey_${{ secrets.PRIVATE_API_KEY_ID }}.p8 \
-            -authenticationKeyID "${{ secrets.PRIVATE_API_KEY_ID }}" \
-            -authenticationKeyIssuerID "${{ secrets.PRIVATE_API_KEY_ISSUER_ID }}" \
             DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" \
-            CODE_SIGN_STYLE="Automatic"
+            PROVISIONING_PROFILE_SPECIFIER="RecStar App Store"
 
           mkdir -p build/ipa
           xcodebuild -exportArchive \
             -archivePath "build/ios.xcarchive" \
             -exportOptionsPlist "ExportOptions.plist" \
-            -exportPath "build/ipa" \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath ~/private_keys/AuthKey_${{ secrets.PRIVATE_API_KEY_ID }}.p8 \
-            -authenticationKeyID "${{ secrets.PRIVATE_API_KEY_ID }}" \
-            -authenticationKeyIssuerID "${{ secrets.PRIVATE_API_KEY_ISSUER_ID }}"
+            -exportPath "build/ipa"
 
           mv build/ipa/*.ipa build/recstar-${{ env.APP_VERSION }}.ipa
         working-directory: iosApp
