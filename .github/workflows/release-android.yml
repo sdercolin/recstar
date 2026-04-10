@@ -89,7 +89,7 @@ jobs:
           keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           keyPassword: ${{ secrets.ANDROID_KEYSTORE_KEY_PASSWORD }}
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: Upload AAB file as artifact
           path: ${{steps.sign_app.outputs.signedReleaseFile}}
