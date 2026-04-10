@@ -18,16 +18,22 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Get version
-        id: version
         run: |
           APP_VERSION=$(awk -F'=' '/^app.versionName/ {print $2}' gradle.properties)
+          APP_VERSION_CODE=$(awk -F'=' '/^app.versionCode/ {print $2}' gradle.properties)
           echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
           if [ "${{ github.event_name }}" = "push" ]; then
-            TAG=${{ env.APP_VERSION }}
+            TAG=${{ github.ref_name }}
             if [ "$TAG" != "$APP_VERSION" ]; then
               echo "Tag $TAG does not match app version $APP_VERSION"
               exit 1
             fi
+          fi
+          PLIST_VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" iosApp/iosApp/Info.plist)
+          PLIST_CODE=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" iosApp/iosApp/Info.plist)
+          if [ "$PLIST_VERSION" != "$APP_VERSION" ] || [ "$PLIST_CODE" != "$APP_VERSION_CODE" ]; then
+            echo "::error::Info.plist version ($PLIST_VERSION/$PLIST_CODE) does not match gradle.properties ($APP_VERSION/$APP_VERSION_CODE)"
+            exit 1
           fi
 
       - name: Set Flavor
