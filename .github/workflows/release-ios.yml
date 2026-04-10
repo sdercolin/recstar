@@ -52,9 +52,9 @@ jobs:
         with:
           bundle-id: 'com.sdercolin.recstar'
           profile-type: 'IOS_APP_STORE'
-          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
-          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
-          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+          issuer-id: ${{ secrets.PRIVATE_API_KEY_ISSUER_ID }}
+          api-key-id: ${{ secrets.PRIVATE_API_KEY_ID }}
+          api-private-key: ${{ secrets.PRIVATE_API_KEY }}
 
       - name: Set Team ID
         run: |
@@ -84,6 +84,6 @@ jobs:
         uses: apple-actions/upload-testflight-build@v1
         with:
           app-path: iosApp/build/recstar-${{ github.ref_name }}.ipa
-          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
-          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
-          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+          issuer-id: ${{ secrets.PRIVATE_API_KEY_ISSUER_ID }}
+          api-key-id: ${{ secrets.PRIVATE_API_KEY_ID }}
+          api-private-key: ${{ secrets.PRIVATE_API_KEY }}
