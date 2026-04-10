@@ -1,0 +1,89 @@
+name: Release iOS
+
+on:
+  push:
+    tags:
+      - "*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+
+    runs-on: macos-15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check version
+        run: |
+          TAG=${{ github.ref_name }}
+          PROPERTIES_PATH=gradle.properties
+          APP_VERSION=$(awk -F'=' '/^app.versionName/ {print $2}' $PROPERTIES_PATH)
+          if [ "$TAG" != "$APP_VERSION" ]; then
+            echo "Tag $TAG does not match app version $APP_VERSION"
+            exit 1
+          fi
+
+      - name: Set Flavor
+        run: echo "buildkonfig.flavor=release" >> gradle.properties
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Update iOS version
+        run: ./gradlew updateProjectVersions
+
+      - name: Install Distribution Certificate
+        uses: apple-actions/import-codesign-certs@v3
+        with:
+          p12-file-base64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE }}
+          p12-password: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
+
+      - name: Download Provisioning Profiles
+        uses: apple-actions/download-provisioning-profiles@v1
+        with:
+          bundle-id: 'com.sdercolin.recstar'
+          profile-type: 'IOS_APP_STORE'
+          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
+          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+
+      - name: Set Team ID
+        run: |
+          sed -i '' "s/\[MY_TEAM_ID\]/${{ secrets.APPLE_TEAM_ID }}/" iosApp/ExportOptions.plist
+          sed -i '' "s/^TEAM_ID=$/TEAM_ID=${{ secrets.APPLE_TEAM_ID }}/" iosApp/Configuration/Config.xcconfig
+
+      - name: Build and Export IPA
+        run: |
+          xcodebuild archive \
+            -scheme "iosApp" \
+            -project "iosApp.xcodeproj" \
+            -configuration Release \
+            -archivePath "build/ios.xcarchive" \
+            -sdk iphoneos \
+            DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}"
+
+          mkdir -p build/ipa
+          xcodebuild -exportArchive \
+            -archivePath "build/ios.xcarchive" \
+            -exportOptionsPlist "ExportOptions.plist" \
+            -exportPath "build/ipa"
+
+          mv build/ipa/*.ipa build/recstar-${{ github.ref_name }}.ipa
+        working-directory: iosApp
+
+      - name: Upload app to TestFlight
+        uses: apple-actions/upload-testflight-build@v1
+        with:
+          app-path: iosApp/build/recstar-${{ github.ref_name }}.ipa
+          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
+          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
