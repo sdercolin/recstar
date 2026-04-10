@@ -57,7 +57,7 @@ jobs:
       - name: Download Provisioning Profiles
         uses: apple-actions/download-provisioning-profiles@v1
         with:
-          bundle-id: 'com.sdercolin.recstar'
+          bundle-id: 'com.sdercolin.recstarS7CF8UHY7B'
           profile-type: 'IOS_APP_STORE'
           issuer-id: ${{ secrets.PRIVATE_API_KEY_ISSUER_ID }}
           api-key-id: ${{ secrets.PRIVATE_API_KEY_ID }}
@@ -79,7 +79,7 @@ jobs:
             DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" \
             CODE_SIGN_STYLE="Manual" \
             CODE_SIGN_IDENTITY="Apple Distribution" \
-            PROVISIONING_PROFILE_SPECIFIER="RecStar App Store"
+            PROVISIONING_PROFILE_SPECIFIER="RecStar App Store Real"
 
           mkdir -p build/ipa
           xcodebuild -exportArchive \

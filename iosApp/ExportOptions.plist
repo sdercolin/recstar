@@ -10,8 +10,8 @@
 	<string>app-store</string>
 	<key>provisioningProfiles</key>
 	<dict>
-		<key>com.sdercolin.recstar</key>
-		<string>RecStar App Store</string>
+		<key>com.sdercolin.recstarS7CF8UHY7B</key>
+		<string>RecStar App Store Real</string>
 	</dict>
 	<key>signingCertificate</key>
 	<string>Apple Distribution</string>
