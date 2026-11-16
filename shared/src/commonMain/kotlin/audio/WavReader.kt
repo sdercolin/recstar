@@ -165,8 +165,8 @@ class WavReader {
     }
 
     private fun Source.read3BytesLe(): Int {
-        val byte1 = readByte().toInt()
-        val byte2 = readByte().toInt()
+        val byte1 = readByte().toInt() and 0xFF
+        val byte2 = readByte().toInt() and 0xFF
         val byte3 = readByte().toInt()
         return byte1 or (byte2 shl 8) or (byte3 shl 16)
     }
