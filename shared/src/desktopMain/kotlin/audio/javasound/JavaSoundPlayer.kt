@@ -1,5 +1,7 @@
-package audio
+package audio.javasound
 
+import audio.AudioPlayer
+import audio.getAudioFormat
 import exception.UnsupportedAudioDeviceException
 import exception.UnsupportedAudioFormatException
 import io.File
@@ -25,7 +27,7 @@ import javax.sound.sampled.LineEvent
 import javax.sound.sampled.Mixer
 import kotlin.math.log10
 
-class AudioPlayerImpl(
+internal class JavaSoundPlayer(
     private val listener: AudioPlayer.Listener,
     context: AppContext,
     private val errorNotifier: ErrorNotifier,
@@ -67,7 +69,7 @@ class AudioPlayerImpl(
                     AudioSystem.getClip()
                 }.also {
                     it.addLineListener { ev ->
-                        Log.d("AudioPlayerImpl.initClip: ${ev.type} at ${it.microsecondPosition / 1000} ms")
+                        Log.d("JavaSoundPlayer.initClip: ${ev.type} at ${it.microsecondPosition / 1000} ms")
                         when (ev.type) {
                             LineEvent.Type.START -> {
                                 startCounting()
@@ -96,7 +98,7 @@ class AudioPlayerImpl(
     ) {
         val clip = clip ?: return
         if (job?.isActive == true) {
-            Log.w("AudioPlayerImpl.start: already started")
+            Log.w("JavaSoundPlayer.start: already started")
             return
         }
         job = scope.launch {
@@ -209,7 +211,7 @@ class AudioPlayerImpl(
     private suspend fun getSelectedMixerInfo(): Mixer.Info? {
         val mixerInfos = AudioSystem.getMixerInfo()
         val format = appPreferenceRepository.value.getAudioFormat()
-        val deviceInfos = getAudioOutputDeviceInfos(
+        val deviceInfos = getJavaSoundOutputDeviceInfos(
             appPreferenceRepository.value.desiredOutputName,
             format,
         ) ?: throw UnsupportedAudioFormatException(format)
@@ -219,13 +221,4 @@ class AudioPlayerImpl(
         val default = deviceInfos.deviceInfos.firstOrNull { it.isDefault } ?: deviceInfos.deviceInfos.first()
         return mixerInfos.find { it.name == default.name } ?: mixerInfos.first()
     }
-}
-
-actual class AudioPlayerProvider actual constructor(
-    private val listener: AudioPlayer.Listener,
-    private val context: AppContext,
-    private val errorNotifier: ErrorNotifier,
-    private val appPreferenceRepository: AppPreferenceRepository,
-) {
-    actual fun get(): AudioPlayer = AudioPlayerImpl(listener, context, errorNotifier, appPreferenceRepository)
 }

@@ -1,4 +1,4 @@
-package audio
+package audio.javasound
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import util.toShortArray
@@ -6,7 +6,7 @@ import java.io.IOException
 import java.io.InputStream
 import javax.sound.sampled.TargetDataLine
 
-class InterceptedAudioInputStream(
+internal class InterceptedAudioInputStream(
     private val line: TargetDataLine,
     bufferSize: Int,
     private val flow: MutableStateFlow<Array<FloatArray>>,
