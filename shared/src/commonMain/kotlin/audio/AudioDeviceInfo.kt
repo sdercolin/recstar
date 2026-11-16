@@ -1,6 +1,7 @@
 package audio
 
 import androidx.compose.runtime.Composable
+import model.AppPreference
 import ui.string.*
 
 /**
@@ -33,12 +34,12 @@ data class AudioDeviceInfoList(
     val selectedDeviceInfo: AudioDeviceInfo,
 )
 
-expect suspend fun getAudioInputDeviceInfos(
-    desiredDeviceName: String?,
-    audioFormat: AudioFormat,
-): AudioDeviceInfoList?
+/**
+ * Returns the input devices available to the audio engine selected in [appPreference], with the desired one selected.
+ */
+expect suspend fun getAudioInputDeviceInfos(appPreference: AppPreference): AudioDeviceInfoList?
 
-expect suspend fun getAudioOutputDeviceInfos(
-    desiredDeviceName: String?,
-    audioFormat: AudioFormat,
-): AudioDeviceInfoList?
+/**
+ * Returns the output devices available to the audio engine selected in [appPreference], with the desired one selected.
+ */
+expect suspend fun getAudioOutputDeviceInfos(appPreference: AppPreference): AudioDeviceInfoList?
