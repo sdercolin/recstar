@@ -30,6 +30,7 @@
 
 typedef struct ra_context ra_context;
 typedef struct ra_capture ra_capture;
+typedef struct ra_player ra_player;
 
 RA_API const char* ra_version(void);
 
@@ -59,5 +60,22 @@ RA_API int ra_capture_read(ra_capture* capture, void* out, int max_frames);
 /* Returns the number of frames dropped because the ring buffer was full. */
 RA_API long long ra_capture_dropped_frames(ra_capture* capture);
 RA_API void ra_capture_close(ra_capture* capture);
+
+/*
+ * Opens a playback device by name, or the default device if device_name is NULL. Sets *error_out and returns NULL
+ * on failure. Must not run concurrently with other calls on the same context. A player is not thread-safe.
+ */
+RA_API ra_player* ra_player_open(ra_context* ctx, const char* device_name, int* error_out);
+/* Loads a WAV file (UTF-8 path), replacing the previous one. The file is decoded into memory. */
+RA_API int ra_player_load(ra_player* player, const char* path);
+RA_API int ra_player_play(ra_player* player, double start_ms);
+RA_API int ra_player_stop(ra_player* player);
+/* Linear volume, 0 to 1. Applies to the current and future sounds. */
+RA_API void ra_player_set_volume(ra_player* player, float volume);
+/* Returns 1 while a sound is playing. Turns 0 after ra_player_stop or at the end of the sound. */
+RA_API int ra_player_is_playing(ra_player* player);
+RA_API double ra_player_position_ms(ra_player* player);
+RA_API double ra_player_length_ms(ra_player* player);
+RA_API void ra_player_close(ra_player* player);
 
 #endif
