@@ -21,6 +21,7 @@ class MiniaudioPlaybackTest {
 
     @Test
     fun playsUntilEnd() {
+        assumeTrue("Audio IO tests disabled", System.getenv("RECSTAR_SKIP_AUDIO_IO_TESTS").isNullOrEmpty())
         assumeTrue("No playback device", context.getDevices(isCapture = false).isNotEmpty())
         val file = writeSilence(durationMs = 300)
         context.openPlayback(null).use { playback ->

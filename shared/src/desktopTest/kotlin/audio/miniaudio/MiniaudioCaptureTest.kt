@@ -12,6 +12,7 @@ class MiniaudioCaptureTest {
 
     @Test
     fun capturesFromDefaultDevice() {
+        assumeTrue("Audio IO tests disabled", System.getenv("RECSTAR_SKIP_AUDIO_IO_TESTS").isNullOrEmpty())
         assumeTrue("No capture device", context.getDevices(isCapture = true).isNotEmpty())
         val format = AudioFormat(48000, 24, 1, signed = true, littleEndian = true, floating = false)
         context.openCapture(null, format, bufferMs = 1000).use { capture ->

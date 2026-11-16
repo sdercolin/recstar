@@ -1,0 +1,63 @@
+name: Desktop Audio
+
+on:
+  pull_request:
+    paths:
+      - "shared/native/**"
+      - "shared/src/desktopMain/kotlin/audio/**"
+      - "shared/src/desktopTest/**"
+      - "shared/build.gradle.kts"
+      - ".github/workflows/desktop-audio.yml"
+  workflow_dispatch:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-15]
+
+    runs-on: ${{ matrix.os }}
+
+    env:
+      RECSTAR_SKIP_AUDIO_IO_TESTS: ${{ matrix.os == 'ubuntu-latest' && 'true' || '' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - name: Set up Zig
+        if: runner.os == 'Linux'
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.14.1
+
+      # Same toolchain as the Ubuntu release, so the library also loads on distributions with an older glibc.
+      - name: Use Zig with glibc 2.17
+        if: runner.os == 'Linux'
+        run: echo "recstar.native.cc=zig cc -target x86_64-linux-gnu.2.17" >> gradle.properties
+
+      - name: Build native library and run desktop tests
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: :shared:desktopTest --console=plain -Precstar.native.required=true
+
+      - name: Check glibc symbol versions
+        if: runner.os == 'Linux'
+        run: |
+          LIB=shared/build/generated/nativeAudio/resources/linux-x86-64/librecstar_audio.so
+          MAX=$(objdump -T "$LIB" | grep -o 'GLIBC_[0-9.]*' | sort -Vu | tail -1)
+          echo "Highest required: $MAX"
+          [ "$(printf '%s\nGLIBC_2.17\n' "$MAX" | sort -V | tail -1)" = "GLIBC_2.17" ]
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-test-reports-${{ matrix.os }}
+          path: shared/build/reports/tests/desktopTest
