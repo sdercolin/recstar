@@ -19,7 +19,7 @@ plugins {
     kotlin("plugin.serialization") version "1.9.10"
     id("com.android.library")
     id("org.jetbrains.compose")
-    id("com.codingfeline.buildkonfig") version "+"
+    id("com.codingfeline.buildkonfig") version "0.15.1"
     id("com.github.jk1.dependency-license-report") version "2.5"
 }
 
