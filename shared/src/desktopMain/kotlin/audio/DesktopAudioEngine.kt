@@ -1,6 +1,7 @@
 package audio
 
 import audio.javasound.JavaSoundEngine
+import audio.miniaudio.MiniaudioEngine
 import model.AppPreference
 import model.AppPreference.AudioBackend
 import model.AppPreference.AudioEngine
@@ -47,7 +48,7 @@ internal data class DesktopAudioEngineKey(
 internal fun DesktopAudioEngineKey.resolve(): DesktopAudioEngine =
     when (engine) {
         AudioEngine.JavaSound -> JavaSoundEngine
-        AudioEngine.Miniaudio -> error("miniaudio engine is not available")
+        AudioEngine.Miniaudio -> MiniaudioEngine(backend)
     }
 
 internal fun AppPreference.desktopAudioEngine(): DesktopAudioEngine = desktopAudioEngineKey().resolve()
