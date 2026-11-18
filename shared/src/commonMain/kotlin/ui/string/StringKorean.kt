@@ -34,6 +34,7 @@ fun Strings.ko(): String =
             "선택한 오디오 장치를 사용할 수 없습니다. 오디오 설정을 확인해 주세요. " +
                 "지속적으로 오류가 발생하는 경우, 시스템의 기본 오디오 장치를 선택한 뒤, " +
                 "RecStar 설정에서 사용하실 오디오 장치를 선택 하세요."
+        ExceptionNativeAudioUnavailable -> "miniaudio 오디오 엔진을 불러올 수 없어 Java Sound를 대신 사용합니다."
         ExceptionReclistNotFound ->
             "사용된 녹음 리스트 ({0}) 혹은 코멘트를 찾지 못했습니다." +
                 "세션을 사용할려면 녹음 리스트 혹은 코멘트를 다시 불러와 주세요."

@@ -34,6 +34,7 @@ fun Strings.en(): String =
             "The selected audio device is not usable, please check audio settings on your " +
                 "system side. If this error keeps happening, please try selecting the system default audio devices " +
                 "in the settings of RecStar, and select your desired audio devices in the system settings."
+        ExceptionNativeAudioUnavailable -> "The miniaudio audio engine could not be loaded. Java Sound is used instead."
         ExceptionReclistNotFound ->
             "Could not open the session because the reclist ({0}) or its comment file used in this session " +
                 "is not found. Please reimport them to use this session."

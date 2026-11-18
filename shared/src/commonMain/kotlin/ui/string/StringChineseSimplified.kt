@@ -32,6 +32,7 @@ fun Strings.zhHans(): String? =
         ExceptionUnsupportedAudioDevice ->
             "所选的音频设备无法使用，请检查您的系统音频设置。如果此错误持续发生，请尝试在 RecStar 的设置中选择系统默认的音频设备，" +
                 "并在系统设置中选择您所需的音频设备。"
+        ExceptionNativeAudioUnavailable -> "无法加载 miniaudio 音频引擎，已改用 Java Sound。"
         ExceptionReclistNotFound -> "无法打开会话，因为该会话所使用的录音表（{0}）或其注释文件未找到。请重新导入以使用该会话。"
         ExceptionReclistNoValidLine -> "该录音表文件中不包含任何有效的行。请确保行中不包含任何无法用于文件名的无效字符。"
         ExceptionTextDecodeFailure -> "文本解码失败。请在设置中启用「显示文本编码设置」，然后重试。"

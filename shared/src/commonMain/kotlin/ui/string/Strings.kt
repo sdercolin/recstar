@@ -26,6 +26,7 @@ enum class Strings {
     ExceptionRenameSessionUnexpected,
     ExceptionUnsupportedAudioFormat,
     ExceptionUnsupportedAudioDevice,
+    ExceptionNativeAudioUnavailable,
     ExceptionReclistNotFound,
     ExceptionReclistNoValidLine,
     ExceptionTextDecodeFailure,

@@ -45,6 +45,15 @@ jobs:
           java-version: '17'
           distribution: 'corretto'
 
+      - name: Set up Zig
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.14.1
+
+      # Builds the native audio library against glibc 2.17 instead of the runner's, so it loads on older distributions.
+      - name: Use Zig for the native audio library
+        run: echo "recstar.native.cc=zig cc -target x86_64-linux-gnu.2.17" >> gradle.properties
+
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
         with:
