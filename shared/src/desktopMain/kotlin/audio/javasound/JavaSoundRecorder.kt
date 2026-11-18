@@ -1,6 +1,10 @@
-package audio
+package audio.javasound
 
 import androidx.compose.runtime.Stable
+import audio.AudioDeviceInfoList
+import audio.AudioRecorder
+import audio.WavData
+import audio.getAudioFormat
 import exception.UnsupportedAudioDeviceException
 import exception.UnsupportedAudioFormatException
 import io.File
@@ -14,7 +18,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import repository.AppPreferenceRepository
 import ui.common.ErrorNotifier
-import ui.model.AppContext
 import util.Log
 import util.runCatchingCancellable
 import util.toJavaFile
@@ -26,7 +29,7 @@ import javax.sound.sampled.Mixer
 import javax.sound.sampled.TargetDataLine
 
 @Stable
-class AudioRecorderImpl(
+internal class JavaSoundRecorder(
     private val listener: AudioRecorder.Listener,
     private val errorNotifier: ErrorNotifier,
     private val appPreferenceRepository: AppPreferenceRepository,
@@ -39,7 +42,7 @@ class AudioRecorderImpl(
 
     override fun start(output: File) {
         if (job?.isActive == true) {
-            Log.w("AudioRecorderImpl.start: already started")
+            Log.w("JavaSoundRecorder.start: already started")
             return
         }
         job = scope.launch {
@@ -51,12 +54,12 @@ class AudioRecorderImpl(
                     open(format)
                     start()
                 }
-                this@AudioRecorderImpl.line = line
-                Log.i("AudioRecorderImpl.start: path: ${output.absolutePath}, format: ${line.format}")
+                this@JavaSoundRecorder.line = line
+                Log.i("JavaSoundRecorder.start: path: ${output.absolutePath}, format: ${line.format}")
                 listener.onStarted()
                 withContext(Dispatchers.IO) {
                     val stream = InterceptedAudioInputStream(line, 1792, _waveDataFlow)
-                    this@AudioRecorderImpl.stream = stream
+                    this@JavaSoundRecorder.stream = stream
                     AudioSystem.write(
                         AudioInputStream(
                             // stream =
@@ -81,7 +84,7 @@ class AudioRecorderImpl(
         val mixerInfos = AudioSystem.getMixerInfo()
         val format = appPreferenceRepository.value.getAudioFormat()
         val dataLineInfo = DataLine.Info(TargetDataLine::class.java, format.toJavaAudioFormat())
-        val deviceInfos = getAudioInputDeviceInfos(appPreferenceRepository.value.desiredInputName, format)
+        val deviceInfos = getJavaSoundInputDeviceInfos(appPreferenceRepository.value.desiredInputName, format)
             ?: throw UnsupportedAudioFormatException(format)
         if (!AudioSystem.isLineSupported(dataLineInfo)) {
             throw UnsupportedAudioFormatException(format)
@@ -116,7 +119,7 @@ class AudioRecorderImpl(
                 stream = null
                 job?.cancelAndJoin()
                 line = null
-                Log.i("AudioRecorderImpl.stop: stopped")
+                Log.i("JavaSoundRecorder.stop: stopped")
                 withContext(Dispatchers.Main) {
                     listener.onStopped()
                 }
@@ -144,19 +147,4 @@ class AudioRecorderImpl(
 
     private val _waveDataFlow = MutableStateFlow(arrayOf(FloatArray(0)))
     override val waveDataFlow: Flow<WavData> = _waveDataFlow
-}
-
-actual class AudioRecorderProvider(
-    private val listener: AudioRecorder.Listener,
-    private val errorNotifier: ErrorNotifier,
-    private val appPreferenceRepository: AppPreferenceRepository,
-) {
-    actual constructor(
-        listener: AudioRecorder.Listener,
-        context: AppContext,
-        errorNotifier: ErrorNotifier,
-        appPreferenceRepository: AppPreferenceRepository,
-    ) : this(listener, errorNotifier, appPreferenceRepository)
-
-    actual fun get(): AudioRecorder = AudioRecorderImpl(listener, errorNotifier, appPreferenceRepository)
 }
