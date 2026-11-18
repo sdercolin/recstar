@@ -42,9 +42,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import audio.AudioDeviceInfoList
-import audio.getAudioFormat
 import audio.getAudioInputDeviceInfos
 import audio.getAudioOutputDeviceInfos
+import audio.getAvailableAudioBackends
+import audio.getAvailableAudioEngines
 import audio.isSupported
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -185,20 +186,54 @@ private fun ScreenContent() {
                 onValueChanged = { repository.update { copy(recording = recording.copy(autoNext = it)) } },
             )
         }
-        // Disable audio device selection on Intel Macs due to a bug in the audio library
-        val enableDeviceSettings = isDesktop && !isMacIntel
+        // Disable audio device selection on Intel Macs due to a bug in Java Sound
+        val enableDeviceSettings =
+            isDesktop && !(isMacIntel && value.audioEngine == AppPreference.AudioEngine.JavaSound)
         Group(
             title = string(Strings.PreferenceGroupAudio),
             description = string(Strings.PreferenceGroupAudioDescription).takeIf { enableDeviceSettings },
         ) {
+            val audioEngines = remember { getAvailableAudioEngines() }
+            if (audioEngines.size > 1) {
+                SelectionItem(
+                    title = string(Strings.PreferenceAudioEngine),
+                    value = value.audioEngine,
+                    onValueChanged = {
+                        repository.update {
+                            copy(
+                                audioEngine = it,
+                                audioBackend = AppPreference.AudioBackend.Auto,
+                                desiredInputName = null,
+                                desiredOutputName = null,
+                            )
+                        }
+                    },
+                    options = audioEngines,
+                )
+            }
+            val audioBackends = remember(value.audioEngine) { getAvailableAudioBackends(value.audioEngine) }
+            if (audioBackends.size > 1) {
+                SelectionItem(
+                    title = string(Strings.PreferenceAudioBackend),
+                    value = value.audioBackend,
+                    onValueChanged = {
+                        repository.update {
+                            copy(audioBackend = it, desiredInputName = null, desiredOutputName = null)
+                        }
+                    },
+                    options = audioBackends,
+                )
+            }
             if (enableDeviceSettings) {
                 val allInputDeviceInfo = produceState<AudioDeviceInfoList?>(
                     null,
                     value.desiredInputName,
                     value.sampleRate,
                     value.bitDepth,
+                    value.audioEngine,
+                    value.audioBackend,
                 ) {
-                    this.value = getAudioInputDeviceInfos(value.desiredInputName, value.getAudioFormat())
+                    this.value = getAudioInputDeviceInfos(value)
                 }
                 allInputDeviceInfo.value?.let { info ->
                     SelectionItem(
@@ -213,8 +248,10 @@ private fun ScreenContent() {
                     value.desiredOutputName,
                     value.sampleRate,
                     value.bitDepth,
+                    value.audioEngine,
+                    value.audioBackend,
                 ) {
-                    this.value = getAudioOutputDeviceInfos(value.desiredOutputName, value.getAudioFormat())
+                    this.value = getAudioOutputDeviceInfos(value)
                 }
                 allOutputDeviceInfo.value?.let { info ->
                     SelectionItem(
@@ -239,7 +276,11 @@ private fun ScreenContent() {
                 onValueChanged = { repository.update { copy(sampleRate = it) } },
                 options = AppPreference.SampleRateOption.entries.toList(),
             )
-            val bitDepthOptions: State<List<AppPreference.BitDepthOption>> = produceState(listOf()) {
+            val bitDepthOptions: State<List<AppPreference.BitDepthOption>> = produceState(
+                listOf(),
+                value.audioEngine,
+                value.audioBackend,
+            ) {
                 this.value = AppPreference.BitDepthOption.entries.filter {
                     it.isSupported(value)
                 }

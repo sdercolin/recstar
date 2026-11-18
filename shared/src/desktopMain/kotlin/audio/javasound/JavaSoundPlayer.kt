@@ -9,9 +9,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import repository.AppPreferenceRepository
@@ -43,21 +40,15 @@ internal class JavaSoundPlayer(
     private var countingJob: Job? = null
     private var isPlaying = false
     private var volume: Float = 1.0f
+    private var clipOutputName: String? = null
     private var initJob: Job = initClip()
 
-    init {
-        scope.launch {
-            appPreferenceRepository.flow.map { it.desiredOutputName }.distinctUntilChanged().drop(1).collect {
-                initJob.cancelAndJoin()
-                initJob = initClip()
-            }
-        }
-    }
-
-    private fun initClip() =
-        scope.launch(Dispatchers.IO) {
+    private fun initClip(): Job {
+        val outputName = appPreferenceRepository.value.desiredOutputName
+        return scope.launch(Dispatchers.IO) {
             runCatchingCancellable {
                 clip?.close()
+                clip = null
                 val selectedMixerInfo = getSelectedMixerInfo()
                 clip = if (selectedMixerInfo != null) {
                     try {
@@ -87,24 +78,28 @@ internal class JavaSoundPlayer(
                         }
                     }
                 }
+                clipOutputName = outputName
             }.onFailure {
                 errorNotifier.notify(it)
             }
         }
+    }
 
     override fun play(
         file: File,
         positionMs: Long,
     ) {
-        val clip = clip ?: return
         if (job?.isActive == true) {
             Log.w("JavaSoundPlayer.start: already started")
             return
         }
         job = scope.launch {
-            if (initJob.isActive) {
+            initJob.join()
+            if (clip == null || clipOutputName != appPreferenceRepository.value.desiredOutputName) {
+                initJob = initClip()
                 initJob.join()
             }
+            val clip = clip ?: return@launch
             runCatchingCancellable {
                 cleanupJob?.join()
                 cleanupJob = null
@@ -196,6 +191,7 @@ internal class JavaSoundPlayer(
 
     override fun dispose() {
         runCatching {
+            initJob.cancel()
             job?.cancel()
             seekingJob?.cancel()
             cleanupJob?.cancel()

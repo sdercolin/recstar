@@ -11,7 +11,9 @@ actual class AudioRecorderProvider actual constructor(
     private val appPreferenceRepository: AppPreferenceRepository,
 ) {
     actual fun get(): AudioRecorder =
-        currentDesktopAudioEngine().createRecorder(listener, errorNotifier, appPreferenceRepository)
+        EngineSwitchingRecorder(appPreferenceRepository) { engine ->
+            engine.createRecorder(listener, errorNotifier, appPreferenceRepository)
+        }
 }
 
 actual class AudioPlayerProvider actual constructor(
@@ -21,5 +23,7 @@ actual class AudioPlayerProvider actual constructor(
     private val appPreferenceRepository: AppPreferenceRepository,
 ) {
     actual fun get(): AudioPlayer =
-        currentDesktopAudioEngine().createPlayer(listener, context, errorNotifier, appPreferenceRepository)
+        EngineSwitchingPlayer(appPreferenceRepository) { engine ->
+            engine.createPlayer(listener, context, errorNotifier, appPreferenceRepository)
+        }
 }

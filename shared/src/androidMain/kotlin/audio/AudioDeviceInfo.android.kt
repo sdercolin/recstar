@@ -1,15 +1,11 @@
 package audio
 
-actual suspend fun getAudioInputDeviceInfos(
-    desiredDeviceName: String?,
-    audioFormat: AudioFormat,
-): AudioDeviceInfoList? {
+import model.AppPreference
+
+actual suspend fun getAudioInputDeviceInfos(appPreference: AppPreference): AudioDeviceInfoList? {
     throw NotImplementedError("Selecting audio input device is not supported on Android")
 }
 
-actual suspend fun getAudioOutputDeviceInfos(
-    desiredDeviceName: String?,
-    audioFormat: AudioFormat,
-): AudioDeviceInfoList? {
+actual suspend fun getAudioOutputDeviceInfos(appPreference: AppPreference): AudioDeviceInfoList? {
     throw NotImplementedError("Selecting audio output device is not supported on Android")
 }

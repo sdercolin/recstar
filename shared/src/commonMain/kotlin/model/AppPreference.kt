@@ -24,6 +24,8 @@ data class AppPreference(
     val preferBuiltInMic: Boolean = false,
     val sampleRate: SampleRateOption = SampleRateOption.Hz44100,
     val bitDepth: BitDepthOption = BitDepthOption.BitDepth16,
+    val audioEngine: AudioEngine = AudioEngine.JavaSound,
+    val audioBackend: AudioBackend = AudioBackend.Auto,
     val alwaysConfirmTextEncoding: Boolean = false,
     val guideAudioVolume: Float = 1.0f,
     val playbackVolume: Float = 1.0f,
@@ -120,5 +122,27 @@ data class AppPreference(
 
         @Composable
         override fun getText(): String = text
+    }
+
+    enum class AudioEngine(override val textKey: Strings) : LocalizedText {
+        JavaSound(Strings.PreferenceAudioEngineJavaSound),
+        Miniaudio(Strings.PreferenceAudioEngineMiniaudio),
+    }
+
+    enum class AudioBackend(private val displayName: String?) : LocalizedText {
+        Auto(null),
+        Wasapi("WASAPI"),
+        DirectSound("DirectSound"),
+        WinMM("WinMM"),
+        CoreAudio("Core Audio"),
+        PulseAudio("PulseAudio"),
+        Alsa("ALSA"),
+        Jack("JACK"),
+        ;
+
+        override val textKey: Strings get() = error("Not accessible")
+
+        @Composable
+        override fun getText(): String = displayName ?: string(Strings.PreferenceAudioBackendAuto)
     }
 }

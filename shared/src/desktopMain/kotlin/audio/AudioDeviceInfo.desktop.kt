@@ -1,11 +1,15 @@
 package audio
 
-actual suspend fun getAudioInputDeviceInfos(
-    desiredDeviceName: String?,
-    audioFormat: AudioFormat,
-): AudioDeviceInfoList? = currentDesktopAudioEngine().getInputDeviceInfos(desiredDeviceName, audioFormat)
+import model.AppPreference
 
-actual suspend fun getAudioOutputDeviceInfos(
-    desiredDeviceName: String?,
-    audioFormat: AudioFormat,
-): AudioDeviceInfoList? = currentDesktopAudioEngine().getOutputDeviceInfos(desiredDeviceName, audioFormat)
+actual suspend fun getAudioInputDeviceInfos(appPreference: AppPreference): AudioDeviceInfoList? =
+    appPreference.desktopAudioEngine().getInputDeviceInfos(
+        appPreference.desiredInputName,
+        appPreference.getAudioFormat(),
+    )
+
+actual suspend fun getAudioOutputDeviceInfos(appPreference: AppPreference): AudioDeviceInfoList? =
+    appPreference.desktopAudioEngine().getOutputDeviceInfos(
+        appPreference.desiredOutputName,
+        appPreference.getAudioFormat(),
+    )
