@@ -1,6 +1,9 @@
 package audio.miniaudio
 
+import audio.AudioFormat
 import com.sun.jna.Pointer
+import exception.UnsupportedAudioDeviceException
+import exception.UnsupportedAudioFormatException
 import model.AppPreference.AudioBackend
 
 /**
@@ -28,6 +31,32 @@ internal class MiniaudioContext private constructor(val pointer: Pointer) {
                 name = buffer.decodeCString(),
                 isDefault = NativeAudio.ra_context_device_is_default(pointer, isCapture.toNative(), index) == 1,
             )
+        }
+    }
+
+    /**
+     * Opens a capture device by [deviceName], or the system default device if it is null.
+     */
+    @Synchronized
+    fun openCapture(
+        deviceName: String?,
+        format: AudioFormat,
+        bufferMs: Int,
+    ): MiniaudioCapture {
+        val error = IntArray(1)
+        val capture = NativeAudio.ra_capture_open(
+            pointer,
+            deviceName?.toCString(),
+            format.sampleRate,
+            format.nativeFormat,
+            format.channelCount,
+            bufferMs,
+            error,
+        )
+        return when {
+            capture != null -> MiniaudioCapture(capture, format)
+            error[0] == NativeAudio.RA_ERROR_NO_DEVICE -> throw UnsupportedAudioDeviceException()
+            else -> throw UnsupportedAudioFormatException(format)
         }
     }
 

@@ -41,7 +41,7 @@ internal class MiniaudioEngine(private val backend: AudioBackend) : DesktopAudio
         listener: AudioRecorder.Listener,
         errorNotifier: ErrorNotifier,
         appPreferenceRepository: AppPreferenceRepository,
-    ): AudioRecorder = TODO("miniaudio recorder is not implemented yet")
+    ): AudioRecorder = MiniaudioRecorder(backend, listener, errorNotifier, appPreferenceRepository)
 
     override fun createPlayer(
         listener: AudioPlayer.Listener,
