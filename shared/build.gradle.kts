@@ -35,6 +35,8 @@ val includeIos = isMac && localProperties.getProperty("ios.disabled", "false").t
 
 val voyagerVersion = "1.0.0"
 
+val nativeAudioResourcesDir = layout.buildDirectory.dir("generated/nativeAudio/resources")
+
 fun voyager(module: String) = "cafe.adriel.voyager:voyager-$module:$voyagerVersion"
 
 kotlin {
@@ -88,6 +90,11 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
+        val desktopTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit"))
+            }
+        }
         val sharedJvmMain by creating {
             dependsOn(commonMain)
             dependencies {
@@ -117,8 +124,10 @@ kotlin {
         }
         val desktopMain by getting {
             dependsOn(sharedJvmMain)
+            resources.srcDir(nativeAudioResourcesDir)
             dependencies {
                 implementation(compose.desktop.common)
+                implementation("net.java.dev.jna:jna:5.19.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3")
                 val lwjglVersion = "3.3.1"
                 listOf("lwjgl", "lwjgl-nfd").forEach { lwjglDep ->
@@ -214,4 +223,67 @@ if (includeIos) {
             }
         }
     }
+}
+
+val buildNativeAudio by tasks.registering(Exec::class) {
+    description = "Builds the miniaudio-based native audio library for the host platform."
+    val osName = System.getProperty("os.name").lowercase()
+    val osArch = System.getProperty("os.arch").lowercase()
+    // Matches com.sun.jna.Platform.RESOURCE_PREFIX so JNA can load the library from the classpath.
+    val jnaOs = when {
+        osName.contains("mac") -> "darwin"
+        osName.startsWith("win") -> "win32"
+        else -> "linux"
+    }
+    val jnaArch = when (osArch) {
+        "amd64", "x86_64" -> "x86-64"
+        "aarch64", "arm64" -> "aarch64"
+        else -> osArch
+    }
+    val libraryFileName = when (jnaOs) {
+        "darwin" -> "librecstar_audio.dylib"
+        "win32" -> "recstar_audio.dll"
+        else -> "librecstar_audio.so"
+    }
+    val sourceDir = layout.projectDirectory.dir("native")
+    val outputFile = nativeAudioResourcesDir.map { it.file("$jnaOs-$jnaArch/$libraryFileName") }
+    inputs.dir(sourceDir)
+    outputs.file(outputFile)
+    doFirst { outputFile.get().asFile.parentFile.mkdirs() }
+
+    // May include arguments, e.g. "zig cc -target x86_64-linux-gnu.2.17" to build against an older glibc.
+    val compiler = (findProperty("recstar.native.cc")?.toString() ?: if (jnaOs == "win32") "clang" else "cc")
+        .split(" ")
+        .filter { it.isNotBlank() }
+    val required = findProperty("recstar.native.required")?.toString() == "true" ||
+        findProperty("buildkonfig.flavor")?.toString() == "release"
+    onlyIf {
+        val found = required || isExecutableOnPath(compiler.first())
+        if (!found) {
+            logger.warn("${compiler.first()} not found: building without the native audio library (miniaudio engine).")
+        }
+        found
+    }
+    val source = sourceDir.file("src/recstar_audio.c").asFile.absolutePath
+    val output = outputFile.get().asFile.absolutePath
+    val unixFlags = listOf("-fPIC", "-fvisibility=hidden")
+    val platformArgs = when (jnaOs) {
+        "darwin" -> unixFlags + "-mmacosx-version-min=11.0"
+        "win32" -> emptyList()
+        else -> unixFlags
+    }
+    val libraries = if (jnaOs == "linux") listOf("-lpthread", "-lm", "-ldl") else emptyList()
+    commandLine(compiler + listOf("-O2", "-shared") + platformArgs + listOf("-o", output, source) + libraries)
+}
+
+fun isExecutableOnPath(name: String): Boolean {
+    if (File(name).isAbsolute) return File(name).canExecute()
+    val extensions = if (File.pathSeparatorChar == ';') listOf("", ".exe", ".cmd", ".bat") else listOf("")
+    return System.getenv("PATH").orEmpty().split(File.pathSeparatorChar).any { dir ->
+        extensions.any { File(dir, name + it).canExecute() }
+    }
+}
+
+tasks.named("desktopProcessResources") {
+    dependsOn(buildNativeAudio)
 }
