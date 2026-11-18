@@ -48,7 +48,7 @@ internal class MiniaudioEngine(private val backend: AudioBackend) : DesktopAudio
         context: AppContext,
         errorNotifier: ErrorNotifier,
         appPreferenceRepository: AppPreferenceRepository,
-    ): AudioPlayer = TODO("miniaudio player is not implemented yet")
+    ): AudioPlayer = MiniaudioPlayer(backend, listener, context, errorNotifier, appPreferenceRepository)
 
     companion object {
         fun getAvailableBackends(): List<AudioBackend> {

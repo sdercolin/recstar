@@ -60,6 +60,20 @@ internal class MiniaudioContext private constructor(val pointer: Pointer) {
         }
     }
 
+    /**
+     * Opens a playback device by [deviceName], or the system default device if it is null.
+     */
+    @Synchronized
+    fun openPlayback(deviceName: String?): MiniaudioPlayback {
+        val error = IntArray(1)
+        val playback = NativeAudio.ra_player_open(pointer, deviceName?.toCString(), error)
+        return when {
+            playback != null -> MiniaudioPlayback(playback)
+            error[0] == NativeAudio.RA_ERROR_NO_DEVICE -> throw UnsupportedAudioDeviceException()
+            else -> throw IllegalStateException("Failed to open audio output device")
+        }
+    }
+
     companion object {
         private const val NAME_BUFFER_SIZE = 256
         private val contexts = mutableMapOf<AudioBackend, MiniaudioContext?>()

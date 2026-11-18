@@ -8,6 +8,10 @@
 
 #include <string.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 struct ra_context {
     ma_context context;
     ma_device_info* playback_infos;
@@ -276,4 +280,146 @@ void ra_capture_close(ra_capture* capture) {
     ma_device_uninit(&capture->device);
     ma_pcm_rb_uninit(&capture->ring_buffer);
     ma_free(capture, NULL);
+}
+
+struct ra_player {
+    ma_engine engine;
+    ma_sound sound;
+    ma_bool32 has_sound;
+    float volume;
+};
+
+ra_player* ra_player_open(ra_context* ctx, const char* device_name, int* error_out) {
+    ma_engine_config config;
+    ma_device_id* device_id = NULL;
+    ra_player* player;
+
+    if (error_out != NULL) *error_out = RA_OK;
+    if (ctx == NULL) {
+        if (error_out != NULL) *error_out = RA_ERROR_INVALID_ARGS;
+        return NULL;
+    }
+    if (device_name != NULL) {
+        ra_context_refresh_devices(ctx, 0);
+        device_id = (ma_device_id*)ra_find_device_id(ctx, ma_device_type_playback, device_name);
+        if (device_id == NULL) {
+            if (error_out != NULL) *error_out = RA_ERROR_NO_DEVICE;
+            return NULL;
+        }
+    }
+
+    player = (ra_player*)ma_malloc(sizeof(ra_player), NULL);
+    if (player == NULL) {
+        if (error_out != NULL) *error_out = RA_ERROR;
+        return NULL;
+    }
+    memset(player, 0, sizeof(*player));
+    player->volume = 1.0f;
+
+    config = ma_engine_config_init();
+    config.pContext = &ctx->context;
+    config.pPlaybackDeviceID = device_id;
+    config.noAutoStart = MA_TRUE;
+    if (ma_engine_init(&config, &player->engine) != MA_SUCCESS) {
+        ma_free(player, NULL);
+        if (error_out != NULL) *error_out = RA_ERROR;
+        return NULL;
+    }
+    return player;
+}
+
+static void ra_player_unload(ra_player* player) {
+    if (!player->has_sound) return;
+    ma_sound_uninit(&player->sound);
+    player->has_sound = MA_FALSE;
+}
+
+int ra_player_load(ra_player* player, const char* path) {
+    const ma_uint32 flags = MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_PITCH | MA_SOUND_FLAG_NO_SPATIALIZATION;
+    ma_result result;
+    if (player == NULL || path == NULL) return RA_ERROR_INVALID_ARGS;
+    /* Uninit first so the resource manager drops its cached copy and a modified file is decoded again. */
+    ra_player_unload(player);
+#ifdef _WIN32
+    {
+        /* miniaudio opens narrow paths with the ANSI code page on Windows, so convert from UTF-8 explicitly. */
+        wchar_t* wide_path;
+        int length = MultiByteToWideChar(CP_UTF8, 0, path, -1, NULL, 0);
+        if (length <= 0) return RA_ERROR_INVALID_ARGS;
+        wide_path = (wchar_t*)ma_malloc(sizeof(wchar_t) * (size_t)length, NULL);
+        if (wide_path == NULL) return RA_ERROR;
+        MultiByteToWideChar(CP_UTF8, 0, path, -1, wide_path, length);
+        result = ma_sound_init_from_file_w(&player->engine, wide_path, flags, NULL, NULL, &player->sound);
+        ma_free(wide_path, NULL);
+    }
+#else
+    result = ma_sound_init_from_file(&player->engine, path, flags, NULL, NULL, &player->sound);
+#endif
+    if (result != MA_SUCCESS) return RA_ERROR;
+    player->has_sound = MA_TRUE;
+    ma_sound_set_volume(&player->sound, player->volume);
+    return RA_OK;
+}
+
+static ma_uint32 ra_player_sample_rate(ra_player* player) {
+    ma_uint32 sample_rate = 0;
+    if (ma_sound_get_data_format(&player->sound, NULL, NULL, &sample_rate, NULL, 0) != MA_SUCCESS) return 0;
+    return sample_rate;
+}
+
+int ra_player_play(ra_player* player, double start_ms) {
+    ma_uint32 sample_rate;
+    if (player == NULL || !player->has_sound || start_ms < 0) return RA_ERROR_INVALID_ARGS;
+    sample_rate = ra_player_sample_rate(player);
+    if (sample_rate == 0) return RA_ERROR;
+    ma_sound_stop(&player->sound);
+    if (ma_sound_seek_to_pcm_frame(&player->sound, (ma_uint64)(start_ms * sample_rate / 1000.0)) != MA_SUCCESS) {
+        return RA_ERROR;
+    }
+    if (ma_engine_start(&player->engine) != MA_SUCCESS) return RA_ERROR;
+    return ma_sound_start(&player->sound) == MA_SUCCESS ? RA_OK : RA_ERROR;
+}
+
+int ra_player_stop(ra_player* player) {
+    ma_result result = MA_SUCCESS;
+    if (player == NULL) return RA_ERROR_INVALID_ARGS;
+    if (player->has_sound) result = ma_sound_stop(&player->sound);
+    if (ma_engine_stop(&player->engine) != MA_SUCCESS) result = MA_ERROR;
+    return result == MA_SUCCESS ? RA_OK : RA_ERROR;
+}
+
+void ra_player_set_volume(ra_player* player, float volume) {
+    if (player == NULL) return;
+    player->volume = volume < 0.0f ? 0.0f : (volume > 1.0f ? 1.0f : volume);
+    if (player->has_sound) ma_sound_set_volume(&player->sound, player->volume);
+}
+
+int ra_player_is_playing(ra_player* player) {
+    if (player == NULL || !player->has_sound) return 0;
+    return ma_sound_is_playing(&player->sound) && !ma_sound_at_end(&player->sound) ? 1 : 0;
+}
+
+double ra_player_position_ms(ra_player* player) {
+    ma_uint64 cursor = 0;
+    ma_uint32 sample_rate;
+    if (player == NULL || !player->has_sound) return 0;
+    sample_rate = ra_player_sample_rate(player);
+    if (sample_rate == 0 || ma_sound_get_cursor_in_pcm_frames(&player->sound, &cursor) != MA_SUCCESS) return 0;
+    return (double)cursor * 1000.0 / sample_rate;
+}
+
+double ra_player_length_ms(ra_player* player) {
+    ma_uint64 length = 0;
+    ma_uint32 sample_rate;
+    if (player == NULL || !player->has_sound) return 0;
+    sample_rate = ra_player_sample_rate(player);
+    if (sample_rate == 0 || ma_sound_get_length_in_pcm_frames(&player->sound, &length) != MA_SUCCESS) return 0;
+    return (double)length * 1000.0 / sample_rate;
+}
+
+void ra_player_close(ra_player* player) {
+    if (player == NULL) return;
+    ra_player_unload(player);
+    ma_engine_uninit(&player->engine);
+    ma_free(player, NULL);
 }

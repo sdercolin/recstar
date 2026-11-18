@@ -98,6 +98,46 @@ internal object NativeAudio {
 
     @JvmStatic
     external fun ra_capture_close(capture: Pointer)
+
+    @JvmStatic
+    external fun ra_player_open(
+        context: Pointer,
+        deviceName: ByteArray?,
+        errorOut: IntArray,
+    ): Pointer?
+
+    @JvmStatic
+    external fun ra_player_load(
+        player: Pointer,
+        path: ByteArray,
+    ): Int
+
+    @JvmStatic
+    external fun ra_player_play(
+        player: Pointer,
+        startMs: Double,
+    ): Int
+
+    @JvmStatic
+    external fun ra_player_stop(player: Pointer): Int
+
+    @JvmStatic
+    external fun ra_player_set_volume(
+        player: Pointer,
+        volume: Float,
+    )
+
+    @JvmStatic
+    external fun ra_player_is_playing(player: Pointer): Int
+
+    @JvmStatic
+    external fun ra_player_position_ms(player: Pointer): Double
+
+    @JvmStatic
+    external fun ra_player_length_ms(player: Pointer): Double
+
+    @JvmStatic
+    external fun ra_player_close(player: Pointer)
 }
 
 internal val AudioBackend.nativeId: Int
