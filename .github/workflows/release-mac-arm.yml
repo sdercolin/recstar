@@ -80,4 +80,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           prerelease: true
+          tag_name: ${{ env.APP_VERSION }}
+          target_commitish: ${{ github.sha }}
           files: recstar-${{ env.APP_VERSION }}-mac-arm64.dmg
