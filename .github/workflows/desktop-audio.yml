@@ -7,6 +7,11 @@ on:
       - "shared/src/desktopMain/kotlin/audio/**"
       - "shared/src/desktopTest/**"
       - "shared/build.gradle.kts"
+      - "build.gradle.kts"
+      - "settings.gradle.kts"
+      - "gradle.properties"
+      - "gradle/**"
+      - "gradlew*"
       - ".github/workflows/desktop-audio.yml"
   workflow_dispatch:
 
