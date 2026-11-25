@@ -30,7 +30,7 @@ jobs:
           $APP_VERSION = (Select-String -Path $PROPERTIES_PATH -Pattern "^app\.versionName=" | ForEach-Object { $_.ToString().Split("=")[1] }).Trim()
           echo "APP_VERSION=$APP_VERSION" >> $env:GITHUB_ENV
           if ("${{ github.event_name }}" -eq "push") {
-            $TAG = "${{ env.APP_VERSION }}"
+            $TAG = "${{ github.ref_name }}"
             if ($TAG -ne $APP_VERSION) {
               Write-Output "Tag $TAG does not match app version $APP_VERSION"
               exit 1
