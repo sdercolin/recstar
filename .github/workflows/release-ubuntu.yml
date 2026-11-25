@@ -63,7 +63,7 @@ jobs:
         run: |
           VERSION=${{ env.APP_VERSION }}
           echo $VERSION
-          mv ./desktopApp/build/compose/binaries/main/deb/recstar_1.0.0-1_amd64.deb ./recstar-$VERSION-amd64.deb
+          mv ./desktopApp/build/compose/binaries/main/deb/*.deb ./recstar-$VERSION-amd64.deb
 
       - name: Release
         uses: softprops/action-gh-release@v1
