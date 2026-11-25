@@ -33,4 +33,10 @@ class MiniaudioCaptureTest {
         val format = AudioFormat(44100, 16, 1, signed = true, littleEndian = true, floating = false)
         context.openCapture("No Such Device デバイス", format, bufferMs = 1000)
     }
+
+    @Test(expected = exception.UnsupportedAudioFormatException::class)
+    fun failsForInvalidFormat() {
+        val format = AudioFormat(0, 16, 1, signed = true, littleEndian = true, floating = false)
+        context.openCapture(null, format, bufferMs = 1000)
+    }
 }

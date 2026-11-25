@@ -16,6 +16,7 @@ internal object NativeAudio {
 
     const val RA_OK = 0
     const val RA_ERROR_NO_DEVICE = -2
+    const val RA_ERROR_UNSUPPORTED_FORMAT = -4
 
     const val RA_FORMAT_S16 = 1
     const val RA_FORMAT_S24 = 2

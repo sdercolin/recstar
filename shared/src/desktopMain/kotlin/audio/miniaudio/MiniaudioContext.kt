@@ -56,7 +56,8 @@ internal class MiniaudioContext private constructor(val pointer: Pointer) {
         return when {
             capture != null -> MiniaudioCapture(capture, format)
             error[0] == NativeAudio.RA_ERROR_NO_DEVICE -> throw UnsupportedAudioDeviceException()
-            else -> throw UnsupportedAudioFormatException(format)
+            error[0] == NativeAudio.RA_ERROR_UNSUPPORTED_FORMAT -> throw UnsupportedAudioFormatException(format)
+            else -> throw IllegalStateException("Failed to open audio input device")
         }
     }
 

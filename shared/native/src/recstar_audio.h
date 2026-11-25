@@ -11,6 +11,7 @@
 #define RA_ERROR (-1)
 #define RA_ERROR_NO_DEVICE (-2)
 #define RA_ERROR_INVALID_ARGS (-3)
+#define RA_ERROR_UNSUPPORTED_FORMAT (-4)
 
 /* Backend ids shared with the Kotlin side. Keep in sync with NativeAudio.kt. */
 #define RA_BACKEND_AUTO 0
