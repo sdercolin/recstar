@@ -187,10 +187,15 @@ ra_capture* ra_capture_open(ra_context* ctx, const char* device_name, int sample
     const ma_device_id* device_id = NULL;
     ra_capture* capture;
     ma_uint32 buffer_frames;
+    ma_result result;
 
     if (error_out != NULL) *error_out = RA_OK;
-    if (ctx == NULL || !ra_to_ma_format(format, &ma_fmt) || sample_rate <= 0 || channels <= 0 || buffer_ms <= 0) {
+    if (ctx == NULL || buffer_ms <= 0) {
         if (error_out != NULL) *error_out = RA_ERROR_INVALID_ARGS;
+        return NULL;
+    }
+    if (!ra_to_ma_format(format, &ma_fmt) || sample_rate <= 0 || channels <= 0) {
+        if (error_out != NULL) *error_out = RA_ERROR_UNSUPPORTED_FORMAT;
         return NULL;
     }
     if (device_name != NULL) {
@@ -225,10 +230,11 @@ ra_capture* ra_capture_open(ra_context* ctx, const char* device_name, int sample
     config.dataCallback = ra_capture_callback;
     config.pUserData = capture;
 
-    if (ma_device_init(&ctx->context, &config, &capture->device) != MA_SUCCESS) {
+    result = ma_device_init(&ctx->context, &config, &capture->device);
+    if (result != MA_SUCCESS) {
         ma_pcm_rb_uninit(&capture->ring_buffer);
         ma_free(capture, NULL);
-        if (error_out != NULL) *error_out = RA_ERROR;
+        if (error_out != NULL) *error_out = result == MA_FORMAT_NOT_SUPPORTED ? RA_ERROR_UNSUPPORTED_FORMAT : RA_ERROR;
         return NULL;
     }
     return capture;
