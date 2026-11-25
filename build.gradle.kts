@@ -13,5 +13,8 @@ subprojects {
 
     configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
         version.set("1.0.1")
+        filter {
+            exclude { it.file.startsWith(layout.buildDirectory.get().asFile) }
+        }
     }
 }
